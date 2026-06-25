@@ -594,14 +594,15 @@
 
       </div>
 
-      <!-- mobile sticky order bar (build screen only) -->
-      <div data-buildbar="1" style="display:none; position:fixed; left:0; right:0; bottom:0; z-index:55; background:#1B3325; color:#EAF2E2; padding:11px clamp(16px,4vw,24px); box-shadow:0 -6px 22px rgba(0,0,0,0.22); align-items:center; justify-content:space-between; gap:14px;">
-        <div style="display:flex; flex-direction:column; gap:2px; min-width:0;">
-          <span style="font-family:'JetBrains Mono', monospace; font-size:20px; font-weight:600; line-height:1.1;">{{ buildPriceLabel }}</span>
-          <span style="font-size:11px; color:#A7DA4E; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ buildCalLabel }} แคล · โปรตีน {{ buildProteinLabel }}</span>
+      <!-- mobile live nutrition summary bar (build screen only) — display only, never blocks taps -->
+      <div data-buildbar="1" style="display:none; position:fixed; left:0; right:0; bottom:0; z-index:54; pointer-events:none; background:#1B3325; color:#EAF2E2; padding:9px clamp(14px,4vw,22px); box-shadow:0 -6px 22px rgba(0,0,0,0.22); align-items:center; gap:12px;">
+        <span style="font-family:'JetBrains Mono', monospace; font-size:19px; font-weight:600; line-height:1; white-space:nowrap;">{{ buildPriceLabel }}</span>
+        <div style="display:flex; flex:1; justify-content:space-between; gap:4px; text-align:center;">
+          <div style="line-height:1.15;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:600;">{{ buildCalLabel }}</div><div style="font-size:9px; color:#8C8C82;">แคล</div></div>
+          <div style="line-height:1.15;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:600; color:#A7DA4E;">{{ buildProteinLabel }}</div><div style="font-size:9px; color:#8C8C82;">โปรตีน</div></div>
+          <div style="line-height:1.15;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:600;">{{ buildFiberLabel }}</div><div style="font-size:9px; color:#8C8C82;">ไฟเบอร์</div></div>
+          <div style="line-height:1.15;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:600;">{{ buildSugarLabel }}</div><div style="font-size:9px; color:#8C8C82;">น้ำตาล</div></div>
         </div>
-        <sc-if value="{{ buildCanAdd }}"><button onclick="{{ addBuild }}" style="background:#A7DA4E; color:#1B3325; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:15px; font-weight:700; padding:13px 22px; border-radius:12px; white-space:nowrap;">เพิ่มลงตะกร้า</button></sc-if>
-        <sc-if value="{{ buildEmpty }}"><button disabled="disabled" style="background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.45); border:none; font-family:'Anuphan', system-ui, sans-serif; font-size:14px; font-weight:600; padding:13px 18px; border-radius:12px; white-space:nowrap;">เลือกส่วนผสมก่อน</button></sc-if>
       </div>
     </div>
   </div>
