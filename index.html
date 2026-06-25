@@ -500,7 +500,7 @@
         <div style="flex:1 1 480px; min-width:300px; display:flex; flex-direction:column; gap:clamp(30px,4vw,42px);">
 
           <div>
-            <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; justify-content:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">1</span>เลือกเบส</h3>
+            <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">1</span>เลือกเบส</h3>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
               <sc-for list="{{ baseOptions }}" as="opt" hint-placeholder-count="4">
                 <button onclick="{{ opt.pick }}" style="{{ opt.chipStyle }}">
@@ -512,11 +512,11 @@
           </div>
 
           <div>
-            <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; justify-content:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">2</span>เติมผลไม้</h3>
+            <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">2</span>เติมผลไม้</h3>
             <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px;">
               <sc-for list="{{ fruitRows }}" as="row" hint-placeholder-count="6">
                 <div style="{{ row.cardStyle }}">
-                  <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px;">
+                  <div style="display:flex; justify-content:center; align-items:baseline; gap:8px;">
                     <span style="font-size:15px; font-weight:600;">{{ row.name }}</span>
                     <sc-if value="{{ row.disabled }}">
                       <span style="font-family:'Anuphan', sans-serif; font-size:11px; background:#ffeded; color:#d93838; padding:2px 8px; border-radius:6px; font-weight:600; margin-left:auto;">หมด</span>
@@ -525,8 +525,8 @@
                       <span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#2FA05E;">{{ row.priceLabel }}</span>
                     </sc-if>
                   </div>
-                  <div style="font-family:'Anuphan', system-ui, sans-serif; font-size:12px; font-weight:500; color:#8C8C82;">{{ row.macroLabel }}</div>
-                  <div style="display:flex; align-items:center; justify-content:flex-end; gap:10px;">
+                  <div style="font-family:'Anuphan', system-ui, sans-serif; font-size:12px; font-weight:500; color:#8C8C82; text-align:center;">{{ row.macroLabel }}</div>
+                  <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
                     <button onclick="{{ row.dec }}" style="width:30px; height:30px; border-radius:9px; border:1px solid rgba(20,21,15,0.2); background:#fff; cursor:pointer; font-size:17px; line-height:1; color:#1B3325;">−</button>
                     <span style="font-family:'JetBrains Mono', monospace; font-size:15px; font-weight:500; min-width:18px; text-align:center;">{{ row.qtyLabel }}</span>
                     <button onclick="{{ row.inc }}" style="{{ row.incStyle }}">+</button>
@@ -537,11 +537,11 @@
           </div>
 
           <div>
-            <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; justify-content:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">3</span>บูสเตอร์</h3>
+            <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">3</span>บูสเตอร์</h3>
             <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px;">
               <sc-for list="{{ boosterRows }}" as="row" hint-placeholder-count="4">
                 <div style="{{ row.cardStyle }}">
-                  <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px;">
+                  <div style="display:flex; justify-content:center; align-items:baseline; gap:8px;">
                     <span style="font-size:15px; font-weight:600;">{{ row.name }}</span>
                     <sc-if value="{{ row.disabled }}">
                       <span style="font-family:'Anuphan', sans-serif; font-size:11px; background:#ffeded; color:#d93838; padding:2px 8px; border-radius:6px; font-weight:600; margin-left:auto;">หมด</span>
@@ -550,8 +550,8 @@
                       <span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#2FA05E;">{{ row.priceLabel }}</span>
                     </sc-if>
                   </div>
-                  <div style="font-family:'Anuphan', system-ui, sans-serif; font-size:12px; font-weight:500; color:#8C8C82;">{{ row.macroLabel }}</div>
-                  <div style="display:flex; align-items:center; justify-content:flex-end; gap:10px;">
+                  <div style="font-family:'Anuphan', system-ui, sans-serif; font-size:12px; font-weight:500; color:#8C8C82; text-align:center;">{{ row.macroLabel }}</div>
+                  <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
                     <button onclick="{{ row.dec }}" style="width:30px; height:30px; border-radius:9px; border:1px solid rgba(20,21,15,0.2); background:#fff; cursor:pointer; font-size:17px; line-height:1; color:#1B3325;">−</button>
                     <span style="font-family:'JetBrains Mono', monospace; font-size:15px; font-weight:500; min-width:18px; text-align:center;">{{ row.qtyLabel }}</span>
                     <button onclick="{{ row.inc }}" style="{{ row.incStyle }}">+</button>
@@ -1390,7 +1390,7 @@ class Component extends DCLogic {
 
     // ---- build-your-own reactive views ----
     const t = this.buildTotals();
-    const chipIdle = { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start', padding: '13px 18px', borderRadius: '14px', border: '1px solid rgba(20,21,15,0.15)', background: '#fff', cursor: 'pointer', fontFamily: "'Anuphan', system-ui, sans-serif", color: '#1B3325', minWidth: '128px', transition: 'all .15s ease' };
+    const chipIdle = { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', textAlign: 'center', padding: '13px 18px', borderRadius: '14px', border: '1px solid rgba(20,21,15,0.15)', background: '#fff', cursor: 'pointer', fontFamily: "'Anuphan', system-ui, sans-serif", color: '#1B3325', minWidth: '128px', transition: 'all .15s ease' };
     const chipActive = Object.assign({}, chipIdle, { background: '#1B3325', color: '#EAF2E2', border: '1px solid #1B3325' });
     const baseOptions = this.BASES.map((b) => {
       const isSelected = this.state.base === b.key;
