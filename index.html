@@ -503,10 +503,11 @@
             <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">1</span>เลือกเบส</h3>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
               <sc-for list="{{ baseOptions }}" as="opt" hint-placeholder-count="4">
-                <button onclick="{{ opt.pick }}" style="{{ opt.chipStyle }}">
+                <div onclick="{{ opt.pick }}" style="{{ opt.chipStyle }}">
                   <span style="font-size:15px; font-weight:600;">{{ opt.name }}</span>
-                  <span style="font-family:'Anuphan', system-ui, sans-serif; font-size:12px; font-weight:500; opacity:0.6;">{{ opt.kcalLabel }}</span>
-                </button>
+                  <sc-if value="{{ opt.disabled }}"><span style="font-family:'Anuphan', system-ui, sans-serif; font-size:12px; font-weight:600; color:#d93838;">หมด</span></sc-if>
+                  <sc-if value="{{ opt.notDisabled }}"><div style="width:100%; display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:rgba(20,21,15,0.12); border-radius:10px; overflow:hidden;"><div style="background:#fff; padding:7px 3px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:500; color:#1B3325;">{{ opt.calLabel }}</div><div style="font-size:9px; color:#8C8C82; margin-top:2px;">แคล</div></div><div style="background:#fff; padding:7px 3px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:500; color:#2FA05E;">{{ opt.proteinLabel }}</div><div style="font-size:9px; color:#8C8C82; margin-top:2px;">โปรตีน</div></div><div style="background:#fff; padding:7px 3px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:500; color:#1B3325;">{{ opt.fiberLabel }}</div><div style="font-size:9px; color:#8C8C82; margin-top:2px;">ไฟเบอร์</div></div><div style="background:#fff; padding:7px 3px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:500; color:#1B3325;">{{ opt.sugarLabel }}</div><div style="font-size:9px; color:#8C8C82; margin-top:2px;">น้ำตาล</div></div></div></sc-if>
+                </div>
               </sc-for>
             </div>
           </div>
@@ -525,7 +526,7 @@
                       <span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#2FA05E;">{{ row.priceLabel }}</span>
                     </sc-if>
                   </div>
-                  <div style="font-family:'Anuphan', system-ui, sans-serif; font-size:12px; font-weight:500; color:#8C8C82; text-align:center;">{{ row.macroLabel }}</div>
+                  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:rgba(20,21,15,0.09); border:1px solid rgba(20,21,15,0.09); border-radius:10px; overflow:hidden;"><div style="background:#fff; padding:8px 4px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:500;">{{ row.calLabel }}</div><div style="font-size:9px; color:#8C8C82; margin-top:2px;">แคล</div></div><div style="background:#fff; padding:8px 4px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:500; color:#2FA05E;">{{ row.proteinLabel }}</div><div style="font-size:9px; color:#8C8C82; margin-top:2px;">โปรตีน</div></div><div style="background:#fff; padding:8px 4px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:500;">{{ row.fiberLabel }}</div><div style="font-size:9px; color:#8C8C82; margin-top:2px;">ไฟเบอร์</div></div><div style="background:#fff; padding:8px 4px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:500;">{{ row.sugarLabel }}</div><div style="font-size:9px; color:#8C8C82; margin-top:2px;">น้ำตาล</div></div></div>
                   <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
                     <button onclick="{{ row.dec }}" style="width:30px; height:30px; border-radius:9px; border:1px solid rgba(20,21,15,0.2); background:#fff; cursor:pointer; font-size:17px; line-height:1; color:#1B3325;">−</button>
                     <span style="font-family:'JetBrains Mono', monospace; font-size:15px; font-weight:500; min-width:18px; text-align:center;">{{ row.qtyLabel }}</span>
@@ -550,7 +551,7 @@
                       <span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#2FA05E;">{{ row.priceLabel }}</span>
                     </sc-if>
                   </div>
-                  <div style="font-family:'Anuphan', system-ui, sans-serif; font-size:12px; font-weight:500; color:#8C8C82; text-align:center;">{{ row.macroLabel }}</div>
+                  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:rgba(20,21,15,0.09); border:1px solid rgba(20,21,15,0.09); border-radius:10px; overflow:hidden;"><div style="background:#fff; padding:8px 4px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:500;">{{ row.calLabel }}</div><div style="font-size:9px; color:#8C8C82; margin-top:2px;">แคล</div></div><div style="background:#fff; padding:8px 4px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:500; color:#2FA05E;">{{ row.proteinLabel }}</div><div style="font-size:9px; color:#8C8C82; margin-top:2px;">โปรตีน</div></div><div style="background:#fff; padding:8px 4px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:500;">{{ row.fiberLabel }}</div><div style="font-size:9px; color:#8C8C82; margin-top:2px;">ไฟเบอร์</div></div><div style="background:#fff; padding:8px 4px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:500;">{{ row.sugarLabel }}</div><div style="font-size:9px; color:#8C8C82; margin-top:2px;">น้ำตาล</div></div></div>
                   <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
                     <button onclick="{{ row.dec }}" style="width:30px; height:30px; border-radius:9px; border:1px solid rgba(20,21,15,0.2); background:#fff; cursor:pointer; font-size:17px; line-height:1; color:#1B3325;">−</button>
                     <span style="font-family:'JetBrains Mono', monospace; font-size:15px; font-weight:500; min-width:18px; text-align:center;">{{ row.qtyLabel }}</span>
@@ -961,8 +962,13 @@ class Component extends DCLogic {
   }
   get ALLING() { const m = {}; this.FRUITS.concat(this.BOOSTERS).forEach((x) => { m[x.key] = x; }); return m; }
   get BASEMAP() { const m = {}; this.BASES.forEach((x) => { m[x.key] = x; }); return m; }
-  macroText(x) {
-    return (x.kcal || 0) + ' แคล · โปรตีน ' + (x.p || 0) + 'g · ไฟเบอร์ ' + (x.f || 0) + 'g · น้ำตาล ' + (x.sug || 0) + 'g';
+  macroFields(x) {
+    return {
+      calLabel: String(x.kcal || 0),
+      proteinLabel: (x.p || 0) + 'g',
+      fiberLabel: (x.f || 0) + 'g',
+      sugarLabel: (x.sug || 0) + 'g',
+    };
   }
   go(k) {
     return (e) => {
@@ -1390,7 +1396,7 @@ class Component extends DCLogic {
 
     // ---- build-your-own reactive views ----
     const t = this.buildTotals();
-    const chipIdle = { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', textAlign: 'center', padding: '13px 18px', borderRadius: '14px', border: '1px solid rgba(20,21,15,0.15)', background: '#fff', cursor: 'pointer', fontFamily: "'Anuphan', system-ui, sans-serif", color: '#1B3325', minWidth: '128px', transition: 'all .15s ease' };
+    const chipIdle = { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', textAlign: 'center', padding: '13px 18px', borderRadius: '14px', border: '1px solid rgba(20,21,15,0.15)', background: '#fff', cursor: 'pointer', fontFamily: "'Anuphan', system-ui, sans-serif", color: '#1B3325', minWidth: '172px', transition: 'all .15s ease' };
     const chipActive = Object.assign({}, chipIdle, { background: '#1B3325', color: '#EAF2E2', border: '1px solid #1B3325' });
     const baseOptions = this.BASES.map((b) => {
       const isSelected = this.state.base === b.key;
@@ -1398,14 +1404,13 @@ class Component extends DCLogic {
       if (b.disabled) {
         style = Object.assign({}, chipIdle, { opacity: 0.5, cursor: 'not-allowed', background: '#f5f5f0', textDecoration: 'line-through' });
       }
-      return {
-        key: b.key, name: b.name, kcalLabel: b.disabled ? 'หมด' : this.macroText(b),
+      return Object.assign({
+        key: b.key, name: b.name, disabled: !!b.disabled, notDisabled: !b.disabled,
         pick: b.disabled ? () => {} : this.pickBase(b.key), chipStyle: style,
-      };
+      }, this.macroFields(b));
     });
-    const mkRow = (x) => ({
+    const mkRow = (x) => Object.assign({
       key: x.key, name: x.name, priceLabel: '+' + this.baht(x.price),
-      macroLabel: this.macroText(x),
       qtyLabel: String(this.state.items[x.key] || 0),
       inc: x.disabled ? () => {} : this.changeItem(x.key, 1),
       dec: this.changeItem(x.key, -1),
@@ -1413,7 +1418,7 @@ class Component extends DCLogic {
       notDisabled: !x.disabled,
       incStyle: x.disabled ? { width: '30px', height: '30px', borderRadius: '9px', border: '1px solid rgba(20,21,15,0.1)', background: '#f5f5f0', cursor: 'not-allowed', fontSize: '17px', lineHeight: '1', color: '#888', opacity: 0.5, pointerEvents: 'none' } : { width: '30px', height: '30px', borderRadius: '9px', border: '1px solid rgba(20,21,15,0.2)', background: '#fff', cursor: 'pointer', fontSize: '17px', lineHeight: '1', color: '#1B3325' },
       cardStyle: x.disabled ? { background: '#fafaf9', border: '1px solid rgba(20,21,15,0.06)', opacity: 0.7, padding: '15px 16px', display: 'flex', flexDirection: 'column', gap: '10px', borderRadius: '14px' } : { background: '#fff', border: '1px solid rgba(20,21,15,0.1)', padding: '15px 16px', display: 'flex', flexDirection: 'column', gap: '10px', borderRadius: '14px' }
-    });
+    }, this.macroFields(x));
     const fruitRows = this.FRUITS.map(mkRow);
     const boosterRows = this.BOOSTERS.map(mkRow);
 
