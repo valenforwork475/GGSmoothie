@@ -500,7 +500,7 @@
         <div style="flex:1 1 480px; min-width:300px; display:flex; flex-direction:column; gap:clamp(30px,4vw,42px);">
 
           <div>
-            <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">1</span>เลือกเบส</h3>
+            <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; justify-content:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">1</span>เลือกเบส</h3>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
               <sc-for list="{{ baseOptions }}" as="opt" hint-placeholder-count="4">
                 <button onclick="{{ opt.pick }}" style="{{ opt.chipStyle }}">
@@ -512,7 +512,7 @@
           </div>
 
           <div>
-            <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">2</span>เติมผลไม้</h3>
+            <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; justify-content:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">2</span>เติมผลไม้</h3>
             <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px;">
               <sc-for list="{{ fruitRows }}" as="row" hint-placeholder-count="6">
                 <div style="{{ row.cardStyle }}">
@@ -537,7 +537,7 @@
           </div>
 
           <div>
-            <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">3</span>บูสเตอร์</h3>
+            <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; justify-content:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">3</span>บูสเตอร์</h3>
             <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px;">
               <sc-for list="{{ boosterRows }}" as="row" hint-placeholder-count="4">
                 <div style="{{ row.cardStyle }}">
@@ -962,11 +962,7 @@ class Component extends DCLogic {
   get ALLING() { const m = {}; this.FRUITS.concat(this.BOOSTERS).forEach((x) => { m[x.key] = x; }); return m; }
   get BASEMAP() { const m = {}; this.BASES.forEach((x) => { m[x.key] = x; }); return m; }
   macroText(x) {
-    const parts = [(x.kcal || 0) + ' แคล'];
-    if (x.p) parts.push('โปร ' + x.p + 'g');
-    if (x.f) parts.push('ไฟเบอร์ ' + x.f + 'g');
-    if (x.sug) parts.push('น้ำตาล ' + x.sug + 'g');
-    return parts.join(' · ');
+    return (x.kcal || 0) + ' แคล · โปรตีน ' + (x.p || 0) + 'g · ไฟเบอร์ ' + (x.f || 0) + 'g · น้ำตาล ' + (x.sug || 0) + 'g';
   }
   go(k) {
     return (e) => {
