@@ -1400,7 +1400,7 @@ class Component extends DCLogic {
     });
     const mkRow = (x) => ({
       key: x.key, name: x.name, priceLabel: '+' + this.baht(x.price),
-      macroLabel: x.kcal + ' แคล · โปร ' + x.p + 'g',
+      macroLabel: x.kcal + ' แคล · โปร ' + x.p + 'g · ไฟเบอร์ ' + x.f + 'g · น้ำตาล ' + x.sug + 'g',
       qtyLabel: String(this.state.items[x.key] || 0),
       inc: x.disabled ? () => {} : this.changeItem(x.key, 1),
       dec: this.changeItem(x.key, -1),
