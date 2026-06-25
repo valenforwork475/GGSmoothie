@@ -990,8 +990,17 @@ class Component extends DCLogic {
     return (e) => {
       if (e && e.preventDefault) e.preventDefault();
       this.setState({ active: k, cartOpen: false });
-      if (typeof window !== 'undefined') window.scrollTo(0, 0);
+      if (typeof window !== 'undefined') {
+        try { window.history.replaceState(null, '', k === 'home' ? '#' : '#' + k); } catch (_) {}
+        window.scrollTo(0, 0);
+      }
     };
+  }
+  applyHash() {
+    if (typeof window === 'undefined') return;
+    const valid = ['home', 'menu', 'build', 'promos', 'stores', 'contact'];
+    const h = (window.location.hash || '').replace('#', '').trim();
+    if (valid.indexOf(h) >= 0) { if (h !== this.state.active) this.setState({ active: h, cartOpen: false }); }
   }
   add(id) {
     return (e) => {
@@ -1100,6 +1109,9 @@ class Component extends DCLogic {
   SHEET_URL = 'https://docs.google.com/spreadsheets/d/1QsXosJ8NkSUNNn-5AP68yzZClDyE05NKJWewpgcQd9Y';
   componentDidMount() {
     this.loadMember();
+    this.applyHash();
+    this._onHash = () => this.applyHash();
+    if (typeof window !== 'undefined') window.addEventListener('hashchange', this._onHash);
     this.setState({ sheetUrlInput: this.SHEET_URL }, () => {
       this.fetchSheetData();
     });
