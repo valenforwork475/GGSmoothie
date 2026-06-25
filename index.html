@@ -961,6 +961,13 @@ class Component extends DCLogic {
   }
   get ALLING() { const m = {}; this.FRUITS.concat(this.BOOSTERS).forEach((x) => { m[x.key] = x; }); return m; }
   get BASEMAP() { const m = {}; this.BASES.forEach((x) => { m[x.key] = x; }); return m; }
+  macroText(x) {
+    const parts = [(x.kcal || 0) + ' แคล'];
+    if (x.p) parts.push('โปร ' + x.p + 'g');
+    if (x.f) parts.push('ไฟเบอร์ ' + x.f + 'g');
+    if (x.sug) parts.push('น้ำตาล ' + x.sug + 'g');
+    return parts.join(' · ');
+  }
   go(k) {
     return (e) => {
       if (e && e.preventDefault) e.preventDefault();
@@ -1135,9 +1142,11 @@ class Component extends DCLogic {
           const name = getHeaderVal(row, ['name', 'ชื่อ', 'ชื่อเมนู', 'ชื่อรายการ']);
           if (!type || !name) return;
           
+          const explicitKey = getHeaderVal(row, ['key', 'id', 'คีย์', 'ไอดี', 'id/key', 'key/id']);
+          const itemKey = explicitKey || (type + ':' + name);
           const parsedItem = {
-            id: getHeaderVal(row, ['key', 'id', 'คีย์', 'ไอดี', 'id/key', 'key/id']),
-            key: getHeaderVal(row, ['key', 'id', 'คีย์', 'ไอดี', 'id/key', 'key/id']),
+            id: itemKey,
+            key: itemKey,
             name: name,
             price: parseFloat(getHeaderVal(row, ['price', 'price/ราคา', 'ราคา'])) || 0,
             cal: parseFloat(getHeaderVal(row, ['cal', 'kcal', 'แคล', 'แคลอรี', 'พลังงาน'])) || 0,
@@ -1394,13 +1403,13 @@ class Component extends DCLogic {
         style = Object.assign({}, chipIdle, { opacity: 0.5, cursor: 'not-allowed', background: '#f5f5f0', textDecoration: 'line-through' });
       }
       return {
-        key: b.key, name: b.name, kcalLabel: b.disabled ? 'หมด' : b.kcal + ' แคล',
+        key: b.key, name: b.name, kcalLabel: b.disabled ? 'หมด' : this.macroText(b),
         pick: b.disabled ? () => {} : this.pickBase(b.key), chipStyle: style,
       };
     });
     const mkRow = (x) => ({
       key: x.key, name: x.name, priceLabel: '+' + this.baht(x.price),
-      macroLabel: x.kcal + ' แคล · โปร ' + x.p + 'g · ไฟเบอร์ ' + x.f + 'g · น้ำตาล ' + x.sug + 'g',
+      macroLabel: this.macroText(x),
       qtyLabel: String(this.state.items[x.key] || 0),
       inc: x.disabled ? () => {} : this.changeItem(x.key, 1),
       dec: this.changeItem(x.key, -1),
