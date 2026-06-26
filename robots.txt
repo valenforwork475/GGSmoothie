@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://gg-smoothie.vercel.app/sitemap.xml

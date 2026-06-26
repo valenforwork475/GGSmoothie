@@ -1,9 +1,22 @@
 <!DOCTYPE html>
-<html><head>
+<html lang="th"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="build-rev" content="2026-06-26b">
-<!-- cache-bust: force fresh fetch so clients pick up corrected CSP header -->
+<meta name="build-rev" content="2026-06-26c">
+<title>GG Smoothie — สมูทตี้ &amp; น้ำผลไม้ปั่นสดเพื่อสุขภาพ</title>
+<meta name="description" content="GG Smoothie ร้านสมูทตี้และน้ำผลไม้ปั่นสด ชั่งตวงทุกแก้ว เลือกจัดสูตรเองได้ พร้อมข้อมูลโภชนาการครบทุกแก้ว สั่งง่ายผ่าน LINE">
+<link rel="canonical" href="https://gg-smoothie.vercel.app/">
+<meta name="theme-color" content="#1B3325">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="GG Smoothie">
+<meta property="og:title" content="GG Smoothie — สมูทตี้ & น้ำผลไม้ปั่นสดเพื่อสุขภาพ">
+<meta property="og:description" content="ร้านสมูทตี้และน้ำผลไม้ปั่นสด ชั่งตวงทุกแก้ว จัดสูตรเองได้ พร้อมข้อมูลโภชนาการครบ สั่งง่ายผ่าน LINE">
+<meta property="og:url" content="https://gg-smoothie.vercel.app/">
+<meta property="og:locale" content="th_TH">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GG Smoothie — สมูทตี้ & น้ำผลไม้ปั่นสดเพื่อสุขภาพ">
+<meta name="twitter:description" content="ร้านสมูทตี้และน้ำผลไม้ปั่นสด จัดสูตรเองได้ พร้อมข้อมูลโภชนาการครบ">
 
 <script src="./assets/9c0a81f9-9a94-4bcc-943a-f0cd1f51e16b.js"></script>
 </head>
@@ -1056,10 +1069,20 @@ class Component extends DCLogic {
     };
   }
   // ===================== NAVIGATION & DEEP LINKS =====================
+  docTitle(screen) {
+    const base = 'GG Smoothie';
+    const tail = ' — สมูทตี้ & น้ำผลไม้ปั่นสดเพื่อสุขภาพ';
+    const m = { home: base + tail, menu: 'เมนู · ' + base, build: 'จัดสูตรเอง · ' + base, promos: 'โปรโมชัน · ' + base, stores: 'สาขา · ' + base, contact: 'ติดต่อเรา · ' + base };
+    return m[screen] || (base + tail);
+  }
+  setDocTitle(screen) {
+    if (typeof document !== 'undefined') document.title = this.docTitle(screen);
+  }
   go(k) {
     return (e) => {
       if (e && e.preventDefault) e.preventDefault();
       this.setState({ active: k, cartOpen: false });
+      this.setDocTitle(k);
       if (typeof window !== 'undefined') {
         try { window.history.replaceState(null, '', k === 'home' ? '#' : '#' + k); } catch (_) {}
         window.scrollTo(0, 0);
@@ -1070,7 +1093,8 @@ class Component extends DCLogic {
     if (typeof window === 'undefined') return;
     const valid = ['home', 'menu', 'build', 'promos', 'stores', 'contact'];
     const h = (window.location.hash || '').replace('#', '').trim();
-    if (valid.indexOf(h) >= 0) { if (h !== this.state.active) this.setState({ active: h, cartOpen: false }); }
+    if (valid.indexOf(h) >= 0) { this.setDocTitle(h); if (h !== this.state.active) this.setState({ active: h, cartOpen: false }); }
+    else { this.setDocTitle('home'); }
   }
   toggleBuildBar = (e) => {
     if (e && e.preventDefault) e.preventDefault();
