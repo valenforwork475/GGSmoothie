@@ -525,6 +525,10 @@
                 </div>
               </sc-for>
             </div>
+            <div style="display:flex; align-items:center; justify-content:flex-end; gap:12px; margin-top:4px;">
+              <sc-if value="{{ needBase }}"><span style="font-size:13px; color:#8C8C82;">เลือกเบส 1 อย่างก่อน</span></sc-if>
+              <button onclick="{{ nextFromBase }}" style="{{ baseNextStyle }}">ถัดไป: เลือกผลไม้ →</button>
+            </div>
           </div>
           </sc-if>
 
@@ -551,6 +555,10 @@
                   </div>
                 </div>
               </sc-for>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:4px;">
+              <button onclick="{{ goBase }}" style="{{ backStyle }}">← เบส</button>
+              <button onclick="{{ goBooster }}" style="{{ nextStyle }}">ถัดไป: บูสเตอร์ →</button>
             </div>
           </div>
           </sc-if>
@@ -579,6 +587,10 @@
                   </div>
                 </div>
               </sc-for>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:4px;">
+              <button onclick="{{ goFruit }}" style="{{ backStyle }}">← ผลไม้</button>
+              <span style="font-size:13px; color:#8C8C82; text-align:right;">เลือกครบแล้ว · กดเพิ่มลงตะกร้าด้านล่าง</span>
             </div>
           </div>
           </sc-if>
@@ -1115,7 +1127,7 @@ class Component extends DCLogic {
       this.setState((s) => {
         const customs = s.customs.slice();
         customs.push({ cid: 'cu' + s.cidSeq, label: 'สูตรของคุณ', desc, price: t.price, qty: 1, cal: t.cal, p: t.p, f: t.f, sug: t.sug });
-        return { customs, cidSeq: s.cidSeq + 1, items: {}, buildBarOpen: false };
+        return { customs, cidSeq: s.cidSeq + 1, items: {}, buildBarOpen: false, buildTab: 'base' };
       });
     };
   }
@@ -1473,9 +1485,14 @@ class Component extends DCLogic {
     // ---- build-your-own reactive views ----
     const t = this.buildTotals();
     const buildTab = this.state.buildTab || 'base';
+    const stepIndex = { base: 0, fruit: 1, booster: 2 };
+    const cur = stepIndex[buildTab] || 0;
+    const hasBase = !!this.BASEMAP[this.state.base];
+    const noop = (e) => { if (e && e.preventDefault) e.preventDefault(); };
     const fruitSel = this.FRUITS.reduce((n, x) => n + (this.state.items[x.key] || 0), 0);
     const boosterSel = this.BOOSTERS.reduce((n, x) => n + (this.state.items[x.key] || 0), 0);
-    const tabBtn = (on) => ({ flex: '1', padding: '11px 8px', borderRadius: '12px', cursor: 'pointer', fontFamily: "'Anuphan', system-ui, sans-serif", fontSize: '14px', fontWeight: '700', whiteSpace: 'nowrap', border: on ? '1px solid #1B3325' : '1px solid rgba(20,21,15,0.15)', background: on ? '#1B3325' : '#fff', color: on ? '#EAF2E2' : '#1B3325', transition: 'all .15s ease' });
+    const tabBtn = (on, locked) => ({ flex: '1', padding: '11px 8px', borderRadius: '12px', cursor: locked ? 'not-allowed' : 'pointer', opacity: locked ? 0.4 : 1, fontFamily: "'Anuphan', system-ui, sans-serif", fontSize: '14px', fontWeight: '700', whiteSpace: 'nowrap', border: on ? '1px solid #1B3325' : '1px solid rgba(20,21,15,0.15)', background: on ? '#1B3325' : '#fff', color: on ? '#EAF2E2' : '#1B3325', transition: 'all .15s ease' });
+    const navBtn = (primary, disabled) => ({ padding: '12px 20px', borderRadius: '12px', cursor: disabled ? 'not-allowed' : 'pointer', fontFamily: "'Anuphan', system-ui, sans-serif", fontSize: '14px', fontWeight: '700', whiteSpace: 'nowrap', border: primary ? '1px solid #1B3325' : '1px solid rgba(20,21,15,0.2)', background: disabled ? '#cfd3cb' : (primary ? '#1B3325' : '#fff'), color: disabled ? '#ffffff' : (primary ? '#EAF2E2' : '#1B3325'), opacity: disabled ? 0.8 : 1, transition: 'all .15s ease' });
     const chipIdle = { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', textAlign: 'center', padding: '13px 18px', borderRadius: '14px', border: '1px solid rgba(20,21,15,0.15)', background: '#fff', cursor: 'pointer', fontFamily: "'Anuphan', system-ui, sans-serif", color: '#1B3325', minWidth: '172px', transition: 'all .15s ease' };
     const chipActive = Object.assign({}, chipIdle, { background: '#1B3325', color: '#EAF2E2', border: '1px solid #1B3325' });
     const baseOptions = this.BASES.map((b) => {
@@ -1535,9 +1552,16 @@ class Component extends DCLogic {
       buildPriceLabel: this.baht(t.price), addBuild: this.addBuild(),
       buildCanAdd: t.itemCount > 0, buildEmpty: t.itemCount <= 0,
       showBaseTab: buildTab === 'base', showFruitTab: buildTab === 'fruit', showBoosterTab: buildTab === 'booster',
-      pickBaseTab: this.setBuildTab('base'), pickFruitTab: this.setBuildTab('fruit'), pickBoosterTab: this.setBuildTab('booster'),
-      baseTabStyle: tabBtn(buildTab === 'base'), fruitTabStyle: tabBtn(buildTab === 'fruit'), boosterTabStyle: tabBtn(buildTab === 'booster'),
+      pickBaseTab: this.setBuildTab('base'),
+      pickFruitTab: cur >= 1 ? this.setBuildTab('fruit') : noop,
+      pickBoosterTab: cur >= 2 ? this.setBuildTab('booster') : noop,
+      baseTabStyle: tabBtn(buildTab === 'base', false),
+      fruitTabStyle: tabBtn(buildTab === 'fruit', cur < 1),
+      boosterTabStyle: tabBtn(buildTab === 'booster', cur < 2),
       fruitTabBadge: fruitSel ? ' (' + fruitSel + ')' : '', boosterTabBadge: boosterSel ? ' (' + boosterSel + ')' : '',
+      needBase: !hasBase, nextFromBase: hasBase ? this.setBuildTab('fruit') : noop,
+      baseNextStyle: navBtn(true, !hasBase), nextStyle: navBtn(true, false), backStyle: navBtn(false, false),
+      goBase: this.setBuildTab('base'), goFruit: this.setBuildTab('fruit'), goBooster: this.setBuildTab('booster'),
       buildBarOpen: this.state.buildBarOpen, buildBarClosed: !this.state.buildBarOpen, toggleBuildBar: this.toggleBuildBar,
       sheetError: this.state.sheetError,
       sheetLoading: this.state.sheetLoading,
