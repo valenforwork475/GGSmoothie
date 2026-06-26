@@ -379,7 +379,9 @@
     /* mobile sticky order bar on the build-your-own screen */
     @media (max-width:680px){
       [data-buildbar]{ display:flex !important; }
-      [data-buildscreen]{ padding-bottom:108px !important; }
+      [data-buildsummary]{ display:none !important; }
+      [data-buildscreen]{ padding-bottom:130px !important; }
+      [data-basechips]{ display:grid !important; grid-template-columns:1fr 1fr !important; }
     }
   </style>
   <script src="./assets/6b469bc1-730c-4800-a548-ab9e1ed12c47.js"></script>
@@ -506,7 +508,7 @@
 
           <div>
             <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">1</span>เลือกเบส</h3>
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <div data-basechips="1" style="display:flex; gap:10px; flex-wrap:wrap;">
               <sc-for list="{{ baseOptions }}" as="opt" hint-placeholder-count="4">
                 <div onclick="{{ opt.pick }}" style="{{ opt.chipStyle }}">
                   <span style="font-size:15px; font-weight:600;">{{ opt.name }}</span>
@@ -570,7 +572,7 @@
         </div>
 
         <!-- live summary -->
-        <div style="flex:1 1 300px; min-width:280px; position:sticky; top:84px;">
+        <div data-buildsummary="1" style="flex:1 1 300px; min-width:280px; position:sticky; top:84px;">
           <div style="background:#1B3325; color:#EAF2E2; border-radius:22px; padding:clamp(22px,3vw,28px); display:flex; flex-direction:column; gap:20px;">
             <div>
               <div style="font-family:'Anuphan', system-ui, sans-serif; font-weight:600; font-size:12px; letter-spacing:0.06em; color:#A7DA4E; margin-bottom:6px;">สูตรของคุณ · เรียลไทม์</div>
@@ -594,14 +596,35 @@
 
       </div>
 
-      <!-- mobile live nutrition summary bar (build screen only) — display only, never blocks taps -->
-      <div data-buildbar="1" style="display:none; position:fixed; left:0; right:0; bottom:0; z-index:54; pointer-events:none; background:#1B3325; color:#EAF2E2; padding:9px clamp(14px,4vw,22px); box-shadow:0 -6px 22px rgba(0,0,0,0.22); align-items:center; gap:12px;">
-        <span style="font-family:'JetBrains Mono', monospace; font-size:19px; font-weight:600; line-height:1; white-space:nowrap;">{{ buildPriceLabel }}</span>
-        <div style="display:flex; flex:1; justify-content:space-between; gap:4px; text-align:center;">
-          <div style="line-height:1.15;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:600;">{{ buildCalLabel }}</div><div style="font-size:9px; color:#8C8C82;">แคล</div></div>
-          <div style="line-height:1.15;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:600; color:#A7DA4E;">{{ buildProteinLabel }}</div><div style="font-size:9px; color:#8C8C82;">โปรตีน</div></div>
-          <div style="line-height:1.15;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:600;">{{ buildFiberLabel }}</div><div style="font-size:9px; color:#8C8C82;">ไฟเบอร์</div></div>
-          <div style="line-height:1.15;"><div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:600;">{{ buildSugarLabel }}</div><div style="font-size:9px; color:#8C8C82;">น้ำตาล</div></div>
+      <!-- mobile live nutrition bar (build screen only) — interactive: tap to expand, add from here -->
+      <div data-buildbar="1" style="display:none; position:fixed; left:0; right:0; bottom:0; z-index:54; flex-direction:column;">
+
+        <!-- expanded panel -->
+        <sc-if value="{{ buildBarOpen }}">
+        <div style="background:#1B3325; color:#EAF2E2; padding:20px clamp(16px,4vw,22px) 16px; border-radius:22px 22px 0 0; box-shadow:0 -10px 30px rgba(0,0,0,0.28); display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="font-family:'Anuphan', system-ui, sans-serif; font-weight:600; font-size:12px; letter-spacing:0.06em; color:#A7DA4E;">สูตรของคุณ · เรียลไทม์</div>
+            <button onclick="{{ toggleBuildBar }}" style="background:rgba(255,255,255,0.12); border:none; cursor:pointer; color:#EAF2E2; width:30px; height:30px; border-radius:9px; font-size:16px; line-height:1; display:flex; align-items:center; justify-content:center;">✕</button>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.12); border-radius:14px; overflow:hidden;">
+            <div style="background:#1B3325; padding:14px 12px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:24px; font-weight:500;">{{ buildCalLabel }}</div><div style="font-size:11px; color:#8C8C82; margin-top:4px;">แคลอรี่</div></div>
+            <div style="background:#1B3325; padding:14px 12px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:24px; font-weight:500; color:#A7DA4E;">{{ buildProteinLabel }}</div><div style="font-size:11px; color:#8C8C82; margin-top:4px;">โปรตีน</div></div>
+            <div style="background:#1B3325; padding:14px 12px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:24px; font-weight:500;">{{ buildFiberLabel }}</div><div style="font-size:11px; color:#8C8C82; margin-top:4px;">ไฟเบอร์</div></div>
+            <div style="background:#1B3325; padding:14px 12px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:24px; font-weight:500;">{{ buildSugarLabel }}</div><div style="font-size:11px; color:#8C8C82; margin-top:4px;">น้ำตาล</div></div>
+          </div>
+          <div style="font-family:'JetBrains Mono', monospace; font-size:10px; color:#8C8C82; text-align:center; line-height:1.7;">* ค่าแก้ว+ปั่น ฿59 · คิดเมื่อเลือกส่วนผสมแล้ว</div>
+        </div>
+        </sc-if>
+
+        <!-- always-visible action bar -->
+        <div style="background:#1B3325; color:#EAF2E2; padding:10px clamp(14px,4vw,18px) max(10px, env(safe-area-inset-bottom)); box-shadow:0 -6px 22px rgba(0,0,0,0.22); display:flex; align-items:center; gap:12px;">
+          <button onclick="{{ toggleBuildBar }}" style="background:transparent; border:none; cursor:pointer; color:#EAF2E2; display:flex; align-items:center; gap:10px; padding:4px 2px; flex:1; min-width:0; text-align:left;">
+            <span style="font-family:'JetBrains Mono', monospace; font-size:20px; font-weight:600; line-height:1; white-space:nowrap;">{{ buildPriceLabel }}</span>
+            <span style="display:flex; gap:10px; color:rgba(234,242,226,0.72); font-family:'JetBrains Mono', monospace; font-size:12px; white-space:nowrap; overflow:hidden;"><span>{{ buildCalLabel }} แคล</span><span style="color:#A7DA4E;">{{ buildProteinLabel }}</span></span>
+            <sc-if value="{{ buildBarClosed }}" hint-placeholder-val="{{ true }}"><span style="margin-left:auto; font-size:11px; color:#A7DA4E; display:flex; align-items:center; gap:4px; white-space:nowrap;">โภชนาการ ▲</span></sc-if>
+          </button>
+          <sc-if value="{{ buildCanAdd }}"><button onclick="{{ addBuild }}" style="background:#A7DA4E; color:#1B3325; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:14px; font-weight:700; padding:12px 20px; border-radius:11px; white-space:nowrap; flex:none;">เพิ่มลงตะกร้า</button></sc-if>
+          <sc-if value="{{ buildEmpty }}" hint-placeholder-val="{{ true }}"><span style="font-size:12px; color:rgba(234,242,226,0.5); flex:none; white-space:nowrap;">เลือกส่วนผสมก่อน</span></sc-if>
         </div>
       </div>
     </div>
@@ -1002,6 +1025,10 @@ class Component extends DCLogic {
     const h = (window.location.hash || '').replace('#', '').trim();
     if (valid.indexOf(h) >= 0) { if (h !== this.state.active) this.setState({ active: h, cartOpen: false }); }
   }
+  toggleBuildBar = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    this.setState((s) => ({ buildBarOpen: !s.buildBarOpen }));
+  };
   add(id) {
     return (e) => {
       if (e && e.preventDefault) e.preventDefault();
@@ -1067,7 +1094,7 @@ class Component extends DCLogic {
       this.setState((s) => {
         const customs = s.customs.slice();
         customs.push({ cid: 'cu' + s.cidSeq, label: 'สูตรของคุณ', desc, price: t.price, qty: 1, cal: t.cal, p: t.p, f: t.f, sug: t.sug });
-        return { customs, cidSeq: s.cidSeq + 1, items: {} };
+        return { customs, cidSeq: s.cidSeq + 1, items: {}, buildBarOpen: false, cartOpen: true };
       });
     };
   }
@@ -1482,6 +1509,7 @@ class Component extends DCLogic {
       buildCalLabel: String(t.cal), buildProteinLabel: t.p + 'g', buildFiberLabel: t.f + 'g', buildSugarLabel: t.sug + 'g',
       buildPriceLabel: this.baht(t.price), addBuild: this.addBuild(),
       buildCanAdd: t.itemCount > 0, buildEmpty: t.itemCount <= 0,
+      buildBarOpen: this.state.buildBarOpen, buildBarClosed: !this.state.buildBarOpen, toggleBuildBar: this.toggleBuildBar,
       sheetError: this.state.sheetError,
       sheetLoading: this.state.sheetLoading,
       showShare: a === 'share', goShare: this.go('share'),
