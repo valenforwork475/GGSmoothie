@@ -504,8 +504,16 @@
       <div style="display:flex; flex-wrap:wrap; gap:clamp(28px,4vw,48px); align-items:flex-start;">
 
         <!-- controls -->
-        <div style="flex:1 1 480px; min-width:300px; display:flex; flex-direction:column; gap:clamp(30px,4vw,42px);">
+        <div style="flex:1 1 480px; min-width:300px; display:flex; flex-direction:column; gap:clamp(22px,3.5vw,32px);">
 
+          <!-- step tabs -->
+          <div style="display:flex; gap:8px;">
+            <button onclick="{{ pickBaseTab }}" style="{{ baseTabStyle }}">เบส</button>
+            <button onclick="{{ pickFruitTab }}" style="{{ fruitTabStyle }}">ผลไม้{{ fruitTabBadge }}</button>
+            <button onclick="{{ pickBoosterTab }}" style="{{ boosterTabStyle }}">บูสเตอร์{{ boosterTabBadge }}</button>
+          </div>
+
+          <sc-if value="{{ showBaseTab }}">
           <div>
             <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">1</span>เลือกเบส</h3>
             <div data-basechips="1" style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -518,7 +526,9 @@
               </sc-for>
             </div>
           </div>
+          </sc-if>
 
+          <sc-if value="{{ showFruitTab }}">
           <div>
             <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">2</span>เติมผลไม้</h3>
             <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px;">
@@ -543,9 +553,12 @@
               </sc-for>
             </div>
           </div>
+          </sc-if>
 
+          <sc-if value="{{ showBoosterTab }}">
           <div>
-            <h3 style="font-size:17px; font-weight:700; margin:0 0 16px; display:flex; align-items:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">3</span>บูสเตอร์</h3>
+            <h3 style="font-size:17px; font-weight:700; margin:0 0 6px; display:flex; align-items:center; gap:10px;"><span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background:#1B3325; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">3</span>บูสเตอร์ <span style="font-family:'Anuphan', system-ui, sans-serif; font-size:12px; font-weight:500; color:#8C8C82;">· ไม่ใส่ก็ได้</span></h3>
+            <p style="font-size:13px; color:#8C8C82; margin:0 0 16px; line-height:1.6;">บูสเตอร์เป็นออปชันเสริม ถ้าไม่ต้องการ กดเพิ่มลงตะกร้าได้เลย</p>
             <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px;">
               <sc-for list="{{ boosterRows }}" as="row" hint-placeholder-count="4">
                 <div style="{{ row.cardStyle }}">
@@ -568,6 +581,7 @@
               </sc-for>
             </div>
           </div>
+          </sc-if>
 
         </div>
 
@@ -916,7 +930,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script="">
 class Component extends DCLogic {
-  state = { active: 'home', cart: {}, cartOpen: false, base: 'water', items: {}, customs: [], cidSeq: 1, shTemplate: 't1', shMenu: 'g', shCaption: '', shPhotoReady: false, checkingOut: false, payMethod: 'promptpay', orderPlaced: false, member: null, stamps: 0, redeemed: 0, mName: '', mPhone: '', stampPulse: false, sheetUrlInput: '', customMenu: null, customBases: null, customFruits: null, customBoosters: null, sheetLoading: false, sheetError: null };
+  state = { active: 'home', cart: {}, cartOpen: false, base: 'water', items: {}, customs: [], cidSeq: 1, shTemplate: 't1', shMenu: 'g', shCaption: '', shPhotoReady: false, checkingOut: false, payMethod: 'promptpay', orderPlaced: false, member: null, stamps: 0, redeemed: 0, mName: '', mPhone: '', stampPulse: false, buildTab: 'base', sheetUrlInput: '', customMenu: null, customBases: null, customFruits: null, customBoosters: null, sheetLoading: false, sheetError: null };
   canvasRef = React.createRef();
   STAMP_GOAL = 10;
   loadMember() {
@@ -1056,6 +1070,13 @@ class Component extends DCLogic {
       const base = this.BASEMAP[key];
       if (base && base.disabled) return;
       this.setState({ base: key });
+    };
+  }
+  setBuildTab(tab) {
+    return (e) => {
+      if (e && e.preventDefault) e.preventDefault();
+      this.setState({ buildTab: tab });
+      if (typeof window !== 'undefined') window.scrollTo(0, 0);
     };
   }
   changeItem(key, d) {
@@ -1451,6 +1472,10 @@ class Component extends DCLogic {
 
     // ---- build-your-own reactive views ----
     const t = this.buildTotals();
+    const buildTab = this.state.buildTab || 'base';
+    const fruitSel = this.FRUITS.reduce((n, x) => n + (this.state.items[x.key] || 0), 0);
+    const boosterSel = this.BOOSTERS.reduce((n, x) => n + (this.state.items[x.key] || 0), 0);
+    const tabBtn = (on) => ({ flex: '1', padding: '11px 8px', borderRadius: '12px', cursor: 'pointer', fontFamily: "'Anuphan', system-ui, sans-serif", fontSize: '14px', fontWeight: '700', whiteSpace: 'nowrap', border: on ? '1px solid #1B3325' : '1px solid rgba(20,21,15,0.15)', background: on ? '#1B3325' : '#fff', color: on ? '#EAF2E2' : '#1B3325', transition: 'all .15s ease' });
     const chipIdle = { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', textAlign: 'center', padding: '13px 18px', borderRadius: '14px', border: '1px solid rgba(20,21,15,0.15)', background: '#fff', cursor: 'pointer', fontFamily: "'Anuphan', system-ui, sans-serif", color: '#1B3325', minWidth: '172px', transition: 'all .15s ease' };
     const chipActive = Object.assign({}, chipIdle, { background: '#1B3325', color: '#EAF2E2', border: '1px solid #1B3325' });
     const baseOptions = this.BASES.map((b) => {
@@ -1509,6 +1534,10 @@ class Component extends DCLogic {
       buildCalLabel: String(t.cal), buildProteinLabel: t.p + 'g', buildFiberLabel: t.f + 'g', buildSugarLabel: t.sug + 'g',
       buildPriceLabel: this.baht(t.price), addBuild: this.addBuild(),
       buildCanAdd: t.itemCount > 0, buildEmpty: t.itemCount <= 0,
+      showBaseTab: buildTab === 'base', showFruitTab: buildTab === 'fruit', showBoosterTab: buildTab === 'booster',
+      pickBaseTab: this.setBuildTab('base'), pickFruitTab: this.setBuildTab('fruit'), pickBoosterTab: this.setBuildTab('booster'),
+      baseTabStyle: tabBtn(buildTab === 'base'), fruitTabStyle: tabBtn(buildTab === 'fruit'), boosterTabStyle: tabBtn(buildTab === 'booster'),
+      fruitTabBadge: fruitSel ? ' (' + fruitSel + ')' : '', boosterTabBadge: boosterSel ? ' (' + boosterSel + ')' : '',
       buildBarOpen: this.state.buildBarOpen, buildBarClosed: !this.state.buildBarOpen, toggleBuildBar: this.toggleBuildBar,
       sheetError: this.state.sheetError,
       sheetLoading: this.state.sheetLoading,
