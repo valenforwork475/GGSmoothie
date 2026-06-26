@@ -530,10 +530,7 @@
                 </div>
               </sc-for>
             </div>
-            <div style="display:flex; align-items:center; justify-content:flex-end; gap:12px; margin-top:4px;">
-              <sc-if value="{{ needBase }}"><span style="font-size:13px; color:#8C8C82;">เลือกเบส 1 อย่างก่อน</span></sc-if>
-              <button onclick="{{ nextFromBase }}" style="{{ baseNextStyle }}">ถัดไป: เลือกผลไม้ →</button>
-            </div>
+            <sc-if value="{{ needBase }}"><div style="font-size:13px; color:#8C8C82; margin-top:6px;">เลือกเบส 1 อย่างก่อน แล้วไปขั้นต่อไปได้</div></sc-if>
           </div>
           </sc-if>
 
@@ -561,9 +558,8 @@
                 </div>
               </sc-for>
             </div>
-            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:4px;">
+            <div style="display:flex; align-items:center; gap:12px; margin-top:4px;">
               <button onclick="{{ goBase }}" style="{{ backStyle }}">← เบส</button>
-              <button onclick="{{ goBooster }}" style="{{ nextStyle }}">ถัดไป: บูสเตอร์ →</button>
             </div>
           </div>
           </sc-if>
@@ -796,9 +792,16 @@
         <div style="font-family:'Anuphan', system-ui, sans-serif; font-weight:600; font-size:12px; letter-spacing:0.06em; color:#2FA05E; margin-bottom:14px;">ติดต่อเรา</div>
         <h2 style="font-size:clamp(30px,4.6vw,54px); line-height:1.1; letter-spacing:0; font-weight:700; margin:0 0 20px;">คุยกับ FLOW</h2>
         <p style="font-size:15px; line-height:1.7; color:#46463e; max-width:380px; margin:0 0 28px;">อยากร่วมงาน เปิดสาขาแฟรนไชส์ หรือสั่งจัดเลี้ยง? ทักมาได้เลย เราตอบทุกข้อความ</p>
-        <div style="display:flex; flex-direction:column; gap:14px; font-size:15px;">
-          <div style="display:flex; gap:10px; align-items:center;"><span style="font-family:'JetBrains Mono', monospace; font-size:11px; color:#8C8C82; width:64px;">พร้อมเพย์</span><span style="font-weight:500;">082-356-4415</span></div>
-          <div style="display:flex; gap:10px; align-items:center;"><span style="font-family:'JetBrains Mono', monospace; font-size:11px; color:#8C8C82; width:64px;">LINE</span><span style="font-weight:500;">krittidej12</span></div>
+        <div style="display:flex; flex-direction:column; gap:18px;">
+          <div style="font-family:'Anuphan', system-ui, sans-serif; font-size:13px; font-weight:600; color:#8C8C82;">ช่องทางติดตาม</div>
+          <!-- TODO: ใส่ลิงก์จริงของ Facebook / Instagram / TikTok แทน href="#" เมื่อมีเพจแล้ว -->
+          <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <a href="#" target="_blank" rel="noopener noreferrer" title="Facebook" style="display:inline-flex; align-items:center; justify-content:center; width:46px; height:46px; border-radius:50%; background:#1B3325; color:#EAF2E2; text-decoration:none; transition:all .2s ease;" style-hover="background:#A7DA4E; color:#1B3325;"><svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.9h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94z"/></svg></a>
+            <a href="#" target="_blank" rel="noopener noreferrer" title="Instagram" style="display:inline-flex; align-items:center; justify-content:center; width:46px; height:46px; border-radius:50%; background:#1B3325; color:#EAF2E2; text-decoration:none; transition:all .2s ease;" style-hover="background:#A7DA4E; color:#1B3325;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.6" cy="6.4" r="1.2" fill="currentColor" stroke="none"/></svg></a>
+            <a href="#" target="_blank" rel="noopener noreferrer" title="TikTok" style="display:inline-flex; align-items:center; justify-content:center; width:46px; height:46px; border-radius:50%; background:#1B3325; color:#EAF2E2; text-decoration:none; transition:all .2s ease;" style-hover="background:#A7DA4E; color:#1B3325;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.6c-.92-.62-1.53-1.6-1.7-2.7h-2.62v11.27c0 1.3-1.05 2.35-2.35 2.35s-2.35-1.05-2.35-2.35 1.05-2.35 2.35-2.35c.25 0 .49.04.72.11V9.27a5 5 0 0 0-.72-.05A5 5 0 0 0 5 14.17a5 5 0 0 0 9.95 0V8.4a6.3 6.3 0 0 0 3.55 1.1V6.88c-.7 0-1.4-.19-1.9-.5z"/></svg></a>
+            <a href="{{ lineHref }}" target="_blank" rel="noopener noreferrer" title="LINE" style="display:inline-flex; align-items:center; justify-content:center; width:46px; height:46px; border-radius:50%; background:#1B3325; color:#EAF2E2; text-decoration:none; transition:all .2s ease;" style-hover="background:#A7DA4E; color:#1B3325;"><svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.48 3 2 6.7 2 11.25c0 4.08 3.55 7.5 8.35 8.14.32.07.77.21.88.49.1.25.07.64.03.89l-.14.85c-.04.25-.2.99.87.54s5.77-3.4 7.87-5.82C21.4 14.6 22 13 22 11.25 22 6.7 17.52 3 12 3zM8.2 13.6H6.1a.4.4 0 0 1-.4-.4V9.6a.4.4 0 0 1 .8 0v3.2h1.7a.4.4 0 0 1 0 .8zm1.6-.4a.4.4 0 0 1-.8 0V9.6a.4.4 0 0 1 .8 0v3.6zm4.3 0a.4.4 0 0 1-.27.38.4.4 0 0 1-.45-.14l-1.84-2.5v2.26a.4.4 0 0 1-.8 0V9.6a.4.4 0 0 1 .72-.24l1.84 2.5V9.6a.4.4 0 0 1 .8 0v3.6zm2.9-2.2a.4.4 0 0 1 0 .8h-1.7v.6h1.7a.4.4 0 0 1 0 .8h-2.1a.4.4 0 0 1-.4-.4V9.6a.4.4 0 0 1 .4-.4h2.1a.4.4 0 0 1 0 .8h-1.7v.6h1.7z"/></svg></a>
+          </div>
+          <a href="tel:0823564415" style="display:inline-flex; align-items:center; gap:11px; color:#1B3325; text-decoration:none; font-weight:600; width:fit-content;" style-hover="color:#2FA05E;"><span style="display:inline-flex; align-items:center; justify-content:center; width:42px; height:42px; border-radius:50%; background:#EAF2E2;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span style="font-family:'JetBrains Mono', monospace; font-size:18px;">082-356-4415</span></a>
         </div>
       </div>
       <div style="flex:1 1 340px; min-width:300px;">
@@ -1583,11 +1586,11 @@ class Component extends DCLogic {
       buildCanAdd: t.itemCount > 0, buildEmpty: t.itemCount <= 0, blendFeeLabel: String(this.CFG.BLEND_FEE),
       showBaseTab: buildTab === 'base', showFruitTab: buildTab === 'fruit', showBoosterTab: buildTab === 'booster',
       pickBaseTab: this.setBuildTab('base'),
-      pickFruitTab: cur >= 1 ? this.setBuildTab('fruit') : noop,
-      pickBoosterTab: cur >= 2 ? this.setBuildTab('booster') : noop,
+      pickFruitTab: hasBase ? this.setBuildTab('fruit') : noop,
+      pickBoosterTab: hasBase ? this.setBuildTab('booster') : noop,
       baseTabStyle: tabBtn(buildTab === 'base', false),
-      fruitTabStyle: tabBtn(buildTab === 'fruit', cur < 1),
-      boosterTabStyle: tabBtn(buildTab === 'booster', cur < 2),
+      fruitTabStyle: tabBtn(buildTab === 'fruit', !hasBase),
+      boosterTabStyle: tabBtn(buildTab === 'booster', !hasBase),
       fruitTabBadge: fruitSel ? ' (' + fruitSel + ')' : '', boosterTabBadge: boosterSel ? ' (' + boosterSel + ')' : '',
       needBase: !hasBase, nextFromBase: hasBase ? this.setBuildTab('fruit') : noop,
       baseNextStyle: navBtn(true, !hasBase), nextStyle: navBtn(true, false), backStyle: navBtn(false, false),
