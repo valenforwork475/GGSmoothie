@@ -654,8 +654,9 @@
             <span style="display:flex; gap:10px; color:rgba(234,242,226,0.72); font-family:'JetBrains Mono', monospace; font-size:12px; white-space:nowrap; overflow:hidden;"><span>{{ buildCalLabel }} แคล</span><span style="color:#A7DA4E;">{{ buildProteinLabel }}</span></span>
             <sc-if value="{{ buildBarClosed }}" hint-placeholder-val="{{ true }}"><span style="margin-left:auto; font-size:11px; color:#A7DA4E; display:flex; align-items:center; gap:4px; white-space:nowrap;">โภชนาการ ▲</span></sc-if>
           </button>
-          <sc-if value="{{ buildCanAdd }}"><button onclick="{{ addBuild }}" style="background:#A7DA4E; color:#1B3325; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:14px; font-weight:700; padding:12px 20px; border-radius:11px; white-space:nowrap; flex:none;">เพิ่มลงตะกร้า</button></sc-if>
-          <sc-if value="{{ buildEmpty }}" hint-placeholder-val="{{ true }}"><span style="font-size:12px; color:rgba(234,242,226,0.5); flex:none; white-space:nowrap;">เลือกส่วนผสมก่อน</span></sc-if>
+          <sc-if value="{{ showBaseTab }}"><button onclick="{{ nextFromBase }}" style="{{ barNextStyle }}">ถัดไป →</button></sc-if>
+          <sc-if value="{{ showFruitTab }}"><button onclick="{{ goBooster }}" style="{{ barNextActiveStyle }}">ถัดไป →</button></sc-if>
+          <sc-if value="{{ showBoosterTab }}"><sc-if value="{{ buildCanAdd }}"><button onclick="{{ addBuild }}" style="{{ barNextActiveStyle }}">เพิ่มลงตะกร้า</button></sc-if><sc-if value="{{ buildEmpty }}"><span style="font-size:12px; color:rgba(234,242,226,0.5); flex:none; white-space:nowrap;">เลือกส่วนผสมก่อน</span></sc-if></sc-if>
         </div>
       </div>
     </div>
@@ -1520,6 +1521,8 @@ class Component extends DCLogic {
     const boosterSel = this.BOOSTERS.reduce((n, x) => n + (this.state.items[x.key] || 0), 0);
     const tabBtn = (on, locked) => ({ flex: '1', padding: '11px 8px', borderRadius: '12px', cursor: locked ? 'not-allowed' : 'pointer', opacity: locked ? 0.4 : 1, fontFamily: "'Anuphan', system-ui, sans-serif", fontSize: '14px', fontWeight: '700', whiteSpace: 'nowrap', border: on ? '1px solid #1B3325' : '1px solid rgba(20,21,15,0.15)', background: on ? '#1B3325' : '#fff', color: on ? '#EAF2E2' : '#1B3325', transition: 'all .15s ease' });
     const navBtn = (primary, disabled) => ({ padding: '12px 20px', borderRadius: '12px', cursor: disabled ? 'not-allowed' : 'pointer', fontFamily: "'Anuphan', system-ui, sans-serif", fontSize: '14px', fontWeight: '700', whiteSpace: 'nowrap', border: primary ? '1px solid #1B3325' : '1px solid rgba(20,21,15,0.2)', background: disabled ? '#cfd3cb' : (primary ? '#1B3325' : '#fff'), color: disabled ? '#ffffff' : (primary ? '#EAF2E2' : '#1B3325'), opacity: disabled ? 0.8 : 1, transition: 'all .15s ease' });
+    // green button style (string) for the dark mobile bottom bar
+    const barBtnStyle = (disabled) => 'background:' + (disabled ? 'rgba(255,255,255,0.15)' : '#A7DA4E') + '; color:' + (disabled ? 'rgba(234,242,226,0.5)' : '#1B3325') + '; border:none; cursor:' + (disabled ? 'not-allowed' : 'pointer') + "; font-family:'Anuphan', system-ui, sans-serif; font-size:14px; font-weight:700; padding:12px 20px; border-radius:11px; white-space:nowrap; flex:none;";
     const chipIdle = { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', textAlign: 'center', padding: '13px 18px', borderRadius: '14px', border: '1px solid rgba(20,21,15,0.15)', background: '#fff', cursor: 'pointer', fontFamily: "'Anuphan', system-ui, sans-serif", color: '#1B3325', minWidth: '172px', transition: 'all .15s ease' };
     const chipActive = Object.assign({}, chipIdle, { background: '#1B3325', color: '#EAF2E2', border: '1px solid #1B3325' });
     const baseOptions = this.BASES.map((b) => {
@@ -1588,6 +1591,7 @@ class Component extends DCLogic {
       fruitTabBadge: fruitSel ? ' (' + fruitSel + ')' : '', boosterTabBadge: boosterSel ? ' (' + boosterSel + ')' : '',
       needBase: !hasBase, nextFromBase: hasBase ? this.setBuildTab('fruit') : noop,
       baseNextStyle: navBtn(true, !hasBase), nextStyle: navBtn(true, false), backStyle: navBtn(false, false),
+      barNextStyle: barBtnStyle(!hasBase), barNextActiveStyle: barBtnStyle(false),
       goBase: this.setBuildTab('base'), goFruit: this.setBuildTab('fruit'), goBooster: this.setBuildTab('booster'),
       buildBarOpen: this.state.buildBarOpen, buildBarClosed: !this.state.buildBarOpen, toggleBuildBar: this.toggleBuildBar,
       sheetError: this.state.sheetError,
