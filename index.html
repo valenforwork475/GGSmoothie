@@ -376,6 +376,8 @@
     body{ background:#EAF2E2; }
     a{ -webkit-tap-highlight-color:transparent; }
     ::placeholder{ color:#9a9a90; }
+    /* deter casual copying/dragging of menu images & artwork (mild deterrence only) */
+    img, canvas, image-slot { -webkit-user-drag:none; -khtml-user-drag:none; -moz-user-drag:none; -webkit-user-select:none; user-select:none; }
     /* mobile sticky order bar on the build-your-own screen */
     @media (max-width:680px){
       [data-buildbar]{ display:flex !important; }
@@ -616,7 +618,7 @@
             </div>
             <sc-if value="{{ buildCanAdd }}" hint-placeholder-val="{{ true }}"><button onclick="{{ addBuild }}" style="background:#A7DA4E; color:#1B3325; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:15px; font-weight:700; padding:15px; border-radius:12px; transition:all .2s ease; width:100%;" style-hover="background:#fff;">เพิ่มลงตะกร้า</button></sc-if>
             <sc-if value="{{ buildEmpty }}"><button disabled="disabled" style="background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.4); border:none; cursor:not-allowed; font-family:'Anuphan', system-ui, sans-serif; font-size:15px; font-weight:700; padding:15px; border-radius:12px; width:100%;">เลือกส่วนผสมอย่างน้อย 1 อย่าง</button></sc-if>
-            <div style="font-family:'JetBrains Mono', monospace; font-size:10px; color:#8C8C82; text-align:center; line-height:1.7;">* ค่าแก้ว+ปั่น ฿59 · คิดเมื่อเลือกส่วนผสมแล้ว</div>
+            <div style="font-family:'JetBrains Mono', monospace; font-size:10px; color:#8C8C82; text-align:center; line-height:1.7;">* ค่าแก้ว+ปั่น ฿{{ blendFeeLabel }} · คิดเมื่อเลือกส่วนผสมแล้ว</div>
           </div>
         </div>
 
@@ -638,7 +640,7 @@
             <div style="background:#1B3325; padding:14px 12px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:24px; font-weight:500;">{{ buildFiberLabel }}</div><div style="font-size:11px; color:#8C8C82; margin-top:4px;">ไฟเบอร์</div></div>
             <div style="background:#1B3325; padding:14px 12px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:24px; font-weight:500;">{{ buildSugarLabel }}</div><div style="font-size:11px; color:#8C8C82; margin-top:4px;">น้ำตาล</div></div>
           </div>
-          <div style="font-family:'JetBrains Mono', monospace; font-size:10px; color:#8C8C82; text-align:center; line-height:1.7;">* ค่าแก้ว+ปั่น ฿59 · คิดเมื่อเลือกส่วนผสมแล้ว</div>
+          <div style="font-family:'JetBrains Mono', monospace; font-size:10px; color:#8C8C82; text-align:center; line-height:1.7;">* ค่าแก้ว+ปั่น ฿{{ blendFeeLabel }} · คิดเมื่อเลือกส่วนผสมแล้ว</div>
         </div>
         </sc-if>
 
@@ -942,9 +944,20 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script="">
 class Component extends DCLogic {
+  // ============================================================
+  //  CONFIG — แก้ค่าธุรกิจหลักได้ที่นี่ที่เดียว
+  //  (เมนู/ราคา/รูป อยู่ใน Google Sheet — เพิ่มได้โดยไม่ต้องแตะโค้ด)
+  // ============================================================
+  CFG = {
+    SHEET_URL: 'https://docs.google.com/spreadsheets/d/1QsXosJ8NkSUNNn-5AP68yzZClDyE05NKJWewpgcQd9Y',
+    BLEND_FEE: 59,                        // ค่าแก้ว+ปั่น ของสูตรจัดเอง (บาท)
+    STAMP_GOAL: 10,                       // จำนวนแสตมป์ครบรับรางวัล
+    LINE_URL: 'https://lin.ee/ttf3FPn',   // ลิงก์ LINE สำหรับสั่งซื้อ
+    PROMPTPAY_ID: '0823564415',           // พร้อมเพย์รับเงิน
+  };
   state = { active: 'home', cart: {}, cartOpen: false, base: 'water', items: {}, customs: [], cidSeq: 1, shTemplate: 't1', shMenu: 'g', shCaption: '', shPhotoReady: false, checkingOut: false, payMethod: 'promptpay', orderPlaced: false, member: null, stamps: 0, redeemed: 0, mName: '', mPhone: '', stampPulse: false, buildTab: 'base', sheetUrlInput: '', customMenu: null, customBases: null, customFruits: null, customBoosters: null, sheetLoading: false, sheetError: null };
   canvasRef = React.createRef();
-  STAMP_GOAL = 10;
+  // ===================== MEMBER & STAMPS =====================
   loadMember() {
     if (typeof window === 'undefined' || !window.localStorage) return;
     try {
@@ -970,15 +983,15 @@ class Component extends DCLogic {
   addStamp = (e) => {
     if (e && e.preventDefault) e.preventDefault();
     if (!this.state.member) return;
-    const stamps = Math.min(this.STAMP_GOAL, this.state.stamps + 1);
+    const stamps = Math.min(this.CFG.STAMP_GOAL, this.state.stamps + 1);
     this.setState({ stamps, stampPulse: true });
     this.saveMember({ member: this.state.member, stamps, redeemed: this.state.redeemed });
     setTimeout(() => this.setState({ stampPulse: false }), 450);
   };
   redeemReward = (e) => {
     if (e && e.preventDefault) e.preventDefault();
-    if (this.state.stamps < this.STAMP_GOAL) return;
-    const stamps = this.state.stamps - this.STAMP_GOAL;
+    if (this.state.stamps < this.CFG.STAMP_GOAL) return;
+    const stamps = this.state.stamps - this.CFG.STAMP_GOAL;
     const redeemed = this.state.redeemed + 1;
     this.setState({ stamps, redeemed });
     this.saveMember({ member: this.state.member, stamps, redeemed });
@@ -1035,6 +1048,7 @@ class Component extends DCLogic {
       sugarLabel: (x.sug || 0) + 'g',
     };
   }
+  // ===================== NAVIGATION & DEEP LINKS =====================
   go(k) {
     return (e) => {
       if (e && e.preventDefault) e.preventDefault();
@@ -1104,6 +1118,7 @@ class Component extends DCLogic {
       });
     };
   }
+  // ===================== BUILD-YOUR-OWN =====================
   buildTotals() {
     const b = this.BASEMAP[this.state.base] || this.BASES[0];
     let cal = b.kcal, p = b.p, f = b.f, sug = b.sug, addOns = 0, itemCount = 0;
@@ -1112,7 +1127,7 @@ class Component extends DCLogic {
       const ing = this.ALLING[k]; const q = items[k];
       if (ing && q > 0) { cal += ing.kcal * q; p += ing.p * q; f += ing.f * q; sug += ing.sug * q; addOns += ing.price * q; itemCount += q; }
     });
-    const price = itemCount > 0 ? 59 + b.price + addOns : 0;
+    const price = itemCount > 0 ? this.CFG.BLEND_FEE + b.price + addOns : 0;
     return { cal: Math.round(cal), p: Math.round(p), f: Math.round(f), sug: Math.round(sug), price, itemCount };
   }
   addBuild() {
@@ -1166,20 +1181,28 @@ class Component extends DCLogic {
       boxShadow: filled ? '0 6px 14px -6px rgba(27,51,37,0.5)' : 'none',
     };
   }
-  SHEET_URL = 'https://docs.google.com/spreadsheets/d/1QsXosJ8NkSUNNn-5AP68yzZClDyE05NKJWewpgcQd9Y';
+  // ===================== LIFECYCLE =====================
   componentDidMount() {
     this.loadMember();
     this.applyHash();
     this._onHash = () => this.applyHash();
     if (typeof window !== 'undefined') window.addEventListener('hashchange', this._onHash);
-    this.setState({ sheetUrlInput: this.SHEET_URL }, () => {
+    this.applyContentProtection();
+    this.setState({ sheetUrlInput: this.CFG.SHEET_URL }, () => {
       this.fetchSheetData();
     });
     const draw = () => this.drawCard();
     if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
     setTimeout(draw, 80);
   }
+  // block right-click + image drag (deters casual content/image copying; not real security)
+  applyContentProtection() {
+    if (typeof document === 'undefined') return;
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+    document.addEventListener('dragstart', (e) => { if (e.target && e.target.tagName === 'IMG') e.preventDefault(); });
+  }
 
+  // ===================== GOOGLE SHEET SYNC =====================
   fetchSheetData() {
     const sheetUrl = (this.state.sheetUrlInput || '').trim();
     if (!sheetUrl) {
@@ -1339,7 +1362,7 @@ class Component extends DCLogic {
     const patch = { orderPlaced: true, active: 'share', cartOpen: false };
     if (this.state.member) {
       const earned = this.cartCupCount();
-      const stamps = Math.min(this.STAMP_GOAL, this.state.stamps + earned);
+      const stamps = Math.min(this.CFG.STAMP_GOAL, this.state.stamps + earned);
       patch.stamps = stamps;
       this.saveMember({ member: this.state.member, stamps, redeemed: this.state.redeemed });
     }
@@ -1361,6 +1384,7 @@ class Component extends DCLogic {
     else { sw = img.width; sh = sw / r; sx = 0; sy = (img.height - sh) / 2; }
     ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
   }
+  // ===================== SHARE CARD (canvas) =====================
   drawCard() {
     const c = this.canvasRef && this.canvasRef.current; if (!c) return;
     const ctx = c.getContext('2d'); const W = 1080, H = 1080;
@@ -1479,8 +1503,8 @@ class Component extends DCLogic {
     })));
     const count = lines.reduce((s, l) => s + l.qty, 0);
     const total = lines.reduce((s, l) => s + l.lineTotal, 0);
-    const lineHref = 'https://lin.ee/ttf3FPn';
-    const ppQrUrl = total > 0 ? 'https://promptpay.io/0823564415/' + total + '.png' : 'https://promptpay.io/0823564415.png';
+    const lineHref = this.CFG.LINE_URL;
+    const ppQrUrl = total > 0 ? 'https://promptpay.io/' + this.CFG.PROMPTPAY_ID + '/' + total + '.png' : 'https://promptpay.io/' + this.CFG.PROMPTPAY_ID + '.png';
 
     // ---- build-your-own reactive views ----
     const t = this.buildTotals();
@@ -1550,7 +1574,7 @@ class Component extends DCLogic {
       baseOptions, fruitRows, boosterRows,
       buildCalLabel: String(t.cal), buildProteinLabel: t.p + 'g', buildFiberLabel: t.f + 'g', buildSugarLabel: t.sug + 'g',
       buildPriceLabel: this.baht(t.price), addBuild: this.addBuild(),
-      buildCanAdd: t.itemCount > 0, buildEmpty: t.itemCount <= 0,
+      buildCanAdd: t.itemCount > 0, buildEmpty: t.itemCount <= 0, blendFeeLabel: String(this.CFG.BLEND_FEE),
       showBaseTab: buildTab === 'base', showFruitTab: buildTab === 'fruit', showBoosterTab: buildTab === 'booster',
       pickBaseTab: this.setBuildTab('base'),
       pickFruitTab: cur >= 1 ? this.setBuildTab('fruit') : noop,
@@ -1576,15 +1600,15 @@ class Component extends DCLogic {
       registerMember: this.registerMember,
       canRegister: (this.state.mName || '').trim().length > 0 && (this.state.mPhone || '').trim().length >= 9,
       cannotRegister: !((this.state.mName || '').trim().length > 0 && (this.state.mPhone || '').trim().length >= 9),
-      stampCells: Array.from({ length: this.STAMP_GOAL }, (_, i) => ({
+      stampCells: Array.from({ length: this.CFG.STAMP_GOAL }, (_, i) => ({
         n: i + 1, filled: i < this.state.stamps,
-        cellStyle: this.stampCellStyle(i < this.state.stamps, i === this.state.stamps && this.state.stamps < this.STAMP_GOAL),
+        cellStyle: this.stampCellStyle(i < this.state.stamps, i === this.state.stamps && this.state.stamps < this.CFG.STAMP_GOAL),
         markColor: i < this.state.stamps ? '#1B3325' : 'rgba(27,51,37,0.18)',
       })),
-      stampsCount: this.state.stamps, goalCount: this.STAMP_GOAL,
-      remainingLabel: String(Math.max(0, this.STAMP_GOAL - this.state.stamps)),
-      rewardReady: this.state.stamps >= this.STAMP_GOAL,
-      rewardNotReady: this.state.stamps < this.STAMP_GOAL,
+      stampsCount: this.state.stamps, goalCount: this.CFG.STAMP_GOAL,
+      remainingLabel: String(Math.max(0, this.CFG.STAMP_GOAL - this.state.stamps)),
+      rewardReady: this.state.stamps >= this.CFG.STAMP_GOAL,
+      rewardNotReady: this.state.stamps < this.CFG.STAMP_GOAL,
       redeemedLabel: String(this.state.redeemed),
       hasRedeemed: this.state.redeemed > 0,
       addStamp: this.addStamp, redeemReward: this.redeemReward, signOutMember: this.signOutMember,
