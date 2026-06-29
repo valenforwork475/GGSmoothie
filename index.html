@@ -450,7 +450,7 @@
           ชั่งตวงทุกกรัม
         </div>
         <h1 style="font-size:clamp(42px,6.6vw,82px); line-height:1.04; letter-spacing:0; font-weight:700; margin:0 0 22px;" data-comment-anchor="be625c074e-h1">คุณค่าจาก<br>ผลไม้จริง</h1>
-        <p style="font-size:clamp(16px,1.4vw,19px); line-height:1.7; color:#46463e; max-width:452px; margin:0 0 32px;" data-comment-anchor="a9be8d8e0e-p">สมูทตี้ผลไม้เต็มผลปั่นเย็น อุดมด้วยโปรตีนและไฟเบอร์จากผลไม้และวัตถุดิบจริง ไม่มีไซรัป ไม่มีหัวเชื้อเข้มข้น ได้รสชาติจากผลไม้แท้ ๆ ทุกแก้ว</p>
+        <p style="font-size:clamp(16px,1.4vw,19px); line-height:1.7; color:#46463e; max-width:452px; margin:0 0 32px;" data-comment-anchor="a9be8d8e0e-p">สมูทตี้ผลไม้เต็มผลปั่น อุดมด้วยไฟเบอร์ ไม่มีไซรัป ไม่มีหัวเชื้อเข้มข้น ได้รสชาติจากผลไม้แท้ ๆ ทุกแก้ว</p>
         <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:center;">
           <button onclick="{{ goMenu }}" style="background:#1B3325; color:#EAF2E2; border:none; cursor:pointer; font-family:'Anuphan', sans-serif; font-weight:500; font-size:15px; padding:15px 30px; border-radius:999px; transition:all .2s ease;" style-hover="background:#A7DA4E; color:#1B3325;">ดูเมนูทั้งหมด</button>
           <button onclick="{{ goBuild }}" style="background:transparent; border:1px solid rgba(20,21,15,0.25); cursor:pointer; font-family:'Anuphan', sans-serif; font-weight:500; font-size:15px; color:#1B3325; padding:14px 26px; border-radius:999px; transition:all .2s ease;" style-hover="background:#1B3325; color:#EAF2E2; border-color:#1B3325;">จัดสูตรเอง →</button>
@@ -643,7 +643,6 @@
             </div>
             <sc-if value="{{ buildCanAdd }}" hint-placeholder-val="{{ true }}"><button onclick="{{ addBuild }}" style="background:#A7DA4E; color:#1B3325; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:15px; font-weight:700; padding:15px; border-radius:12px; transition:all .2s ease; width:100%;" style-hover="background:#fff;">เพิ่มลงตะกร้า</button></sc-if>
             <sc-if value="{{ buildEmpty }}"><button disabled="disabled" style="background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.4); border:none; cursor:not-allowed; font-family:'Anuphan', system-ui, sans-serif; font-size:15px; font-weight:700; padding:15px; border-radius:12px; width:100%;">เลือกส่วนผสมอย่างน้อย 1 อย่าง</button></sc-if>
-            <div style="font-family:'JetBrains Mono', monospace; font-size:10px; color:#8C8C82; text-align:center; line-height:1.7;">* ค่าแก้ว+ปั่น ฿{{ blendFeeLabel }} · คิดเมื่อเลือกส่วนผสมแล้ว</div>
           </div>
         </div>
 
@@ -665,7 +664,6 @@
             <div style="background:#1B3325; padding:14px 12px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:24px; font-weight:500;">{{ buildFiberLabel }}</div><div style="font-size:11px; color:#8C8C82; margin-top:4px;">ไฟเบอร์</div></div>
             <div style="background:#1B3325; padding:14px 12px; text-align:center;"><div style="font-family:'JetBrains Mono', monospace; font-size:24px; font-weight:500;">{{ buildSugarLabel }}</div><div style="font-size:11px; color:#8C8C82; margin-top:4px;">น้ำตาล</div></div>
           </div>
-          <div style="font-family:'JetBrains Mono', monospace; font-size:10px; color:#8C8C82; text-align:center; line-height:1.7;">* ค่าแก้ว+ปั่น ฿{{ blendFeeLabel }} · คิดเมื่อเลือกส่วนผสมแล้ว</div>
         </div>
         </sc-if>
 
@@ -756,7 +754,6 @@
     <div style="max-width:1180px; margin:0 auto; padding:clamp(40px,6vw,80px) clamp(20px,5vw,56px) clamp(54px,7vw,96px);">
       <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
         <div style="font-family:'Anuphan', system-ui, sans-serif; font-weight:600; font-size:12px; letter-spacing:0.06em; color:#2FA05E;">โปรโมชัน &amp; ข่าวสาร</div>
-        <span style="font-family:'Anuphan', system-ui, sans-serif; font-weight:500; font-size:12px; color:#8C8C82; border:1px solid rgba(20,21,15,0.18); border-radius:999px; padding:3px 10px;">ตัวอย่าง · เร็วๆ นี้</span>
       </div>
       <h2 style="font-size:clamp(30px,4.6vw,54px); line-height:1.1; letter-spacing:0; font-weight:700; margin:0 0 clamp(30px,4vw,44px);">ข้อเสนอประจำสัปดาห์</h2>
       <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px;">
@@ -773,7 +770,6 @@
           <div style="padding:22px;"><div style="font-family:'JetBrains Mono', monospace; font-size:11px; color:#2FA05E; margin-bottom:8px;">แพ็กรายสัปดาห์</div><h3 style="font-size:20px; font-weight:600; margin:0 0 8px;">เซ็ตฟื้นพลัง 5 วัน</h3><p style="font-size:14px; line-height:1.65; color:#46463e; margin:0;">สมูทตี้โปรตีน 5 แก้ว คุมแคลอรี่ทั้งสัปดาห์ ในราคาพิเศษ</p></div>
         </div>
       </div>
-      <p style="font-family:'JetBrains Mono', monospace; font-size:11px; color:#8C8C82; margin:24px 0 0;">* เนื้อหาตัวอย่าง — ส่งโปรโมชันและข่าวจริงให้ผมเพื่ออัปเดตได้เลย</p>
     </div>
   </div>
   </sc-if>
@@ -784,9 +780,8 @@
     <div style="max-width:1180px; margin:0 auto; padding:clamp(40px,6vw,80px) clamp(20px,5vw,56px) clamp(54px,7vw,96px);">
       <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
         <div style="font-family:'Anuphan', system-ui, sans-serif; font-weight:600; font-size:12px; letter-spacing:0.06em; color:#2FA05E;">สาขาของเรา</div>
-        <span style="font-family:'Anuphan', system-ui, sans-serif; font-weight:500; font-size:12px; color:#8C8C82; border:1px solid rgba(20,21,15,0.18); border-radius:999px; padding:3px 10px;">ตัวอย่าง · เร็วๆ นี้</span>
       </div>
-      <h2 style="font-size:clamp(30px,4.6vw,54px); line-height:1.1; letter-spacing:0; font-weight:700; margin:0 0 clamp(30px,4vw,44px);">หา FLOW ใกล้คุณ</h2>
+      <h2 style="font-size:clamp(30px,4.6vw,54px); line-height:1.1; letter-spacing:0; font-weight:700; margin:0 0 clamp(30px,4vw,44px);">หา GG Smoothie ใกล้คุณ</h2>
       <div style="display:flex; flex-wrap:wrap; gap:clamp(24px,4vw,40px);">
         <div style="flex:1 1 300px; min-width:280px; display:flex; flex-direction:column; gap:14px;">
           <div style="border:1px solid rgba(20,21,15,0.12); border-radius:16px; padding:20px 22px; background:#fff; display:flex; justify-content:space-between; align-items:flex-start; gap:14px;">
@@ -816,7 +811,7 @@
     <div style="max-width:1180px; margin:0 auto; padding:clamp(40px,6vw,80px) clamp(20px,5vw,56px) clamp(54px,7vw,96px); display:flex; flex-wrap:wrap; gap:clamp(32px,5vw,64px);">
       <div style="flex:1 1 320px; min-width:280px;">
         <div style="font-family:'Anuphan', system-ui, sans-serif; font-weight:600; font-size:12px; letter-spacing:0.06em; color:#2FA05E; margin-bottom:14px;">ติดต่อเรา</div>
-        <h2 style="font-size:clamp(30px,4.6vw,54px); line-height:1.1; letter-spacing:0; font-weight:700; margin:0 0 20px;">คุยกับ FLOW</h2>
+        <h2 style="font-size:clamp(30px,4.6vw,54px); line-height:1.1; letter-spacing:0; font-weight:700; margin:0 0 20px;">คุยกับ GG Smoothie</h2>
         <p style="font-size:15px; line-height:1.7; color:#46463e; max-width:380px; margin:0 0 28px;">อยากร่วมงาน เปิดสาขาแฟรนไชส์ หรือสั่งจัดเลี้ยง? ทักมาได้เลย เราตอบทุกข้อความ</p>
         <div style="display:flex; flex-direction:column; gap:18px;">
           <div style="font-family:'Anuphan', system-ui, sans-serif; font-size:13px; font-weight:600; color:#8C8C82;">ช่องทางติดตาม</div>
@@ -863,7 +858,7 @@
         </div>
       </div>
       <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; padding-top:24px; font-family:'JetBrains Mono', monospace; font-size:12px; color:#8C8C82;">
-        <span>© 2026 FLOW NUTRITION</span>
+        <span>© 2026 GG SMOOTHIE</span>
         <span>Bangkok, Thailand</span>
       </div>
     </div>
@@ -1382,7 +1377,7 @@ class Component extends DCLogic {
       'สาขา': 'Stores', 'ติดต่อ': 'Contact', 'สั่งเลย': 'Order',
       // home hero
       'ชั่งตวงทุกกรัม': 'Weighed to the gram', 'คุณค่าจาก': 'Goodness from', 'ผลไม้จริง': 'real fruit',
-      'สมูทตี้ผลไม้เต็มผลปั่นเย็น อุดมด้วยโปรตีนและไฟเบอร์จากผลไม้และวัตถุดิบจริง ไม่มีไซรัป ไม่มีหัวเชื้อเข้มข้น ได้รสชาติจากผลไม้แท้ ๆ ทุกแก้ว': 'Whole-fruit smoothies blended cold, rich in protein and fiber from real fruit and ingredients. No syrup, no concentrates — real fruit flavor in every cup.',
+      'สมูทตี้ผลไม้เต็มผลปั่น อุดมด้วยไฟเบอร์ ไม่มีไซรัป ไม่มีหัวเชื้อเข้มข้น ได้รสชาติจากผลไม้แท้ ๆ ทุกแก้ว': 'Whole-fruit smoothies, rich in fiber. No syrup, no concentrates — real fruit flavor in every cup.',
       'ดูเมนูทั้งหมด': 'View all menu',
       'โปรตีน': 'Protein', 'แคลอรี่': 'Calories', 'แคล': 'kcal', 'ไฟเบอร์': 'Fiber', 'น้ำตาล': 'Sugar',
       'สูตรซิกเนเจอร์': 'Signature blend', 'กรีนโปรตีน': 'Green Protein',
@@ -1445,11 +1440,11 @@ class Component extends DCLogic {
       'สมูทตี้โปรตีน 5 แก้ว คุมแคลอรี่ทั้งสัปดาห์ ในราคาพิเศษ': 'Five protein smoothies to manage calories all week, at a special price.',
       'เนื้อหาตัวอย่าง — ส่งโปรโมชันและข่าวจริงให้ผมเพื่ออัปเดตได้เลย': 'Sample content — send your real promos and news so I can update them.',
       // stores
-      'สาขาของเรา': 'Our stores', 'หา FLOW ใกล้คุณ': 'Find FLOW near you', 'สยามสแควร์': 'Siam Square',
+      'สาขาของเรา': 'Our stores', 'หา GG Smoothie ใกล้คุณ': 'Find GG Smoothie near you', 'สยามสแควร์': 'Siam Square',
       'ซอย 3 ใกล้ทางออก BTS': 'Soi 3, near the BTS exit', 'ทองหล่อ': 'Thong Lo', 'ทองหล่อ ซอย 13': 'Thong Lo Soi 13',
       'อารีย์': 'Ari', 'BTS อารีย์ ทางออก 1': 'BTS Ari, Exit 1', 'วางภาพแผนที่ / หน้าร้าน': 'Drop map / storefront image',
       // contact
-      'ติดต่อเรา': 'Contact us', 'คุยกับ FLOW': 'Talk to FLOW',
+      'ติดต่อเรา': 'Contact us', 'คุยกับ GG Smoothie': 'Talk to GG Smoothie',
       'อยากร่วมงาน เปิดสาขาแฟรนไชส์ หรือสั่งจัดเลี้ยง? ทักมาได้เลย เราตอบทุกข้อความ': 'Want to collaborate, open a franchise, or order catering? Message us — we reply to everyone.',
       'ช่องทางติดตาม': 'Follow us', 'ชื่อ': 'Name', 'ชื่อของคุณ': 'Your name', 'อีเมล': 'Email', 'ข้อความ': 'Message',
       'พิมพ์ข้อความ…': 'Type your message…', 'พิมพ์ข้อความ': 'Type your message', 'ส่งข้อความ': 'Send message',
@@ -1474,7 +1469,7 @@ class Component extends DCLogic {
       'หน้าแรก': '首页', 'เมนู': '菜单', 'จัดสูตรเอง': '自选配方', 'โปรโมชัน': '优惠',
       'สาขา': '门店', 'ติดต่อ': '联系', 'สั่งเลย': '立即下单',
       'ชั่งตวงทุกกรัม': '每克精准称量', 'คุณค่าจาก': '源自', 'ผลไม้จริง': '真实水果',
-      'สมูทตี้ผลไม้เต็มผลปั่นเย็น อุดมด้วยโปรตีนและไฟเบอร์จากผลไม้และวัตถุดิบจริง ไม่มีไซรัป ไม่มีหัวเชื้อเข้มข้น ได้รสชาติจากผลไม้แท้ ๆ ทุกแก้ว': '整颗水果冷打果昔，富含来自真实水果与食材的蛋白质和纤维。无糖浆、无浓缩液，每一杯都是真实果香。',
+      'สมูทตี้ผลไม้เต็มผลปั่น อุดมด้วยไฟเบอร์ ไม่มีไซรัป ไม่มีหัวเชื้อเข้มข้น ได้รสชาติจากผลไม้แท้ ๆ ทุกแก้ว': '整颗水果打制的果昔，富含纤维。无糖浆、无浓缩液，每一杯都是真实果香。',
       'ดูเมนูทั้งหมด': '查看全部菜单',
       'โปรตีน': '蛋白质', 'แคลอรี่': '热量', 'แคล': '卡', 'ไฟเบอร์': '纤维', 'น้ำตาล': '糖',
       'สูตรซิกเนเจอร์': '招牌配方', 'กรีนโปรตีน': '绿色蛋白',
@@ -1528,10 +1523,10 @@ class Component extends DCLogic {
       'แพ็กรายสัปดาห์': '周套餐', 'เซ็ตฟื้นพลัง 5 วัน': '5 天焕活套餐',
       'สมูทตี้โปรตีน 5 แก้ว คุมแคลอรี่ทั้งสัปดาห์ ในราคาพิเศษ': '5 杯蛋白质果昔，整周控制热量，特惠价格。',
       'เนื้อหาตัวอย่าง — ส่งโปรโมชันและข่าวจริงให้ผมเพื่ออัปเดตได้เลย': '示例内容 — 请把真实的优惠和资讯发给我以便更新。',
-      'สาขาของเรา': '我们的门店', 'หา FLOW ใกล้คุณ': '寻找你附近的 FLOW', 'สยามสแควร์': '暹罗广场',
+      'สาขาของเรา': '我们的门店', 'หา GG Smoothie ใกล้คุณ': '寻找你附近的 GG Smoothie', 'สยามสแควร์': '暹罗广场',
       'ซอย 3 ใกล้ทางออก BTS': '3 巷，近 BTS 出口', 'ทองหล่อ': '通罗', 'ทองหล่อ ซอย 13': '通罗 13 巷',
       'อารีย์': '阿里', 'BTS อารีย์ ทางออก 1': 'BTS 阿里站 1 号出口', 'วางภาพแผนที่ / หน้าร้าน': '放入地图 / 店面图片',
-      'ติดต่อเรา': '联系我们', 'คุยกับ FLOW': '联系 FLOW',
+      'ติดต่อเรา': '联系我们', 'คุยกับ GG Smoothie': '联系 GG Smoothie',
       'อยากร่วมงาน เปิดสาขาแฟรนไชส์ หรือสั่งจัดเลี้ยง? ทักมาได้เลย เราตอบทุกข้อความ': '想要合作、加盟开店或预订宴会餐饮？随时联系我们，我们会回复每一条消息。',
       'ช่องทางติดตาม': '关注我们', 'ชื่อ': '姓名', 'ชื่อของคุณ': '你的名字', 'อีเมล': '邮箱', 'ข้อความ': '留言',
       'พิมพ์ข้อความ…': '输入留言…', 'พิมพ์ข้อความ': '输入留言', 'ส่งข้อความ': '发送留言',
