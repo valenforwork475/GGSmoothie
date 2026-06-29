@@ -418,6 +418,11 @@
         <button onclick="{{ goPromos }}" style="background:transparent; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:14px; font-weight:500; color:#5b5b52; padding:6px 2px; position:relative; transition:color .2s ease; white-space:nowrap;" style-hover="color:#1B3325;">โปรโมชัน<sc-if value="{{ showPromos }}"><span style="position:absolute; left:0; right:0; bottom:-3px; height:2px; background:#A7DA4E; border-radius:2px;"></span></sc-if></button>
         <button onclick="{{ goStores }}" style="background:transparent; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:14px; font-weight:500; color:#5b5b52; padding:6px 2px; position:relative; transition:color .2s ease; white-space:nowrap;" style-hover="color:#1B3325;">สาขา<sc-if value="{{ showStores }}"><span style="position:absolute; left:0; right:0; bottom:-3px; height:2px; background:#A7DA4E; border-radius:2px;"></span></sc-if></button>
         <button onclick="{{ goContact }}" style="background:transparent; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:14px; font-weight:500; color:#5b5b52; padding:6px 2px; position:relative; transition:color .2s ease; white-space:nowrap;" style-hover="color:#1B3325;">ติดต่อ<sc-if value="{{ showContact }}"><span style="position:absolute; left:0; right:0; bottom:-3px; height:2px; background:#A7DA4E; border-radius:2px;"></span></sc-if></button>
+        <div style="display:flex; align-items:center; gap:2px; background:rgba(20,21,15,0.05); border-radius:10px; padding:2px;">
+          <button onclick="{{ pickLangTh }}" style="{{ langThStyle }}">TH</button>
+          <button onclick="{{ pickLangEn }}" style="{{ langEnStyle }}">EN</button>
+          <button onclick="{{ pickLangZh }}" style="{{ langZhStyle }}">中</button>
+        </div>
         <div style="display:flex; align-items:center; gap:8px;">
           <button onclick="{{ openCart }}" style="position:relative; background:#1B3325; color:#EAF2E2; border:none; cursor:pointer; font-family:'Anuphan', sans-serif; font-weight:500; font-size:14px; padding:11px 22px; border-radius:999px; transition:all .2s ease;" style-hover="background:#A7DA4E; color:#1B3325;">สั่งเลย<sc-if value="{{ cartHasItems }}"><span style="position:absolute; top:-6px; right:-6px; min-width:20px; height:20px; padding:0 5px; border-radius:999px; background:#A7DA4E; color:#1B3325; font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 2px #EAF2E2;">{{ countLabel }}</span></sc-if></button>
         </div>
@@ -973,7 +978,7 @@ class Component extends DCLogic {
     LINE_URL: 'https://lin.ee/ttf3FPn',   // ลิงก์ LINE สำหรับสั่งซื้อ
     PROMPTPAY_ID: '0823564415',           // พร้อมเพย์รับเงิน
   };
-  state = { active: 'home', cart: {}, cartOpen: false, base: 'water', items: {}, customs: [], cidSeq: 1, shTemplate: 't1', shMenu: 'g', shCaption: '', shPhotoReady: false, checkingOut: false, payMethod: 'promptpay', orderPlaced: false, member: null, stamps: 0, redeemed: 0, mName: '', mPhone: '', stampPulse: false, buildTab: 'base', sheetUrlInput: '', customMenu: null, customBases: null, customFruits: null, customBoosters: null, sheetLoading: false, sheetError: null };
+  state = { active: 'home', lang: 'th', cart: {}, cartOpen: false, base: 'water', items: {}, customs: [], cidSeq: 1, shTemplate: 't1', shMenu: 'g', shCaption: '', shPhotoReady: false, checkingOut: false, payMethod: 'promptpay', orderPlaced: false, member: null, stamps: 0, redeemed: 0, mName: '', mPhone: '', stampPulse: false, buildTab: 'base', sheetUrlInput: '', customMenu: null, customBases: null, customFruits: null, customBoosters: null, sheetLoading: false, sheetError: null };
   canvasRef = React.createRef();
   // ===================== MEMBER & STAMPS =====================
   loadMember() {
@@ -1172,7 +1177,7 @@ class Component extends DCLogic {
       const t = this.buildTotals();
       if (t.itemCount <= 0) return;
       const b = this.BASEMAP[this.state.base];
-      const parts = ['เบส' + b.name];
+      const parts = ['เบส ' + b.name];
       Object.keys(this.state.items).forEach((k) => { const ing = this.ALLING[k]; if (ing) parts.push(ing.name + ' x' + this.state.items[k]); });
       const desc = parts.join(' · ');
       this.setState((s) => {
@@ -1224,6 +1229,7 @@ class Component extends DCLogic {
     this._onHash = () => this.applyHash();
     if (typeof window !== 'undefined') window.addEventListener('hashchange', this._onHash);
     this.applyContentProtection();
+    this.initI18n();
     // Sheet sync paused: use in-code defaults while the menu is being finalized.
     // Re-enable by uncommenting the block below.
     // this.setState({ sheetUrlInput: this.CFG.SHEET_URL }, () => {
@@ -1239,6 +1245,298 @@ class Component extends DCLogic {
     document.addEventListener('contextmenu', (e) => e.preventDefault());
     document.addEventListener('dragstart', (e) => { if (e.target && e.target.tagName === 'IMG') e.preventDefault(); });
   }
+
+  // ===================== I18N (Thai source; EN/ZH overlay applied to the DOM) =====================
+  LANGS = ['th', 'en', 'zh'];
+  langBtn(l) {
+    const on = (this.state.lang || 'th') === l;
+    return { background: on ? '#1B3325' : 'transparent', color: on ? '#EAF2E2' : '#5b5b52', border: 'none', cursor: 'pointer', fontFamily: "'Anuphan', system-ui, sans-serif", fontSize: '12px', fontWeight: '700', padding: '5px 10px', borderRadius: '8px', lineHeight: '1', transition: 'all .15s ease' };
+  }
+  pickLang(l) {
+    return (e) => {
+      if (e && e.preventDefault) e.preventDefault();
+      if ((this.state.lang || 'th') === l) return;
+      try { window.localStorage.setItem('gg_lang', l); } catch (er) {}
+      if (typeof document !== 'undefined') document.documentElement.setAttribute('lang', l);
+      this.setState({ lang: l }, () => this.applyI18n());
+    };
+  }
+  initI18n() {
+    if (typeof document === 'undefined') return;
+    let l = 'th';
+    try { const s = window.localStorage.getItem('gg_lang'); if (s && this.LANGS.indexOf(s) >= 0) l = s; } catch (e) {}
+    document.documentElement.setAttribute('lang', l);
+    if (l !== (this.state.lang || 'th')) this.setState({ lang: l }, () => this.applyI18n());
+    else this.applyI18n();
+  }
+  i18nSortedKeys() {
+    if (this._i18nKeys) return this._i18nKeys;
+    const seen = {};
+    ['en', 'zh'].forEach((lg) => { Object.keys(this.I18N[lg] || {}).forEach((k) => { seen[k] = true; }); });
+    this._i18nKeys = Object.keys(seen).sort((a, b) => b.length - a.length);
+    return this._i18nKeys;
+  }
+  translateText(src, lang) {
+    const dict = this.I18N[lang]; if (!dict) return src;
+    const trimmed = src.trim();
+    if (Object.prototype.hasOwnProperty.call(dict, trimmed)) return src.replace(trimmed, dict[trimmed]);
+    let out = src; const keys = this.i18nSortedKeys();
+    for (let i = 0; i < keys.length; i++) { const k = keys[i]; if (dict[k] && out.indexOf(k) !== -1) out = out.split(k).join(dict[k]); }
+    return out;
+  }
+  restoreI18n() {
+    if (typeof document === 'undefined' || typeof NodeFilter === 'undefined') return;
+    const root = document.body; if (!root || !this._i18nOrig) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    let n; while ((n = walker.nextNode())) { const o = this._i18nOrig.get(n); if (o !== undefined && n.nodeValue !== o) n.nodeValue = o; }
+    if (this._i18nAttr) {
+      ['placeholder', 'title', 'alt', 'aria-label'].forEach((a) => {
+        Array.prototype.forEach.call(root.querySelectorAll('[' + a + ']'), (el) => {
+          const store = this._i18nAttr.get(el); if (store && store[a] !== undefined && el.getAttribute(a) !== store[a]) el.setAttribute(a, store[a]);
+        });
+      });
+    }
+    this._i18nActivated = false;
+  }
+  applyI18n() {
+    if (typeof document === 'undefined' || typeof NodeFilter === 'undefined') return;
+    const lang = this.state.lang || 'th';
+    const root = document.body; if (!root) return;
+    // Fast path: Thai is the source language, so it needs no DOM work and no
+    // observer. Most visitors stay in Thai and pay zero i18n overhead.
+    if (lang === 'th') {
+      if (this._i18nObserver) this._i18nObserver.disconnect();
+      if (this._i18nActivated) this.restoreI18n();
+      return;
+    }
+    this._i18nActivated = true;
+    if (!this._i18nOrig) this._i18nOrig = new WeakMap();
+    if (!this._i18nAttr) this._i18nAttr = new WeakMap();
+    if (this._i18nObserver) this._i18nObserver.disconnect();
+    const THAI = /[฀-๿]/;
+    // --- text nodes ---
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        const p = n.parentNode; if (!p) return NodeFilter.FILTER_REJECT;
+        const tag = p.nodeName;
+        if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'CANVAS' || tag === 'NOSCRIPT') return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const nodes = []; let cur; while ((cur = walker.nextNode())) nodes.push(cur);
+    nodes.forEach((n) => {
+      const now = n.nodeValue;
+      let src;
+      if (THAI.test(now)) { src = now; this._i18nOrig.set(n, now); }
+      else { src = this._i18nOrig.get(n); }
+      if (src === undefined || !THAI.test(src)) return;
+      const next = (lang === 'th') ? src : this.translateText(src, lang);
+      if (n.nodeValue !== next) n.nodeValue = next;
+    });
+    // --- selected attributes (placeholders, titles, alt, aria-label) ---
+    const attrs = ['placeholder', 'title', 'alt', 'aria-label'];
+    attrs.forEach((a) => {
+      const els = root.querySelectorAll('[' + a + ']');
+      Array.prototype.forEach.call(els, (el) => {
+        const now = el.getAttribute(a) || '';
+        let store = this._i18nAttr.get(el); if (!store) { store = {}; this._i18nAttr.set(el, store); }
+        let src;
+        if (THAI.test(now)) { src = now; store[a] = now; }
+        else { src = store[a]; }
+        if (src === undefined || !THAI.test(src)) return;
+        const next = (lang === 'th') ? src : this.translateText(src, lang);
+        if (el.getAttribute(a) !== next) el.setAttribute(a, next);
+      });
+    });
+    // --- re-arm observer (skips our own mutations since it's disconnected above) ---
+    if (typeof MutationObserver !== 'undefined') {
+      if (!this._i18nObserver) {
+        this._i18nObserver = new MutationObserver(() => {
+          if (this._i18nBusy) return;
+          this._i18nBusy = true;
+          const run = () => { this._i18nBusy = false; this.applyI18n(); };
+          if (typeof window !== 'undefined' && window.requestAnimationFrame) window.requestAnimationFrame(run); else setTimeout(run, 16);
+        });
+      }
+      this._i18nObserver.observe(root, { childList: true, subtree: true, characterData: true });
+    }
+  }
+  I18N = {
+    en: {
+      // nav / global
+      'หน้าแรก': 'Home', 'เมนู': 'Menu', 'จัดสูตรเอง': 'Build Your Own', 'โปรโมชัน': 'Promotions',
+      'สาขา': 'Stores', 'ติดต่อ': 'Contact', 'สั่งเลย': 'Order',
+      // home hero
+      'ชั่งตวงทุกกรัม': 'Weighed to the gram', 'คุณค่าจาก': 'Goodness from', 'ผลไม้จริง': 'real fruit',
+      'สมูทตี้ผลไม้เต็มผลปั่นเย็น อุดมด้วยโปรตีนและไฟเบอร์จากผลไม้และวัตถุดิบจริง ไม่มีไซรัป ไม่มีหัวเชื้อเข้มข้น ได้รสชาติจากผลไม้แท้ ๆ ทุกแก้ว': 'Whole-fruit smoothies blended cold, rich in protein and fiber from real fruit and ingredients. No syrup, no concentrates — real fruit flavor in every cup.',
+      'ดูเมนูทั้งหมด': 'View all menu',
+      'โปรตีน': 'Protein', 'แคลอรี่': 'Calories', 'แคล': 'kcal', 'ไฟเบอร์': 'Fiber', 'น้ำตาล': 'Sugar',
+      'สูตรซิกเนเจอร์': 'Signature blend', 'กรีนโปรตีน': 'Green Protein',
+      'วางรูปสมูทตี้ของคุณ': 'Drop your smoothie photo',
+      'ไม่ใช่แค่น้ำผลไม้ปั่น': 'Not just a smoothie',
+      'เราคงเนื้อผลไม้และไฟเบอร์ตามธรรมชาติไว้ในทุกแก้ว โดยไม่ใช้หัวเชื้อเข้มข้น': 'We keep natural fruit pulp and fiber in every cup, with no concentrates.',
+      'ชั่งตวง ไม่ใช่กะ': 'Weighed, not guessed',
+      'ทุกวัตถุดิบถูกชั่งอย่างเป็นมาตรฐาน เพื่อให้ทุกแก้วมีปริมาณตามสูตรที่กำหนด': 'Every ingredient is weighed to standard so each cup matches its exact recipe.',
+      'ปั่นสดเมื่อสั่ง': 'Blended fresh to order',
+      'ไม่มีการผสมไว้ล่วงหน้า ไม่มีแก้วตั้งทิ้ง ทุกแก้วเริ่มปั่นทันทีหลังจากที่คุณสั่ง': 'Nothing pre-mixed, nothing left sitting — every cup starts blending right after you order.',
+      // menu
+      'เมนูทั้งหมด — 6 สูตร': 'All menu — 6 blends', 'เลือกสูตรของคุณ': 'Choose your blend', 'วางรูปเมนู': 'Drop menu photo',
+      'เพิ่มลงตะกร้า': 'Add to cart',
+      // menu items
+      'เบอร์รี่ฟื้นพลัง': 'Berry Recharge', 'ทรอปิคอลรีเซ็ต': 'Tropical Reset', 'คาเคาชาร์จ': 'Cacao Charge',
+      'มัทฉะรีชาร์จ': 'Matcha Recharge', 'ซิตรัสดีท็อกซ์': 'Citrus Detox',
+      'ผักโขม · กล้วย · โปรตีนถั่ว · อัลมอนด์': 'Spinach · Banana · Pea protein · Almond',
+      'บลูเบอร์รี่ · บีทรูท · เชอร์รี่ · โยเกิร์ต': 'Blueberry · Beetroot · Cherry · Yogurt',
+      'มะม่วง · สับปะรด · ขิง · มะพร้าว': 'Mango · Pineapple · Ginger · Coconut',
+      'กล้วย · คาเคา · ข้าวโอ๊ต · โคลด์บรูว์': 'Banana · Cacao · Oats · Cold brew',
+      'มัทฉะ · กล้วย · โปรตีนถั่ว · อัลมอนด์': 'Matcha · Banana · Pea protein · Almond',
+      'ส้ม · เกรปฟรุต · ขิง · น้ำมะพร้าว': 'Orange · Grapefruit · Ginger · Coconut water',
+      // build
+      'สร้างสมูทตี้ในแบบของคุณ': 'Create your own smoothie',
+      'เลือกส่วนผสมได้เอง พร้อมดูราคาและข้อมูลโภชนาการแบบเรียลไทม์': 'Pick your own ingredients with real-time price and nutrition.',
+      'เบส': 'Base', 'ผลไม้': 'Fruit', 'บูสเตอร์': 'Booster', 'เลือกเบส': 'Choose a base', 'หมด': 'Sold out',
+      'เลือกเบส 1 อย่างก่อน แล้วไปขั้นต่อไปได้': 'Pick 1 base first, then continue.',
+      'เติมผลไม้': 'Add fruit', 'ไม่ใส่ก็ได้': 'Optional',
+      'บูสเตอร์เป็นออปชันเสริม ถ้าไม่ต้องการ กดเพิ่มลงตะกร้าได้เลย': "Boosters are optional — if you don't want any, just add to cart.",
+      'เลือกครบแล้ว · กดเพิ่มลงตะกร้าด้านล่าง': 'All set · add to cart below',
+      'สูตรของคุณ · เรียลไทม์': 'Your blend · live', 'โภชนาการต่อแก้ว': 'Nutrition per cup', 'ราคา': 'Price',
+      'เลือกส่วนผสมอย่างน้อย 1 อย่าง': 'Pick at least 1 ingredient',
+      'ค่าแก้ว+ปั่น': 'Cup + blend', 'คิดเมื่อเลือกส่วนผสมแล้ว': 'charged once you pick ingredients',
+      'โภชนาการ': 'Nutrition', 'ถัดไป': 'Next', 'เลือกส่วนผสมก่อน': 'Pick ingredients first',
+      // ingredients — bases
+      'น้ำเปล่า': 'Water', 'น้ำมะพร้าว': 'Coconut water', 'นมอัลมอนด์': 'Almond milk', 'นมโอ๊ต': 'Oat milk', 'โยเกิร์ตกรีก': 'Greek yogurt',
+      // ingredients — fruits
+      'มะม่วง': 'Mango', 'สตรอว์เบอร์รี่': 'Strawberry', 'กล้วย': 'Banana', 'สับปะรด': 'Pineapple', 'บลูเบอร์รี่': 'Blueberry',
+      'กีวี': 'Kiwi', 'แตงโม': 'Watermelon', 'อะโวคาโด': 'Avocado', 'มะพร้าว': 'Coconut',
+      // ingredients — boosters
+      'เวย์โปรตีนรสวนิลา': 'Vanilla whey protein', 'เมล็ดเจีย': 'Chia seeds', 'ข้าวโอ๊ต': 'Oats', 'ผงโกโก้แท้': 'Pure cacao powder',
+      'มัทฉะ': 'Matcha', 'อินทผลัม': 'Dates', 'เมล็ดแฟลกซ์บด': 'Ground flaxseed', 'ไซเลี่ยมฮัสค์': 'Psyllium husk',
+      // share
+      'สร้างการ์ดแชร์ของคุณ': 'Create your share card',
+      'อัปโหลดรูปสมูทตี้ของคุณ เลือกเมนูเพื่อดึงค่าโภชนาการอัตโนมัติ เลือกเทมเพลตน่ารัก แล้วบันทึกเป็นรูปไปโพสต์': 'Upload your smoothie photo, pick a menu to auto-fill nutrition, choose a cute template, and save an image to post on',
+      'ปลดล็อกหลังสั่งซื้อ': 'Unlock after ordering',
+      'การ์ดแชร์ใช้ได้หลังจากสั่งซื้อและยืนยันการชำระเงินแล้ว สั่งเครื่องดื่มของคุณก่อนได้เลย': 'The share card is available after you order and confirm payment. Order your drink first.',
+      'ไปเลือกเมนู': 'Go to menu', 'อัปโหลดรูป': 'Upload photo', 'เลือกเมนู / สูตร': 'Choose menu / blend',
+      'ข้อความบนการ์ด': 'Card text', 'ไม่บังคับ': 'Optional', 'เว้นว่างไว้จะใช้ชื่อเมนู': 'Leave blank to use the menu name',
+      'เลือกเทมเพลต': 'Choose a template', 'สดใส': 'Bright', 'เข้ม': 'Bold', 'มินิมอล': 'Minimal',
+      'บันทึกรูปการ์ด': 'Save card image', 'ไฟล์ขนาด': 'File size', 'เหมาะกับฟีด': 'great for feeds',
+      'ตัวอย่างการ์ด · พรีวิวเรียลไทม์': 'Card preview · real-time',
+      // promos
+      'ข่าวสาร': 'News', 'ตัวอย่าง · เร็วๆ นี้': 'Sample · coming soon', 'ข้อเสนอประจำสัปดาห์': "This week's offers",
+      'ทุกวันจันทร์': 'Every Monday', 'ซื้อ 1 แถม 1': 'Buy 1 Get 1',
+      'สมูทตี้แก้วที่สองฟรี เมื่อสั่งสูตรโปรตีนทุกเมนู': 'Second smoothie free with any protein blend.',
+      'สมาชิกใหม่': 'New members', 'ลด 20% ครั้งแรก': '20% off your first order',
+      'สมัครสมาชิกผ่านแอป รับส่วนลดทันทีสำหรับออเดอร์แรก': 'Sign up via the app and get an instant discount on your first order.',
+      'แพ็กรายสัปดาห์': 'Weekly pack', 'เซ็ตฟื้นพลัง 5 วัน': '5-Day Recharge Set',
+      'สมูทตี้โปรตีน 5 แก้ว คุมแคลอรี่ทั้งสัปดาห์ ในราคาพิเศษ': 'Five protein smoothies to manage calories all week, at a special price.',
+      'เนื้อหาตัวอย่าง — ส่งโปรโมชันและข่าวจริงให้ผมเพื่ออัปเดตได้เลย': 'Sample content — send your real promos and news so I can update them.',
+      // stores
+      'สาขาของเรา': 'Our stores', 'หา FLOW ใกล้คุณ': 'Find FLOW near you', 'สยามสแควร์': 'Siam Square',
+      'ซอย 3 ใกล้ทางออก BTS': 'Soi 3, near the BTS exit', 'ทองหล่อ': 'Thong Lo', 'ทองหล่อ ซอย 13': 'Thong Lo Soi 13',
+      'อารีย์': 'Ari', 'BTS อารีย์ ทางออก 1': 'BTS Ari, Exit 1', 'วางภาพแผนที่ / หน้าร้าน': 'Drop map / storefront image',
+      // contact
+      'ติดต่อเรา': 'Contact us', 'คุยกับ FLOW': 'Talk to FLOW',
+      'อยากร่วมงาน เปิดสาขาแฟรนไชส์ หรือสั่งจัดเลี้ยง? ทักมาได้เลย เราตอบทุกข้อความ': 'Want to collaborate, open a franchise, or order catering? Message us — we reply to everyone.',
+      'ช่องทางติดตาม': 'Follow us', 'ชื่อ': 'Name', 'ชื่อของคุณ': 'Your name', 'อีเมล': 'Email', 'ข้อความ': 'Message',
+      'พิมพ์ข้อความ…': 'Type your message…', 'พิมพ์ข้อความ': 'Type your message', 'ส่งข้อความ': 'Send message',
+      // footer
+      'ผลไม้เต็มผล ปั่นสดทุกแก้ว': 'Whole fruit, blended fresh every cup', 'คำนวณโภชนาการอย่างแม่นยำ': 'Precisely calculated nutrition',
+      'เมนูลัด': 'Quick links', 'เวลาทำการ': 'Opening hours', 'เปิดทุกวัน': 'Open daily',
+      // cart / checkout
+      'ตะกร้าของคุณ': 'Your cart', 'ยังไม่มีสินค้าในตะกร้า': 'Your cart is empty', 'เลือกสูตรจากหน้าเมนูได้เลย': 'Pick a blend from the menu',
+      'รวมทั้งหมด': 'Total', 'ดำเนินการสั่งซื้อ': 'Checkout', 'ช่องทางชำระเงิน': 'Payment method',
+      'พร้อมเพย์': 'PromptPay', 'สแกน QR ทุกแอปธนาคาร': 'Scan QR with any banking app', 'ทักแชทร้านเพื่อยืนยัน': 'Chat to confirm',
+      'โอนพร้อมเพย์': 'PromptPay transfer', 'แนบสลิปยืนยันในแชท': 'Attach slip in chat',
+      'เงินสด · รับที่ร้าน': 'Cash · pickup', 'จ่ายตอนมารับเครื่องดื่ม': 'Pay when you pick up',
+      'แจ้งชำระเงินทาง': 'Notify payment via', 'เปิด LINE เพื่อยืนยันออเดอร์': 'Open LINE to confirm order',
+      'โอนพร้อมเพย์ไปที่': 'Transfer via PromptPay to', 'แนบสลิปทาง': 'Attach slip via',
+      'จองออเดอร์ · รับที่ร้าน': 'Reserve order · pickup', 'ชำระแล้ว · ทำการ์ดแชร์': 'Paid · make share card',
+      'ปลดล็อกการ์ดแชร์หลังยืนยันการชำระเงิน': 'Unlock the share card after payment is confirmed',
+      'กลับไปแก้ตะกร้า': 'Back to cart',
+      'เดโม — ออเดอร์ส่งผ่าน LINE ยังไม่ตัดเงินอัตโนมัติ': 'Demo — orders are sent via LINE; no automatic charge.',
+      'ยอด': 'Total'
+    },
+    zh: {
+      'หน้าแรก': '首页', 'เมนู': '菜单', 'จัดสูตรเอง': '自选配方', 'โปรโมชัน': '优惠',
+      'สาขา': '门店', 'ติดต่อ': '联系', 'สั่งเลย': '立即下单',
+      'ชั่งตวงทุกกรัม': '每克精准称量', 'คุณค่าจาก': '源自', 'ผลไม้จริง': '真实水果',
+      'สมูทตี้ผลไม้เต็มผลปั่นเย็น อุดมด้วยโปรตีนและไฟเบอร์จากผลไม้และวัตถุดิบจริง ไม่มีไซรัป ไม่มีหัวเชื้อเข้มข้น ได้รสชาติจากผลไม้แท้ ๆ ทุกแก้ว': '整颗水果冷打果昔，富含来自真实水果与食材的蛋白质和纤维。无糖浆、无浓缩液，每一杯都是真实果香。',
+      'ดูเมนูทั้งหมด': '查看全部菜单',
+      'โปรตีน': '蛋白质', 'แคลอรี่': '热量', 'แคล': '卡', 'ไฟเบอร์': '纤维', 'น้ำตาล': '糖',
+      'สูตรซิกเนเจอร์': '招牌配方', 'กรีนโปรตีน': '绿色蛋白',
+      'วางรูปสมูทตี้ของคุณ': '放入你的果昔照片',
+      'ไม่ใช่แค่น้ำผลไม้ปั่น': '不只是果昔',
+      'เราคงเนื้อผลไม้และไฟเบอร์ตามธรรมชาติไว้ในทุกแก้ว โดยไม่ใช้หัวเชื้อเข้มข้น': '每一杯都保留天然果肉与纤维，绝不使用浓缩原液。',
+      'ชั่งตวง ไม่ใช่กะ': '称量，而非估量',
+      'ทุกวัตถุดิบถูกชั่งอย่างเป็นมาตรฐาน เพื่อให้ทุกแก้วมีปริมาณตามสูตรที่กำหนด': '每种食材都按标准称量，确保每杯都符合既定配方。',
+      'ปั่นสดเมื่อสั่ง': '现点现打',
+      'ไม่มีการผสมไว้ล่วงหน้า ไม่มีแก้วตั้งทิ้ง ทุกแก้วเริ่มปั่นทันทีหลังจากที่คุณสั่ง': '不预先调配、不久置，每杯都在你下单后立即现打。',
+      'เมนูทั้งหมด — 6 สูตร': '全部菜单 — 6 款', 'เลือกสูตรของคุณ': '选择你的配方', 'วางรูปเมนู': '放入菜单照片',
+      'เพิ่มลงตะกร้า': '加入购物车',
+      'เบอร์รี่ฟื้นพลัง': '莓果焕活', 'ทรอปิคอลรีเซ็ต': '热带轻盈', 'คาเคาชาร์จ': '可可能量',
+      'มัทฉะรีชาร์จ': '抹茶焕活', 'ซิตรัสดีท็อกซ์': '柑橘排毒',
+      'ผักโขม · กล้วย · โปรตีนถั่ว · อัลมอนด์': '菠菜 · 香蕉 · 豌豆蛋白 · 杏仁',
+      'บลูเบอร์รี่ · บีทรูท · เชอร์รี่ · โยเกิร์ต': '蓝莓 · 甜菜根 · 樱桃 · 酸奶',
+      'มะม่วง · สับปะรด · ขิง · มะพร้าว': '芒果 · 菠萝 · 姜 · 椰子',
+      'กล้วย · คาเคา · ข้าวโอ๊ต · โคลด์บรูว์': '香蕉 · 可可 · 燕麦 · 冷萃咖啡',
+      'มัทฉะ · กล้วย · โปรตีนถั่ว · อัลมอนด์': '抹茶 · 香蕉 · 豌豆蛋白 · 杏仁',
+      'ส้ม · เกรปฟรุต · ขิง · น้ำมะพร้าว': '橙 · 西柚 · 姜 · 椰子水',
+      'สร้างสมูทตี้ในแบบของคุณ': '打造你的专属果昔',
+      'เลือกส่วนผสมได้เอง พร้อมดูราคาและข้อมูลโภชนาการแบบเรียลไทม์': '自由挑选食材，价格与营养信息实时显示。',
+      'เบส': '基底', 'ผลไม้': '水果', 'บูสเตอร์': '加料', 'เลือกเบส': '选择基底', 'หมด': '售罄',
+      'เลือกเบส 1 อย่างก่อน แล้วไปขั้นต่อไปได้': '请先选择 1 种基底，再继续。',
+      'เติมผลไม้': '添加水果', 'ไม่ใส่ก็ได้': '可不加',
+      'บูสเตอร์เป็นออปชันเสริม ถ้าไม่ต้องการ กดเพิ่มลงตะกร้าได้เลย': '加料为可选项，若不需要可直接加入购物车。',
+      'เลือกครบแล้ว · กดเพิ่มลงตะกร้าด้านล่าง': '选好了 · 在下方加入购物车',
+      'สูตรของคุณ · เรียลไทม์': '你的配方 · 实时', 'โภชนาการต่อแก้ว': '每杯营养', 'ราคา': '价格',
+      'เลือกส่วนผสมอย่างน้อย 1 อย่าง': '至少选择 1 种食材',
+      'ค่าแก้ว+ปั่น': '杯子+打制费', 'คิดเมื่อเลือกส่วนผสมแล้ว': '选择食材后计费',
+      'โภชนาการ': '营养', 'ถัดไป': '下一步', 'เลือกส่วนผสมก่อน': '请先选择食材',
+      'น้ำเปล่า': '纯净水', 'น้ำมะพร้าว': '椰子水', 'นมอัลมอนด์': '杏仁奶', 'นมโอ๊ต': '燕麦奶', 'โยเกิร์ตกรีก': '希腊酸奶',
+      'มะม่วง': '芒果', 'สตรอว์เบอร์รี่': '草莓', 'กล้วย': '香蕉', 'สับปะรด': '菠萝', 'บลูเบอร์รี่': '蓝莓',
+      'กีวี': '猕猴桃', 'แตงโม': '西瓜', 'อะโวคาโด': '牛油果', 'มะพร้าว': '椰子',
+      'เวย์โปรตีนรสวนิลา': '香草乳清蛋白', 'เมล็ดเจีย': '奇亚籽', 'ข้าวโอ๊ต': '燕麦', 'ผงโกโก้แท้': '纯可可粉',
+      'มัทฉะ': '抹茶', 'อินทผลัม': '椰枣', 'เมล็ดแฟลกซ์บด': '亚麻籽粉', 'ไซเลี่ยมฮัสค์': '洋车前子壳',
+      'สร้างการ์ดแชร์ของคุณ': '制作你的分享卡',
+      'อัปโหลดรูปสมูทตี้ของคุณ เลือกเมนูเพื่อดึงค่าโภชนาการอัตโนมัติ เลือกเทมเพลตน่ารัก แล้วบันทึกเป็นรูปไปโพสต์': '上传你的果昔照片，选择菜单自动填入营养，挑选可爱模板，保存图片即可发布到',
+      'ปลดล็อกหลังสั่งซื้อ': '下单后解锁',
+      'การ์ดแชร์ใช้ได้หลังจากสั่งซื้อและยืนยันการชำระเงินแล้ว สั่งเครื่องดื่มของคุณก่อนได้เลย': '分享卡需在下单并确认付款后使用，请先下单。',
+      'ไปเลือกเมนู': '前往菜单', 'อัปโหลดรูป': '上传照片', 'เลือกเมนู / สูตร': '选择菜单 / 配方',
+      'ข้อความบนการ์ด': '卡片文字', 'ไม่บังคับ': '可选', 'เว้นว่างไว้จะใช้ชื่อเมนู': '留空则使用菜单名称',
+      'เลือกเทมเพลต': '选择模板', 'สดใส': '明亮', 'เข้ม': '浓郁', 'มินิมอล': '简约',
+      'บันทึกรูปการ์ด': '保存卡片图片', 'ไฟล์ขนาด': '文件尺寸', 'เหมาะกับฟีด': '适合信息流',
+      'ตัวอย่างการ์ด · พรีวิวเรียลไทม์': '卡片预览 · 实时',
+      'ข่าวสาร': '资讯', 'ตัวอย่าง · เร็วๆ นี้': '示例 · 即将推出', 'ข้อเสนอประจำสัปดาห์': '本周优惠',
+      'ทุกวันจันทร์': '每周一', 'ซื้อ 1 แถม 1': '买一送一',
+      'สมูทตี้แก้วที่สองฟรี เมื่อสั่งสูตรโปรตีนทุกเมนู': '购买任意蛋白质配方，第二杯果昔免费。',
+      'สมาชิกใหม่': '新会员', 'ลด 20% ครั้งแรก': '首单 8 折',
+      'สมัครสมาชิกผ่านแอป รับส่วนลดทันทีสำหรับออเดอร์แรก': '通过 App 注册，首单立享折扣。',
+      'แพ็กรายสัปดาห์': '周套餐', 'เซ็ตฟื้นพลัง 5 วัน': '5 天焕活套餐',
+      'สมูทตี้โปรตีน 5 แก้ว คุมแคลอรี่ทั้งสัปดาห์ ในราคาพิเศษ': '5 杯蛋白质果昔，整周控制热量，特惠价格。',
+      'เนื้อหาตัวอย่าง — ส่งโปรโมชันและข่าวจริงให้ผมเพื่ออัปเดตได้เลย': '示例内容 — 请把真实的优惠和资讯发给我以便更新。',
+      'สาขาของเรา': '我们的门店', 'หา FLOW ใกล้คุณ': '寻找你附近的 FLOW', 'สยามสแควร์': '暹罗广场',
+      'ซอย 3 ใกล้ทางออก BTS': '3 巷，近 BTS 出口', 'ทองหล่อ': '通罗', 'ทองหล่อ ซอย 13': '通罗 13 巷',
+      'อารีย์': '阿里', 'BTS อารีย์ ทางออก 1': 'BTS 阿里站 1 号出口', 'วางภาพแผนที่ / หน้าร้าน': '放入地图 / 店面图片',
+      'ติดต่อเรา': '联系我们', 'คุยกับ FLOW': '联系 FLOW',
+      'อยากร่วมงาน เปิดสาขาแฟรนไชส์ หรือสั่งจัดเลี้ยง? ทักมาได้เลย เราตอบทุกข้อความ': '想要合作、加盟开店或预订宴会餐饮？随时联系我们，我们会回复每一条消息。',
+      'ช่องทางติดตาม': '关注我们', 'ชื่อ': '姓名', 'ชื่อของคุณ': '你的名字', 'อีเมล': '邮箱', 'ข้อความ': '留言',
+      'พิมพ์ข้อความ…': '输入留言…', 'พิมพ์ข้อความ': '输入留言', 'ส่งข้อความ': '发送留言',
+      'ผลไม้เต็มผล ปั่นสดทุกแก้ว': '整颗水果，杯杯现打', 'คำนวณโภชนาการอย่างแม่นยำ': '精准计算营养',
+      'เมนูลัด': '快捷菜单', 'เวลาทำการ': '营业时间', 'เปิดทุกวัน': '每日营业',
+      'ตะกร้าของคุณ': '你的购物车', 'ยังไม่มีสินค้าในตะกร้า': '购物车还是空的', 'เลือกสูตรจากหน้าเมนูได้เลย': '从菜单中选择配方',
+      'รวมทั้งหมด': '合计', 'ดำเนินการสั่งซื้อ': '去结算', 'ช่องทางชำระเงิน': '支付方式',
+      'พร้อมเพย์': 'PromptPay', 'สแกน QR ทุกแอปธนาคาร': '任意银行 App 扫码', 'ทักแชทร้านเพื่อยืนยัน': '私信门店确认',
+      'โอนพร้อมเพย์': 'PromptPay 转账', 'แนบสลิปยืนยันในแชท': '在聊天中附上转账凭证',
+      'เงินสด · รับที่ร้าน': '现金 · 到店自取', 'จ่ายตอนมารับเครื่องดื่ม': '取饮品时付款',
+      'แจ้งชำระเงินทาง': '通过以下方式通知付款：', 'เปิด LINE เพื่อยืนยันออเดอร์': '打开 LINE 确认订单',
+      'โอนพร้อมเพย์ไปที่': '通过 PromptPay 转账至', 'แนบสลิปทาง': '附上凭证：',
+      'จองออเดอร์ · รับที่ร้าน': '预订订单 · 到店自取', 'ชำระแล้ว · ทำการ์ดแชร์': '已付款 · 制作分享卡',
+      'ปลดล็อกการ์ดแชร์หลังยืนยันการชำระเงิน': '确认付款后解锁分享卡',
+      'กลับไปแก้ตะกร้า': '返回购物车',
+      'เดโม — ออเดอร์ส่งผ่าน LINE ยังไม่ตัดเงินอัตโนมัติ': '演示 — 订单通过 LINE 发送，暂不自动扣款。',
+      'ยอด': '合计'
+    }
+  };
 
   // ===================== GOOGLE SHEET SYNC =====================
   fetchSheetData() {
@@ -1584,6 +1882,8 @@ class Component extends DCLogic {
     const boosterRows = this.BOOSTERS.map(mkRow);
 
     return {
+      pickLangTh: this.pickLang('th'), pickLangEn: this.pickLang('en'), pickLangZh: this.pickLang('zh'),
+      langThStyle: this.langBtn('th'), langEnStyle: this.langBtn('en'), langZhStyle: this.langBtn('zh'),
       showHome: a === 'home', showMenu: a === 'menu', showNutri: a === 'nutrition',
       showBuild: a === 'build', showPromos: a === 'promos', showStores: a === 'stores', showContact: a === 'contact',
       goHome: this.go('home'), goMenu: this.go('menu'), goNutri: this.go('nutrition'),
