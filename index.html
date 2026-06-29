@@ -418,10 +418,20 @@
         <button onclick="{{ goPromos }}" style="background:transparent; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:14px; font-weight:500; color:#5b5b52; padding:6px 2px; position:relative; transition:color .2s ease; white-space:nowrap;" style-hover="color:#1B3325;">โปรโมชัน<sc-if value="{{ showPromos }}"><span style="position:absolute; left:0; right:0; bottom:-3px; height:2px; background:#A7DA4E; border-radius:2px;"></span></sc-if></button>
         <button onclick="{{ goStores }}" style="background:transparent; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:14px; font-weight:500; color:#5b5b52; padding:6px 2px; position:relative; transition:color .2s ease; white-space:nowrap;" style-hover="color:#1B3325;">สาขา<sc-if value="{{ showStores }}"><span style="position:absolute; left:0; right:0; bottom:-3px; height:2px; background:#A7DA4E; border-radius:2px;"></span></sc-if></button>
         <button onclick="{{ goContact }}" style="background:transparent; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:14px; font-weight:500; color:#5b5b52; padding:6px 2px; position:relative; transition:color .2s ease; white-space:nowrap;" style-hover="color:#1B3325;">ติดต่อ<sc-if value="{{ showContact }}"><span style="position:absolute; left:0; right:0; bottom:-3px; height:2px; background:#A7DA4E; border-radius:2px;"></span></sc-if></button>
-        <div style="display:flex; align-items:center; gap:2px; background:rgba(20,21,15,0.05); border-radius:10px; padding:2px;">
-          <button onclick="{{ pickLangTh }}" style="{{ langThStyle }}">TH</button>
-          <button onclick="{{ pickLangEn }}" style="{{ langEnStyle }}">EN</button>
-          <button onclick="{{ pickLangZh }}" style="{{ langZhStyle }}">中</button>
+        <div style="position:relative; display:flex; align-items:center;">
+          <button onclick="{{ toggleLangMenu }}" aria-label="เลือกภาษา" style="display:flex; align-items:center; gap:6px; background:transparent; border:1px solid rgba(20,21,15,0.16); border-radius:999px; padding:8px 13px; cursor:pointer; font-family:'Space Grotesk', system-ui, sans-serif; font-size:13px; font-weight:600; letter-spacing:0.02em; color:#1B3325; transition:all .15s ease; white-space:nowrap;" style-hover="border-color:#1B3325;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="3" y1="12" x2="21" y2="12"></line><path d="M12 3c2.6 2.7 2.6 15.3 0 18M12 3c-2.6 2.7-2.6 15.3 0 18"></path></svg>
+            <span>{{ curLangShort }}</span>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5 5 6.5 8 3.5"></path></svg>
+          </button>
+          <sc-if value="{{ langMenuOpen }}">
+            <div onclick="{{ closeLangMenu }}" style="position:fixed; inset:0; z-index:70;"></div>
+            <div style="position:absolute; top:calc(100% + 10px); right:0; z-index:80; background:#fff; border:1px solid rgba(20,21,15,0.1); border-radius:14px; box-shadow:0 18px 40px -16px rgba(20,21,15,0.35); padding:6px; display:flex; flex-direction:column; gap:2px; min-width:170px;">
+              <button onclick="{{ pickLangTh }}" style="{{ langItemTh }}"><span>ไทย</span><sc-if value="{{ langTickTh }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2FA05E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 6.5"></path></svg></sc-if></button>
+              <button onclick="{{ pickLangEn }}" style="{{ langItemEn }}"><span>English</span><sc-if value="{{ langTickEn }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2FA05E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 6.5"></path></svg></sc-if></button>
+              <button onclick="{{ pickLangZh }}" style="{{ langItemZh }}"><span>中文</span><sc-if value="{{ langTickZh }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2FA05E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 6.5"></path></svg></sc-if></button>
+            </div>
+          </sc-if>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
           <button onclick="{{ openCart }}" style="position:relative; background:#1B3325; color:#EAF2E2; border:none; cursor:pointer; font-family:'Anuphan', sans-serif; font-weight:500; font-size:14px; padding:11px 22px; border-radius:999px; transition:all .2s ease;" style-hover="background:#A7DA4E; color:#1B3325;">สั่งเลย<sc-if value="{{ cartHasItems }}"><span style="position:absolute; top:-6px; right:-6px; min-width:20px; height:20px; padding:0 5px; border-radius:999px; background:#A7DA4E; color:#1B3325; font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 2px #EAF2E2;">{{ countLabel }}</span></sc-if></button>
@@ -978,7 +988,7 @@ class Component extends DCLogic {
     LINE_URL: 'https://lin.ee/ttf3FPn',   // ลิงก์ LINE สำหรับสั่งซื้อ
     PROMPTPAY_ID: '0823564415',           // พร้อมเพย์รับเงิน
   };
-  state = { active: 'home', lang: 'th', cart: {}, cartOpen: false, base: 'water', items: {}, customs: [], cidSeq: 1, shTemplate: 't1', shMenu: 'g', shCaption: '', shPhotoReady: false, checkingOut: false, payMethod: 'promptpay', orderPlaced: false, member: null, stamps: 0, redeemed: 0, mName: '', mPhone: '', stampPulse: false, buildTab: 'base', sheetUrlInput: '', customMenu: null, customBases: null, customFruits: null, customBoosters: null, sheetLoading: false, sheetError: null };
+  state = { active: 'home', lang: 'th', langMenuOpen: false, cart: {}, cartOpen: false, base: 'water', items: {}, customs: [], cidSeq: 1, shTemplate: 't1', shMenu: 'g', shCaption: '', shPhotoReady: false, checkingOut: false, payMethod: 'promptpay', orderPlaced: false, member: null, stamps: 0, redeemed: 0, mName: '', mPhone: '', stampPulse: false, buildTab: 'base', sheetUrlInput: '', customMenu: null, customBases: null, customFruits: null, customBoosters: null, sheetLoading: false, sheetError: null };
   canvasRef = React.createRef();
   // ===================== MEMBER & STAMPS =====================
   loadMember() {
@@ -1248,17 +1258,21 @@ class Component extends DCLogic {
 
   // ===================== I18N (Thai source; EN/ZH overlay applied to the DOM) =====================
   LANGS = ['th', 'en', 'zh'];
-  langBtn(l) {
+  LANG_LABELS = { th: 'ไทย', en: 'English', zh: '中文' };
+  LANG_SHORT = { th: 'TH', en: 'EN', zh: '中' };
+  langItem(l) {
     const on = (this.state.lang || 'th') === l;
-    return { background: on ? '#1B3325' : 'transparent', color: on ? '#EAF2E2' : '#5b5b52', border: 'none', cursor: 'pointer', fontFamily: "'Anuphan', system-ui, sans-serif", fontSize: '12px', fontWeight: '700', padding: '5px 10px', borderRadius: '8px', lineHeight: '1', transition: 'all .15s ease' };
+    return { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', width: '100%', textAlign: 'left', background: on ? '#EAF2E2' : 'transparent', color: '#1B3325', border: 'none', cursor: 'pointer', fontFamily: "'Anuphan', system-ui, sans-serif", fontSize: '14px', fontWeight: on ? '700' : '500', padding: '9px 12px', borderRadius: '9px', whiteSpace: 'nowrap', transition: 'all .12s ease' };
   }
+  toggleLangMenu = (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState((s) => ({ langMenuOpen: !s.langMenuOpen })); };
+  closeLangMenu = (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ langMenuOpen: false }); };
   pickLang(l) {
     return (e) => {
       if (e && e.preventDefault) e.preventDefault();
-      if ((this.state.lang || 'th') === l) return;
+      if ((this.state.lang || 'th') === l) { this.setState({ langMenuOpen: false }); return; }
       try { window.localStorage.setItem('gg_lang', l); } catch (er) {}
       if (typeof document !== 'undefined') document.documentElement.setAttribute('lang', l);
-      this.setState({ lang: l }, () => this.applyI18n());
+      this.setState({ lang: l, langMenuOpen: false }, () => this.applyI18n());
     };
   }
   initI18n() {
@@ -1883,7 +1897,10 @@ class Component extends DCLogic {
 
     return {
       pickLangTh: this.pickLang('th'), pickLangEn: this.pickLang('en'), pickLangZh: this.pickLang('zh'),
-      langThStyle: this.langBtn('th'), langEnStyle: this.langBtn('en'), langZhStyle: this.langBtn('zh'),
+      langItemTh: this.langItem('th'), langItemEn: this.langItem('en'), langItemZh: this.langItem('zh'),
+      toggleLangMenu: this.toggleLangMenu, closeLangMenu: this.closeLangMenu,
+      langMenuOpen: this.state.langMenuOpen, curLangShort: this.LANG_SHORT[this.state.lang || 'th'],
+      langTickTh: (this.state.lang || 'th') === 'th', langTickEn: this.state.lang === 'en', langTickZh: this.state.lang === 'zh',
       showHome: a === 'home', showMenu: a === 'menu', showNutri: a === 'nutrition',
       showBuild: a === 'build', showPromos: a === 'promos', showStores: a === 'stores', showContact: a === 'contact',
       goHome: this.go('home'), goMenu: this.go('menu'), goNutri: this.go('nutrition'),
