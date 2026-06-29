@@ -1050,10 +1050,14 @@ class Component extends DCLogic {
   }
   get BOOSTERS() {
     return this.state.customBoosters || [
-      { key: 'whey', name: 'เวย์โปรตีน', kcal: 110, p: 24, f: 0, sug: 1, price: 30 },
-      { key: 'pb', name: 'เนยถั่ว', kcal: 95, p: 4, f: 1, sug: 1, price: 20 },
+      { key: 'whey', name: 'เวย์โปรตีนรสวนิลา', kcal: 110, p: 24, f: 1, sug: 2, price: 30 },
       { key: 'chia', name: 'เมล็ดเจีย', kcal: 60, p: 2, f: 5, sug: 0, price: 15 },
-      { key: 'ginger', name: 'ขิง', kcal: 5, p: 0, f: 0, sug: 0, price: 10 },
+      { key: 'oat', name: 'ข้าวโอ๊ต', kcal: 70, p: 3, f: 1, sug: 0, price: 15 },
+      { key: 'cacao', name: 'ผงโกโก้แท้', kcal: 25, p: 2, f: 1, sug: 0, price: 20 },
+      { key: 'matcha', name: 'มัทฉะ', kcal: 5, p: 1, f: 0, sug: 0, price: 25 },
+      { key: 'date', name: 'อินทผลัม', kcal: 65, p: 0, f: 0, sug: 15, price: 15 },
+      { key: 'flax', name: 'เมล็ดแฟลกซ์บด', kcal: 55, p: 2, f: 4, sug: 0, price: 15 },
+      { key: 'psyllium', name: 'ไซเลี่ยมฮัสค์', kcal: 20, p: 0, f: 0, sug: 0, price: 15 },
     ];
   }
   get ALLING() { const m = {}; this.FRUITS.concat(this.BOOSTERS).forEach((x) => { m[x.key] = x; }); return m; }
@@ -1171,7 +1175,7 @@ class Component extends DCLogic {
       this.setState((s) => {
         const customs = s.customs.slice();
         customs.push({ cid: 'cu' + s.cidSeq, label: 'สูตรของคุณ', desc, price: t.price, qty: 1, cal: t.cal, p: t.p, f: t.f, sug: t.sug });
-        return { customs, cidSeq: s.cidSeq + 1, items: {}, buildBarOpen: false, buildTab: 'base' };
+        return { customs, cidSeq: s.cidSeq + 1, items: {}, base: 'water', buildBarOpen: false, buildTab: 'base' };
       });
     };
   }
