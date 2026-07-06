@@ -1,1 +1,3 @@
 deploy-member/
+# POS ใช้ในร้านเท่านั้น ห้าม deploy ขึ้นเว็บสาธารณะ
+POS-1c-standalone.html
