@@ -34,6 +34,12 @@ Deno.serve(async (req) => {
   if (callerError || !caller || !caller.active || !["manager", "owner"].includes(caller.role)) {
     return json({ error: "manager or owner access required" }, 403);
   }
+  const { data: staffPermission, error: permissionError } = await admin
+    .from("role_permissions").select("allowed")
+    .eq("role", caller.role).eq("permission", "staff.manage").maybeSingle();
+  if (permissionError || !staffPermission?.allowed) {
+    return json({ error: "staff management permission required" }, 403);
+  }
 
   let body: Record<string, unknown>;
   try { body = await req.json(); } catch { return json({ error: "invalid json" }, 400); }

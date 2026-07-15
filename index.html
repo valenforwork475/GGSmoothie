@@ -1424,7 +1424,7 @@ class Component extends DCLogic {
     const cart = this.state.cart || {};
     const items = Object.keys(cart).filter((id) => cart[id] > 0 && byId[id]).map((id) => {
       const m = byId[id];
-      return { kind: 'menu', name: m.name, qty: cart[id], price: m.price, desc: m.desc || '', cal: m.cal, p: m.p, f: m.f, sug: m.sug };
+      return { kind: 'menu', menu_id: id, name: m.name, qty: cart[id], price: m.price, desc: m.desc || '', cal: m.cal, p: m.p, f: m.f, sug: m.sug };
     });
     return items.concat((this.state.customs || []).filter((c) => c.qty > 0).map((c) => (
       { kind: 'custom', name: c.label, qty: c.qty, price: c.price, desc: c.desc || '', cal: c.cal || 0, p: c.p || 0, f: c.f || 0, sug: c.sug || 0 }
