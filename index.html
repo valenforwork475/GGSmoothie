@@ -886,6 +886,17 @@
             <div style="font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:500; min-width:52px; text-align:right;">{{ line.totalLabel }}</div>
           </div>
         </sc-for>
+        <!-- order confirmation: shows queue number + live status after the order lands in Supabase -->
+        <sc-if value="{{ orderSent }}">
+          <div style="background:#fff; border:1px solid rgba(20,21,15,0.12); border-radius:16px; padding:24px 20px; text-align:center; display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:13px; font-weight:600; color:#2FA05E;">รับออเดอร์แล้ว</div>
+            <div style="font-family:'JetBrains Mono', monospace; font-size:46px; font-weight:500; color:#1B3325; line-height:1.15;">{{ orderQueueLabel }}</div>
+            <div style="font-size:12px; color:#7C8C83;">คิวของคุณ</div>
+            <div style="margin-top:8px; font-size:15px; font-weight:600; color:#1B3325;">{{ orderStatusLabel }}</div>
+            <button onclick="{{ goShare }}" style="margin-top:14px; background:#A7DA4E; color:#1B3325; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:14px; font-weight:700; padding:13px; border-radius:12px; transition:all .2s ease;" style-hover="background:#1B3325; color:#EAF2E2;">ทำการ์ดแชร์ →</button>
+            <a href="{{ lineHref }}" target="_blank" rel="noopener" style="font-size:13px; color:#7C8C83; text-decoration:none; padding:8px; transition:color .2s ease;" style-hover="color:#1B3325;">สอบถามร้านทาง LINE</a>
+          </div>
+        </sc-if>
       </div>
       <sc-if value="{{ cartHasItems }}">
       <div style="border-top:1px solid rgba(20,21,15,0.1); padding:20px 24px; display:flex; flex-direction:column; gap:13px; max-height:64vh; overflow-y:auto;">
@@ -953,14 +964,94 @@
             <a href="{{ lineHref }}" target="_blank" rel="noopener" style="background:#1B3325; color:#EAF2E2; text-align:center; text-decoration:none; font-weight:600; font-size:15px; padding:15px; border-radius:12px; transition:all .2s ease;" style-hover="background:#A7DA4E; color:#1B3325;">จองออเดอร์ · รับที่ร้าน</a>
           </sc-if>
 
-          <div style="border-top:1px dashed rgba(20,21,15,0.16); margin-top:4px; padding-top:14px; display:flex; flex-direction:column; gap:8px;">
-            <button onclick="{{ unlockShare }}" style="background:#A7DA4E; color:#1B3325; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:15px; font-weight:700; padding:14px; border-radius:12px; transition:all .2s ease;" style-hover="background:#1B3325; color:#EAF2E2;">ชำระแล้ว · ทำการ์ดแชร์ →</button>
-            <div style="font-size:11px; color:#9aa79e; text-align:center; line-height:1.6;">ปลดล็อกการ์ดแชร์หลังยืนยันการชำระเงิน</div>
+          <div style="border-top:1px dashed rgba(20,21,15,0.16); margin-top:4px; padding-top:14px; display:flex; flex-direction:column; gap:9px;">
+            <input type="text" value="{{ coName }}" oninput="{{ onCoName }}" placeholder="ชื่อผู้รับ" style="width:100%; box-sizing:border-box; font-family:'Anuphan', system-ui, sans-serif; font-size:15px; padding:13px 14px; border:1px solid rgba(20,21,15,0.16); border-radius:12px; outline:none; background:#fff; color:#1B3325;">
+            <input type="tel" value="{{ coPhone }}" oninput="{{ onCoPhone }}" placeholder="เบอร์โทร (ไม่บังคับ)" style="width:100%; box-sizing:border-box; font-family:'Anuphan', system-ui, sans-serif; font-size:15px; padding:13px 14px; border:1px solid rgba(20,21,15,0.16); border-radius:12px; outline:none; background:#fff; color:#1B3325;">
+            <sc-if value="{{ hasOrderError }}"><div style="font-size:12px; color:#D93838; text-align:center; line-height:1.6;">{{ orderError }}</div></sc-if>
+            <sc-if value="{{ orderNotSending }}" hint-placeholder-val="{{ true }}">
+              <button onclick="{{ submitOrder }}" style="background:#A7DA4E; color:#1B3325; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:15px; font-weight:700; padding:14px; border-radius:12px; transition:all .2s ease;" style-hover="background:#1B3325; color:#EAF2E2;">ยืนยันออเดอร์ →</button>
+            </sc-if>
+            <sc-if value="{{ orderSending }}">
+              <button style="background:#cfd3cb; color:#fff; border:none; cursor:wait; font-family:'Anuphan', system-ui, sans-serif; font-size:15px; font-weight:700; padding:14px; border-radius:12px;">กำลังส่งออเดอร์…</button>
+            </sc-if>
+            <div style="font-size:11px; color:#9aa79e; text-align:center; line-height:1.6;">ออเดอร์จะเข้าคิวหน้าร้านทันที · ชำระเงินตามช่องทางด้านบน</div>
           </div>
           <button onclick="{{ backToCart }}" style="background:transparent; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:13px; color:#7C8C83; padding:8px; transition:color .2s ease;" style-hover="color:#1B3325;">← กลับไปแก้ตะกร้า</button>
-          <div style="font-size:11px; color:#9aa79e; text-align:center; line-height:1.7;">เดโม — ออเดอร์ส่งผ่าน LINE ยังไม่ตัดเงินอัตโนมัติ</div>
         </sc-if>
       </div>
+      </sc-if>
+    </div>
+  </div>
+  <!-- ===================== CLAIM STAMPS MODAL ===================== -->
+  <sc-if value="{{ claimModalOpen }}">
+  <div style="position:fixed; inset:0; z-index:1001; display:flex; align-items:center; justify-content:center; padding:16px;">
+    <div onclick="{{ closeClaimModal }}" style="position:absolute; inset:0; background:rgba(20,21,15,0.45);"></div>
+    <div style="position:relative; width:min(440px,100%); background:#EAF2E2; border-radius:24px; padding:28px 24px; box-shadow:0 20px 50px rgba(0,0,0,0.3); display:flex; flex-direction:column; gap:18px; color:#1B3325; max-height:90vh; overflow-y:auto; box-sizing:border-box;">
+      
+      <div style="text-align:center;">
+        <div style="font-size:22px; font-weight:800; color:#1B3325; font-family:'Anuphan', system-ui, sans-serif;">สะสมแต้ม GG Smoothie</div>
+        <div style="font-size:12px; color:#7C8C83; margin-top:4px;">สะสมแต้มง่ายๆ ด้วยเบอร์โทรศัพท์ของคุณ</div>
+      </div>
+
+      <sc-if value="{{ claimLoading }}">
+        <div style="text-align:center; padding:32px 0; font-size:14px; color:#7C8C83;">กำลังโหลดข้อมูลออเดอร์...</div>
+      </sc-if>
+
+      <sc-if value="{{ claimError }}">
+        <div style="background:#fff; border:1px solid rgba(217,56,56,0.15); border-radius:16px; padding:20px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <div style="width:40px; height:40px; border-radius:50%; background:rgba(217,56,56,0.1); color:#D93838; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800;">!</div>
+          <div style="font-size:13.5px; font-weight:700; color:#D93838;">{{ claimError }}</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ claimSuccess }}">
+        <div style="background:#fff; border:1px solid rgba(47,160,94,0.15); border-radius:20px; padding:28px 20px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="width:48px; height:48px; border-radius:50%; background:#A7DA4E; color:#1B3325; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:800;">✓</div>
+          <div style="font-size:18px; font-weight:800; color:#1B3325; margin-top:4px; font-family:'Anuphan', system-ui, sans-serif;">สะสมแต้มสำเร็จ!</div>
+          <div style="font-size:13.5px; color:#5b5b52; line-height:1.65; margin:6px 0;">
+            ออเดอร์นี้ได้รับ <b>{{ claimEarned }}</b> แต้ม<br>
+            ยอดแต้มสะสมทั้งหมดของคุณ: <b>{{ claimCurrentStamps }} / 10</b> แต้ม
+          </div>
+          <button onclick="{{ closeClaimModal }}" style="width:100%; background:#1B3325; color:#EAF2E2; border:none; cursor:pointer; font-family:'Anuphan', system-ui, sans-serif; font-size:14.5px; font-weight:700; padding:13px; border-radius:12px;">ตกลง</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ claimOrderQueue }}">
+        <sc-if value="{{ !claimSuccess }}">
+          <div style="background:#fff; border:1px solid rgba(20,21,15,0.1); border-radius:16px; padding:16px 20px; display:flex; flex-direction:column; gap:4px; font-size:13.5px;">
+            <div style="display:flex; justify-content:space-between; font-weight:700;">
+              <span>ออเดอร์คิวที่ {{ claimOrderQueue }}</span>
+              <span>ยอดรวม ฿{{ claimOrderTotal }}</span>
+            </div>
+            <div style="font-size:12px; color:#8C8C82; margin-top:2px;">
+              สิทธิ์สะสมแต้ม: <b>{{ claimOrderCups }} แต้ม</b> (ตามจำนวนแก้วที่สั่ง)
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div>
+              <label style="display:block; font-size:12px; font-weight:700; color:#7C8C83; margin-bottom:6px;">เบอร์โทรศัพท์สะสมแต้ม</label>
+              <input type="tel" placeholder="กรอกเบอร์โทร 10 หลัก เช่น 0812345678" value="{{ claimPhone }}" oninput="{{ onClaimPhoneInput }}" style="width:100%; box-sizing:border-box; font-family:inherit; font-size:15px; padding:12px 14px; border:1px solid rgba(20,21,15,0.16); border-radius:12px; outline:none; background:#fff; color:#1B3325;">
+            </div>
+
+            <div>
+              <label style="display:block; font-size:12px; font-weight:700; color:#7C8C83; margin-bottom:6px;">ชื่อของคุณ (สำหรับสมัครสมาชิกใหม่)</label>
+              <input type="text" placeholder="กรอกชื่อเพื่อลงทะเบียนสมาชิกใหม่" value="{{ claimName }}" oninput="{{ onClaimNameInput }}" style="width:100%; box-sizing:border-box; font-family:inherit; font-size:15px; padding:12px 14px; border:1px solid rgba(20,21,15,0.16); border-radius:12px; outline:none; background:#fff; color:#1B3325;">
+              <span style="display:block; font-size:11px; color:#8C8C82; margin-top:4px; line-height:1.45;">*หากเคยสมัครสมาชิกแล้ว ระบบจะใช้ชื่อเดิม และบวกแต้มให้ทันทีโดยอัตโนมัติ</span>
+            </div>
+
+            <sc-if value="{{ claimSending }}">
+              <button style="background:#cfd3cb; color:#fff; border:none; cursor:wait; font-family:inherit; font-size:15px; font-weight:700; padding:14px; border-radius:12px;">กำลังบันทึกคะแนน…</button>
+            </sc-if>
+            <sc-if value="{{ !claimSending }}">
+              <button onclick="{{ submitClaim }}" style="background:#1b3325; color:#EAF2E2; border:none; cursor:pointer; font-family:inherit; font-weight:700; font-size:15px; padding:14px; border-radius:12px; transition:all .2s ease;" style-hover="background:#A7DA4E; color:#1B3325;">สะสมแต้มออเดอร์นี้ →</button>
+            </sc-if>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ !claimSuccess }}">
+        <button onclick="{{ closeClaimModal }}" style="background:transparent; border:none; cursor:pointer; font-family:inherit; font-size:13px; color:#7C8C83; text-decoration:underline; align-self:center; padding:4px;" style-hover="color:#1B3325;">ยกเลิก</button>
       </sc-if>
     </div>
   </div>
@@ -979,8 +1070,13 @@ class Component extends DCLogic {
     STAMP_GOAL: 10,                       // จำนวนแสตมป์ครบรับรางวัล
     LINE_URL: 'https://lin.ee/ttf3FPn',   // ลิงก์ LINE สำหรับสั่งซื้อ
     PROMPTPAY_ID: '0823564415',           // พร้อมเพย์รับเงิน
+    // Supabase — ศูนย์กลางออเดอร์/เมนู/สมาชิก ที่เว็บ + POS + เครื่องปริ้นสติกเกอร์ใช้ร่วมกัน
+    // (publishable key ปลอดภัยที่จะอยู่ใน frontend — สิทธิ์ถูกจำกัดด้วย RLS ฝั่ง Supabase)
+    // เว้นว่างทั้งสองค่า = โหมดออฟไลน์ เว็บทำงานเหมือนเดิมทุกอย่าง
+    SUPABASE_URL: 'https://qsylglypfjxincexteqy.supabase.co',
+    SUPABASE_KEY: 'sb_publishable_BFsUTvD1T7gt9cwDC0tMGw_EY48x4EP',
   };
-  state = { active: 'home', lang: 'th', langMenuOpen: false, cart: {}, cartOpen: false, base: 'water', items: {}, customs: [], cidSeq: 1, shTemplate: 't1', shMenu: 'g', shCaption: '', shPhotoReady: false, checkingOut: false, payMethod: 'promptpay', orderPlaced: false, member: null, stamps: 0, redeemed: 0, mName: '', mPhone: '', stampPulse: false, buildTab: 'base', sheetUrlInput: '', customMenu: null, customBases: null, customFruits: null, customBoosters: null, sheetLoading: false, sheetError: null };
+  state = { active: 'home', lang: 'th', langMenuOpen: false, cart: {}, cartOpen: false, base: 'water', items: {}, customs: [], cidSeq: 1, shTemplate: 't1', shMenu: 'g', shCaption: '', shPhotoReady: false, checkingOut: false, payMethod: 'promptpay', orderPlaced: false, member: null, stamps: 0, redeemed: 0, mName: '', mPhone: '', stampPulse: false, buildTab: 'base', sheetUrlInput: '', customMenu: null, customBases: null, customFruits: null, customBoosters: null, sheetLoading: false, sheetError: null, coName: '', coPhone: '', orderSending: false, orderId: null, orderQueue: null, orderStatus: null, orderError: null, claimOrderId: null, claimModalOpen: false, claimLoading: false, claimSending: false, claimError: null, claimSuccess: false, claimPhone: '', claimName: '', claimOrderQueue: '', claimOrderTotal: 0, claimOrderCups: 0, claimEarned: 0, claimCurrentStamps: 0 };
   canvasRef = React.createRef();
   // ===================== MEMBER & STAMPS =====================
   loadMember() {
@@ -995,6 +1091,84 @@ class Component extends DCLogic {
     const d = { member: next.member, stamps: next.stamps, redeemed: next.redeemed };
     try { window.localStorage.setItem('gg_member', JSON.stringify(d)); } catch (e) {}
   }
+  fetchOrderForClaim(claimId) {
+    if (!this.sbReady()) return;
+    this.sbRpc('claim_order_info', { p_order_id: claimId })
+      .then((o) => {
+        if (!o) {
+          this.setState({ claimLoading: false, claimError: 'ไม่พบข้อมูลออเดอร์นี้ในระบบ' });
+          return;
+        }
+        if (o.claimed) {
+          this.setState({ claimLoading: false, claimError: 'ขออภัย ออเดอร์นี้ถูกสะสมแต้มไปแล้ว' });
+          return;
+        }
+        if (o.expired || o.status === 'cancelled' || o.status === 'pending') {
+          this.setState({ claimLoading: false, claimError: 'ไม่สามารถสะสมแต้มจากออเดอร์ที่ถูกยกเลิกได้' });
+          return;
+        }
+        const cups = Number(o.cups) || 0;
+        this.setState({
+          claimLoading: false,
+          claimOrderQueue: o.queue_no,
+          claimOrderTotal: o.total,
+          claimOrderCups: cups,
+          claimPhone: this.state.member ? this.state.member.phone : '',
+          claimName: this.state.member ? this.state.member.name : '',
+        });
+      })
+      .catch(() => {
+        this.setState({ claimLoading: false, claimError: 'โหลดข้อมูลล้มเหลว กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต' });
+      });
+  }
+  submitClaim = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const s = this.state;
+    if (s.claimSending || s.claimSuccess) return;
+    const phone = (s.claimPhone || '').trim();
+    const name = (s.claimName || '').trim();
+    if (phone.length < 9) {
+      this.setState({ claimError: 'กรุณาใส่เบอร์โทรศัพท์ที่ถูกต้อง (อย่างน้อย 9 หลัก)' });
+      return;
+    }
+    this.setState({ claimSending: true, claimError: null });
+    this.sbRpc('claim_order_stamps', {
+      p_order_id: s.claimOrderId,
+      p_phone: phone,
+      p_name: name || 'ลูกค้าหน้าร้าน'
+    }).then((res) => {
+      if (res.success) {
+        const member = { phone, name: res.customer_name };
+        this.setState({
+          claimSending: false,
+          claimSuccess: true,
+          claimEarned: res.earned_stamps,
+          claimCurrentStamps: res.stamps,
+          member,
+          stamps: res.stamps,
+          redeemed: res.redeemed
+        });
+        this.saveMember({ member, stamps: res.stamps, redeemed: res.redeemed });
+      } else {
+        this.setState({ claimSending: false, claimError: res.message || 'สะสมแต้มไม่สำเร็จ' });
+      }
+    }).catch((err) => {
+      this.setState({ claimSending: false, claimError: err.message || 'สะสมแต้มไม่สำเร็จ ลองใหม่อีกครั้ง' });
+    });
+  };
+  closeClaimModal = () => {
+    this.setState({ claimModalOpen: false, claimOrderId: null, claimOrderQueue: '', claimOrderTotal: 0, claimOrderCups: 0, claimError: null, claimSuccess: false });
+    if (typeof window !== 'undefined') {
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('claim');
+        if (url.hash.startsWith('#claim-')) url.hash = '';
+        window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+      } catch (_) {}
+    }
+  };
+  onClaimPhoneInput = (e) => { this.setState({ claimPhone: e.target.value, claimError: null }); };
+  onClaimNameInput = (e) => { this.setState({ claimName: e.target.value, claimError: null }); };
   onMField(field) { return (e) => { const v = e.target.value; this.setState(field === 'name' ? { mName: v } : { mPhone: v }); }; }
   registerMember = (e) => {
     if (e && e.preventDefault) e.preventDefault();
@@ -1004,6 +1178,16 @@ class Component extends DCLogic {
     const member = { name, phone };
     this.setState({ member, stamps: this.state.stamps, redeemed: this.state.redeemed });
     this.saveMember({ member, stamps: this.state.stamps, redeemed: this.state.redeemed });
+    // ขึ้นทะเบียนบนเซิร์ฟเวอร์ให้ POS มองเห็น — แต้มในเครื่องถูก seed เฉพาะสมัครครั้งแรก
+    if (this.sbReady()) {
+      this.sbRpc('register_member', { p_name: name, p_phone: phone, p_stamps: this.state.stamps }).then((res) => {
+        if (!res) return;
+        const stamps = Math.max(0, Math.min(this.CFG.STAMP_GOAL, res.stamps | 0));
+        const redeemed = Math.max(0, res.redeemed | 0);
+        this.setState({ stamps, redeemed });
+        this.saveMember({ member, stamps, redeemed });
+      }).catch(() => {});
+    }
   };
   addStamp = (e) => {
     if (e && e.preventDefault) e.preventDefault();
@@ -1204,7 +1388,122 @@ class Component extends DCLogic {
       this.setState({ cartOpen: open, checkingOut: open ? this.state.checkingOut : false });
     };
   }
-  setCheckout(v) { return (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ checkingOut: v }); }; }
+  setCheckout(v) {
+    return (e) => {
+      if (e && e.preventDefault) e.preventDefault();
+      const patch = { checkingOut: v };
+      // เติมชื่อ/เบอร์จากสมาชิกให้อัตโนมัติตอนเข้าหน้าชำระเงิน
+      if (v && this.state.member) {
+        if (!this.state.coName) patch.coName = this.state.member.name || '';
+        if (!this.state.coPhone) patch.coPhone = this.state.member.phone || '';
+      }
+      this.setState(patch);
+    };
+  }
+  // ===================== ONLINE ORDERS (Supabase) =====================
+  // เว็บคุยกับ Supabase ผ่าน REST + RPC เท่านั้น (ดู supabase/schema.sql)
+  // POS และโปรแกรมปริ้นสติกเกอร์อ่านออเดอร์จากตาราง orders ชุดเดียวกัน
+  sbReady() { return !!(this.CFG.SUPABASE_URL && this.CFG.SUPABASE_KEY); }
+  sbRpc(fn, args) {
+    return fetch(this.CFG.SUPABASE_URL + '/rest/v1/rpc/' + fn, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: this.CFG.SUPABASE_KEY },
+      body: JSON.stringify(args || {}),
+    }).then((r) => { if (!r.ok) throw new Error('supabase ' + r.status); return r.json(); });
+  }
+  sbGet(pathQuery) {
+    return fetch(this.CFG.SUPABASE_URL + '/rest/v1/' + pathQuery, {
+      headers: { apikey: this.CFG.SUPABASE_KEY },
+    }).then((r) => { if (!r.ok) throw new Error('supabase ' + r.status); return r.json(); });
+  }
+  onCoField(field) { return (e) => { const v = e.target.value; this.setState(field === 'name' ? { coName: v } : { coPhone: v }); }; }
+  // รายการในออเดอร์ — แนบโภชนาการ/ส่วนผสมไว้ให้สติกเกอร์ใช้พิมพ์ได้เลย
+  orderItems() {
+    const byId = {};
+    this.MENU.forEach((m) => { byId[m.id] = m; });
+    const cart = this.state.cart || {};
+    const items = Object.keys(cart).filter((id) => cart[id] > 0 && byId[id]).map((id) => {
+      const m = byId[id];
+      return { kind: 'menu', name: m.name, qty: cart[id], price: m.price, desc: m.desc || '', cal: m.cal, p: m.p, f: m.f, sug: m.sug };
+    });
+    return items.concat((this.state.customs || []).filter((c) => c.qty > 0).map((c) => (
+      { kind: 'custom', name: c.label, qty: c.qty, price: c.price, desc: c.desc || '', cal: c.cal || 0, p: c.p || 0, f: c.f || 0, sug: c.sug || 0 }
+    )));
+  }
+  submitOrder = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (this.state.orderSending) return;
+    const name = (this.state.coName || '').trim();
+    if (!name) { this.setState({ orderError: 'กรุณาใส่ชื่อผู้รับ' }); return; }
+    const items = this.orderItems();
+    if (!items.length) return;
+    const total = items.reduce((s, x) => s + x.price * x.qty, 0);
+    const earned = this.cartCupCount();
+    const finish = (o) => {
+      const patch = { orderSending: false, orderError: null, orderPlaced: true, cart: {}, customs: [], checkingOut: false };
+      if (o) { patch.orderId = o.id; patch.orderQueue = o.queue_no; patch.orderStatus = o.status; }
+      if (this.state.member) {
+        const stamps = Math.min(this.CFG.STAMP_GOAL, this.state.stamps + earned);
+        patch.stamps = stamps;
+        this.saveMember({ member: this.state.member, stamps, redeemed: this.state.redeemed });
+      }
+      if (!o) { patch.active = 'share'; patch.cartOpen = false; }
+      this.setState(patch);
+      if (o) this.startOrderPoll();
+      else if (typeof window !== 'undefined') window.scrollTo(0, 0);
+    };
+    if (!this.sbReady()) { finish(null); return; } // ไม่ได้ตั้งค่า Supabase: ใช้ flow ยืนยันทาง LINE แบบเดิม
+    this.setState({ orderSending: true, orderError: null });
+    this.sbRpc('place_order', {
+      p_name: name,
+      p_phone: (this.state.coPhone || '').trim(),
+      p_items: items,
+      p_total: total,
+      p_pay_method: this.state.payMethod,
+    }).then(finish).catch(() => {
+      this.setState({ orderSending: false, orderError: 'ส่งออเดอร์ไม่สำเร็จ ลองใหม่อีกครั้ง หรือทักร้านทาง LINE' });
+    });
+  };
+  startOrderPoll() {
+    if (this._orderTimer) clearInterval(this._orderTimer);
+    this._orderTimer = setInterval(() => {
+      if (!this.state.orderId || !this.sbReady()) return;
+      this.sbRpc('order_status', { p_id: this.state.orderId }).then((o) => {
+        if (!o) return;
+        this.setState({ orderStatus: o.status, orderQueue: o.queue_no });
+        if (o.status === 'done' || o.status === 'cancelled') { clearInterval(this._orderTimer); this._orderTimer = null; }
+      }).catch(() => {});
+    }, 8000);
+  }
+  statusLabel(s) {
+    const m = { pending: 'รอร้านยืนยัน', confirmed: 'ร้านรับออเดอร์แล้ว', making: 'กำลังปั่น', ready: 'พร้อมรับที่ร้าน', done: 'รับเรียบร้อย', cancelled: 'ยกเลิกแล้ว' };
+    return m[s] || s || '';
+  }
+  // เมนูจาก Supabase ทับค่า default ในโค้ด (ล้มเหลว/ออฟไลน์ = ใช้ค่าในโค้ดต่อ)
+  fetchMenuFromDb() {
+    if (!this.sbReady()) return;
+    this.sbGet('menu_items?active=eq.true&order=sort_order.asc,id.asc&select=id,name,description,price,cal,p,f,sug')
+      .then((rows) => {
+        if (!rows || !rows.length) return;
+        const menu = rows.map((r) => ({ id: r.id, name: r.name, price: Number(r.price), cal: r.cal, p: r.p, f: r.f, sug: r.sug, desc: r.description || '' }));
+        this.setState({ customMenu: menu });
+      }).catch(() => {});
+  }
+  // ดึงแต้มจริงจากเซิร์ฟเวอร์ (POS เป็นคนให้แต้ม) — ถ้ายังไม่มีข้อมูลบนเซิร์ฟเวอร์ ใช้ค่าในเครื่องต่อ
+  syncMemberFromDb() {
+    if (!this.sbReady() || typeof window === 'undefined' || !window.localStorage) return;
+    let d = null;
+    try { d = JSON.parse(window.localStorage.getItem('gg_member') || 'null'); } catch (e) {}
+    const member = d && d.member;
+    if (!member || !member.phone) return;
+    this.sbRpc('member_stamps', { p_phone: member.phone }).then((res) => {
+      if (!res) return;
+      const stamps = Math.max(0, Math.min(this.CFG.STAMP_GOAL, res.stamps | 0));
+      const redeemed = Math.max(0, res.redeemed | 0);
+      this.setState({ stamps, redeemed });
+      this.saveMember({ member, stamps, redeemed });
+    }).catch(() => {});
+  }
   pickPay(k) { return (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ payMethod: k }); }; }
   payCardStyle(k) {
     const on = this.state.payMethod === k;
@@ -1227,19 +1526,44 @@ class Component extends DCLogic {
   // ===================== LIFECYCLE =====================
   componentDidMount() {
     this.loadMember();
+    this.fetchMenuFromDb();
+    this._menuTimer = setInterval(() => this.fetchMenuFromDb(), 30000);
+    this._onMenuVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') this.fetchMenuFromDb();
+    };
+    if (typeof document !== 'undefined') document.addEventListener('visibilitychange', this._onMenuVisibility);
+    this.syncMemberFromDb();
     this.applyHash();
     this._onHash = () => this.applyHash();
     if (typeof window !== 'undefined') window.addEventListener('hashchange', this._onHash);
     this.applyContentProtection();
     this.initI18n();
-    // Sheet sync paused: use in-code defaults while the menu is being finalized.
-    // Re-enable by uncommenting the block below.
-    // this.setState({ sheetUrlInput: this.CFG.SHEET_URL }, () => {
-    //   this.fetchSheetData();
-    // });
+
+    // Check for claim query parameter or hash
+    let claimId = null;
+    if (typeof window !== 'undefined') {
+      try {
+        const searchParams = new URLSearchParams(window.location.search);
+        claimId = searchParams.get('claim');
+        if (!claimId && window.location.hash.startsWith('#claim-')) {
+          claimId = window.location.hash.replace('#claim-', '').trim();
+        }
+      } catch (_) {}
+    }
+    if (claimId) {
+      this.setState({ claimOrderId: claimId, claimModalOpen: true, claimLoading: true, claimError: null, claimSuccess: false });
+      this.fetchOrderForClaim(claimId);
+    }
+
     const draw = () => this.drawCard();
     if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
     setTimeout(draw, 80);
+  }
+  componentWillUnmount() {
+    if (this._menuTimer) clearInterval(this._menuTimer);
+    if (this._orderTimer) clearInterval(this._orderTimer);
+    if (typeof window !== 'undefined' && this._onHash) window.removeEventListener('hashchange', this._onHash);
+    if (typeof document !== 'undefined' && this._onMenuVisibility) document.removeEventListener('visibilitychange', this._onMenuVisibility);
   }
   // block right-click + image drag (deters casual content/image copying; not real security)
   applyContentProtection() {
@@ -1456,6 +1780,17 @@ class Component extends DCLogic {
       'ปลดล็อกการ์ดแชร์หลังยืนยันการชำระเงิน': 'Unlock the share card after payment is confirmed',
       'กลับไปแก้ตะกร้า': 'Back to cart',
       'เดโม — ออเดอร์ส่งผ่าน LINE ยังไม่ตัดเงินอัตโนมัติ': 'Demo — orders are sent via LINE; no automatic charge.',
+      // online ordering
+      'ชื่อผู้รับ': 'Pickup name', 'เบอร์โทร (ไม่บังคับ)': 'Phone (optional)',
+      'ยืนยันออเดอร์': 'Confirm order', 'กำลังส่งออเดอร์…': 'Sending order…',
+      'กรุณาใส่ชื่อผู้รับ': 'Please enter a pickup name',
+      'ส่งออเดอร์ไม่สำเร็จ ลองใหม่อีกครั้ง หรือทักร้านทาง LINE': 'Could not send your order — try again or message us on LINE.',
+      'ออเดอร์จะเข้าคิวหน้าร้านทันที · ชำระเงินตามช่องทางด้านบน': 'Your order joins the shop queue right away · pay via the method above',
+      'รับออเดอร์แล้ว': 'Order received', 'คิวของคุณ': 'Your queue number',
+      'ทำการ์ดแชร์': 'Make a share card', 'สอบถามร้านทาง LINE': 'Ask us on LINE',
+      'รอร้านยืนยัน': 'Waiting for the shop to confirm', 'ร้านรับออเดอร์แล้ว': 'Confirmed by the shop',
+      'กำลังปั่น': 'Blending now', 'พร้อมรับที่ร้าน': 'Ready for pickup',
+      'รับเรียบร้อย': 'Picked up', 'ยกเลิกแล้ว': 'Cancelled',
       'ยอด': 'Total'
     },
     zh: {
@@ -1536,6 +1871,17 @@ class Component extends DCLogic {
       'ปลดล็อกการ์ดแชร์หลังยืนยันการชำระเงิน': '确认付款后解锁分享卡',
       'กลับไปแก้ตะกร้า': '返回购物车',
       'เดโม — ออเดอร์ส่งผ่าน LINE ยังไม่ตัดเงินอัตโนมัติ': '演示 — 订单通过 LINE 发送，暂不自动扣款。',
+      // online ordering
+      'ชื่อผู้รับ': '取餐姓名', 'เบอร์โทร (ไม่บังคับ)': '电话（选填）',
+      'ยืนยันออเดอร์': '确认订单', 'กำลังส่งออเดอร์…': '正在提交订单…',
+      'กรุณาใส่ชื่อผู้รับ': '请输入取餐姓名',
+      'ส่งออเดอร์ไม่สำเร็จ ลองใหม่อีกครั้ง หรือทักร้านทาง LINE': '订单提交失败，请重试或通过 LINE 联系门店。',
+      'ออเดอร์จะเข้าคิวหน้าร้านทันที · ชำระเงินตามช่องทางด้านบน': '订单会立即进入门店队列 · 请按上方方式付款',
+      'รับออเดอร์แล้ว': '已收到订单', 'คิวของคุณ': '您的排队号',
+      'ทำการ์ดแชร์': '制作分享卡', 'สอบถามร้านทาง LINE': '通过 LINE 咨询门店',
+      'รอร้านยืนยัน': '等待门店确认', 'ร้านรับออเดอร์แล้ว': '门店已接单',
+      'กำลังปั่น': '正在制作', 'พร้อมรับที่ร้าน': '可以取餐了',
+      'รับเรียบร้อย': '已取餐', 'ยกเลิกแล้ว': '已取消',
       'ยอด': '合计'
     }
   };
@@ -1899,8 +2245,16 @@ class Component extends DCLogic {
       openCart: this.setCart(true), closeCart: this.setCart(false),
       cartOpen: this.state.cartOpen,
       cartLines: lines, cartCount: count, countLabel: String(count),
-      cartHasItems: count > 0, cartEmpty: count === 0,
+      cartHasItems: count > 0, cartEmpty: count === 0 && !this.state.orderQueue,
       cartTotalLabel: this.baht(total), lineHref, ppQrUrl,
+      coName: this.state.coName, coPhone: this.state.coPhone,
+      onCoName: this.onCoField('name'), onCoPhone: this.onCoField('phone'),
+      submitOrder: this.submitOrder,
+      orderSending: this.state.orderSending, orderNotSending: !this.state.orderSending,
+      orderError: this.state.orderError || '', hasOrderError: !!this.state.orderError,
+      orderSent: !!this.state.orderQueue,
+      orderQueueLabel: this.state.orderQueue != null ? String(this.state.orderQueue) : '',
+      orderStatusLabel: this.statusLabel(this.state.orderStatus),
       ppQrImg: React.createElement('img', { src: ppQrUrl, alt: 'PromptPay QR', style: { width: '184px', height: '184px', borderRadius: '10px', display: 'block' } }),
       checkingOut: this.state.checkingOut, notCheckingOut: !this.state.checkingOut, goCheckout: this.setCheckout(true), backToCart: this.setCheckout(false),
       payIsPromptpay: this.state.payMethod === 'promptpay',
