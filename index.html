@@ -494,14 +494,14 @@
     <div style="max-width:1180px; margin:0 auto; padding:clamp(40px,6vw,80px) clamp(20px,5vw,56px) clamp(54px,7vw,96px);">
       <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:22px; margin-bottom:clamp(30px,4vw,52px);">
         <div>
-          <div style="font-family:'Anuphan', system-ui, sans-serif; font-weight:600; font-size:12px; letter-spacing:0.06em; color:#2FA05E; margin-bottom:14px;">เมนูทั้งหมด — 6 สูตร</div>
+          <div style="font-family:'Anuphan', system-ui, sans-serif; font-weight:600; font-size:12px; letter-spacing:0.06em; color:#2FA05E; margin-bottom:14px;">เมนูทั้งหมด — {{ menuCountLabel }}</div>
           <h2 style="font-size:clamp(30px,4.6vw,54px); line-height:1.1; letter-spacing:0; font-weight:700; margin:0;">เลือกสูตรของคุณ</h2>
         </div>
       </div>
       <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px;">
         <sc-for list="{{ menuCards }}" as="card" hint-placeholder-count="6">
         <div style="background:#fff; border:1px solid rgba(20,21,15,0.1); border-radius:20px; overflow:hidden; display:flex; flex-direction:column; transition:transform .2s ease, box-shadow .2s ease;" style-hover="transform:translateY(-4px); box-shadow:0 18px 40px -20px rgba(20,21,15,0.35);">
-          <image-slot id="{{ card.slotId }}" shape="rect" placeholder="วางรูปเมนู" style="display:block; width:100%; height:188px;"></image-slot>
+          <sc-if value="{{ card.hasImage }}"><img src="{{ card.imageUrl }}" alt="{{ card.name }}" loading="lazy" style="display:block;width:100%;height:188px;object-fit:cover;"></sc-if><sc-if value="{{ !card.hasImage }}"><image-slot id="{{ card.slotId }}" shape="rect" placeholder="วางรูปเมนู" style="display:block; width:100%; height:188px;"></image-slot></sc-if>
           <div style="padding:22px; display:flex; flex-direction:column; gap:13px; flex:1;">
             <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px;"><h3 style="font-size:20px; font-weight:600; margin:0;">{{ card.name }}</h3><span style="font-family:'JetBrains Mono', monospace; font-size:15px; font-weight:500; white-space:nowrap;">{{ card.priceLabel }}</span></div>
             <p style="font-size:13px; line-height:1.6; color:#7a796f; margin:0;">{{ card.desc }}</p>
@@ -1482,10 +1482,10 @@ class Component extends DCLogic {
   // เมนูจาก Supabase ทับค่า default ในโค้ด (ล้มเหลว/ออฟไลน์ = ใช้ค่าในโค้ดต่อ)
   fetchMenuFromDb() {
     if (!this.sbReady()) return;
-    this.sbGet('menu_items?active=eq.true&order=sort_order.asc,id.asc&select=id,name,description,price,cal,p,f,sug')
+    this.sbGet('menu_items?active=eq.true&order=sort_order.asc,id.asc&select=id,name,description,price,cal,p,f,sug,image_url')
       .then((rows) => {
         if (!rows || !rows.length) return;
-        const menu = rows.map((r) => ({ id: r.id, name: r.name, price: Number(r.price), cal: r.cal, p: r.p, f: r.f, sug: r.sug, desc: r.description || '' }));
+        const menu = rows.map((r) => ({ id: r.id, name: r.name, price: Number(r.price), cal: r.cal, p: r.p, f: r.f, sug: r.sug, desc: r.description || '', imageUrl: r.image_url || '' }));
         this.setState({ customMenu: menu });
       }).catch(() => {});
   }
@@ -2236,8 +2236,9 @@ class Component extends DCLogic {
       showBuild: a === 'build', showPromos: a === 'promos', showStores: a === 'stores', showContact: a === 'contact',
       goHome: this.go('home'), goMenu: this.go('menu'), goNutri: this.go('nutrition'),
       goBuild: this.go('build'), goPromos: this.go('promos'), goStores: this.go('stores'), goContact: this.go('contact'),
+      menuCountLabel: this.MENU.length + ' สูตร',
       menuCards: this.MENU.map((m, i) => ({
-        id: m.id, slotId: 'flow-menu-' + (i + 1), name: m.name, desc: m.desc,
+        id: m.id, slotId: 'flow-menu-' + (i + 1), name: m.name, desc: m.desc, imageUrl: m.imageUrl || '', hasImage: !!m.imageUrl,
         priceLabel: this.baht(m.price), calLabel: String(m.cal),
         proteinLabel: m.p + 'g', fiberLabel: m.f + 'g', sugarLabel: m.sug + 'g',
         add: this.add(m.id),
