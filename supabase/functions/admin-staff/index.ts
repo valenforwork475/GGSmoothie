@@ -50,8 +50,9 @@ Deno.serve(async (req) => {
     const password = String(body.password || "");
     const displayName = String(body.display_name || "").trim();
     const role = String(body.role || "cashier");
-    const staffCode = String(body.staff_code || "").trim().toUpperCase();
+    let staffCode = String(body.staff_code || "").trim().toUpperCase();
     const isCashier = role === "cashier";
+    if (isCashier && !staffCode) { const { data, error } = await admin.rpc("next_staff_code"); if (error || !data) return json({ error: error?.message || "สร้างรหัสพนักงานไม่สำเร็จ" }, 400); staffCode = data; }
     const email = isCashier ? `pos+${staffCode.toLowerCase()}@gg-smoothie.vercel.app` : requestedEmail;
     if (displayName.length < 2 || displayName.length > 80) return json({ error: "display name is required" }, 400);
     if (!["cashier", "manager", "owner"].includes(role)) return json({ error: "invalid role" }, 400);
@@ -85,7 +86,8 @@ Deno.serve(async (req) => {
     const role = String(body.role || "");
     const active = body.active === true;
     const displayName = String(body.display_name || "").trim();
-    const staffCode = String(body.staff_code || "").trim().toUpperCase();
+    let staffCode = String(body.staff_code || "").trim().toUpperCase();
+    if (role === "cashier" && !staffCode) { const { data, error } = await admin.rpc("next_staff_code"); if (error || !data) return json({ error: error?.message || "สร้างรหัสพนักงานไม่สำเร็จ" }, 400); staffCode = data; }
     if (!uid || !["cashier", "manager", "owner"].includes(role) || displayName.length < 2) {
       return json({ error: "invalid staff update" }, 400);
     }
