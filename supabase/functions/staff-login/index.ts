@@ -8,7 +8,7 @@ const corsHeaders = {
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
   status, headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
 });
-const codePattern = /^[A-Z0-9][A-Z0-9_-]{2,19}$/;
+const codePattern = /^[0-9]{3,8}$/;
 const internalEmail = (code: string) => `pos+${code.toLowerCase()}@gg-smoothie.vercel.app`;
 
 Deno.serve(async (req) => {

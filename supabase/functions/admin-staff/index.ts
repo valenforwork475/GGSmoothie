@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
     if (displayName.length < 2 || displayName.length > 80) return json({ error: "display name is required" }, 400);
     if (!["cashier", "manager", "owner"].includes(role)) return json({ error: "invalid role" }, 400);
     if (role === "owner" && caller.role !== "owner") return json({ error: "only an owner may create another owner" }, 403);
-    if (isCashier && !/^[A-Z0-9][A-Z0-9_-]{2,19}$/.test(staffCode)) return json({ error: "รหัสพนักงานต้องมี 3-20 ตัว ใช้ A-Z, 0-9, _ หรือ -" }, 400);
+    if (isCashier && !/^[0-9]{3,8}$/.test(staffCode)) return json({ error: "รหัสพนักงานต้องเป็นตัวเลข 3-8 หลัก" }, 400);
     if (!isCashier && !/^\S+@\S+\.\S+$/.test(email)) return json({ error: "กรุณากรอกอีเมลจริงสำหรับ Manager/Owner" }, 400);
     if (isCashier && !/^\d{6}$/.test(password)) return json({ error: "PIN ต้องเป็นตัวเลข 6 หลัก" }, 400);
     if (!isCashier && password.length < 8) return json({ error: "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร" }, 400);
@@ -92,7 +92,7 @@ Deno.serve(async (req) => {
       return json({ error: "invalid staff update" }, 400);
     }
     if (uid === caller.uid && !active) return json({ error: "you cannot deactivate your own account" }, 400);
-    if (staffCode && !/^[A-Z0-9][A-Z0-9_-]{2,19}$/.test(staffCode)) return json({ error: "invalid staff code" }, 400);
+    if (staffCode && !/^[0-9]{3,8}$/.test(staffCode)) return json({ error: "invalid staff code" }, 400);
     const { data: target } = await admin.from("staff").select("role,email,staff_code").eq("uid", uid).maybeSingle();
     if (!target) return json({ error: "staff account not found" }, 404);
     if ((target.role === "owner" || role === "owner") && caller.role !== "owner") {

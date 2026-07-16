@@ -2,7 +2,7 @@
 
 ## Cashier
 
-- Create the account from Back Office; the system assigns `GG001`, `GG002`, and so on automatically.
+- Create the account from Back Office; the system assigns numeric codes `001`, `002`, and so on automatically.
 - The initial credential is a six-digit numeric PIN.
 - Sign in to POS with the employee code and PIN. A personal email address is not required.
 - After five consecutive failed attempts, sign-in is temporarily blocked for 15 minutes.
