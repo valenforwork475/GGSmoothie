@@ -46,15 +46,20 @@ Deno.serve(async (req) => {
   const action = String(body.action || "");
 
   if (action === "create") {
-    const email = String(body.email || "").trim().toLowerCase();
+    const requestedEmail = String(body.email || "").trim().toLowerCase();
     const password = String(body.password || "");
     const displayName = String(body.display_name || "").trim();
     const role = String(body.role || "cashier");
-    if (!/^\S+@\S+\.\S+$/.test(email)) return json({ error: "valid email required" }, 400);
-    if (password.length < 8) return json({ error: "password must be at least 8 characters" }, 400);
+    const staffCode = String(body.staff_code || "").trim().toUpperCase();
+    const isCashier = role === "cashier";
+    const email = isCashier ? `pos+${staffCode.toLowerCase()}@gg-smoothie.vercel.app` : requestedEmail;
     if (displayName.length < 2 || displayName.length > 80) return json({ error: "display name is required" }, 400);
     if (!["cashier", "manager", "owner"].includes(role)) return json({ error: "invalid role" }, 400);
     if (role === "owner" && caller.role !== "owner") return json({ error: "only an owner may create another owner" }, 403);
+    if (isCashier && !/^[A-Z0-9][A-Z0-9_-]{2,19}$/.test(staffCode)) return json({ error: "รหัสพนักงานต้องมี 3-20 ตัว ใช้ A-Z, 0-9, _ หรือ -" }, 400);
+    if (!isCashier && !/^\S+@\S+\.\S+$/.test(email)) return json({ error: "กรุณากรอกอีเมลจริงสำหรับ Manager/Owner" }, 400);
+    if (isCashier && !/^\d{6}$/.test(password)) return json({ error: "PIN ต้องเป็นตัวเลข 6 หลัก" }, 400);
+    if (!isCashier && password.length < 8) return json({ error: "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร" }, 400);
 
     const { data: created, error: createError } = await admin.auth.admin.createUser({
       email, password, email_confirm: true, user_metadata: { display_name: displayName },
@@ -62,7 +67,7 @@ Deno.serve(async (req) => {
     if (createError || !created.user) return json({ error: createError?.message || "user creation failed" }, 400);
 
     const { error: staffError } = await admin.from("staff").insert({
-      uid: created.user.id, email, display_name: displayName, role, active: true,
+      uid: created.user.id, email, staff_code: staffCode || null, display_name: displayName, role, active: true,
     });
     if (staffError) {
       await admin.auth.admin.deleteUser(created.user.id);
@@ -70,9 +75,9 @@ Deno.serve(async (req) => {
     }
     await admin.from("audit_log").insert({
       actor_uid: caller.uid, action: "staff.create", entity_type: "staff", entity_id: created.user.id,
-      detail: { email, display_name: displayName, role },
+      detail: { email: isCashier ? null : email, staff_code: staffCode || null, display_name: displayName, role },
     });
-    return json({ success: true, uid: created.user.id });
+    return json({ success: true, uid: created.user.id, staff_code: staffCode || null });
   }
 
   if (action === "update") {
@@ -80,20 +85,22 @@ Deno.serve(async (req) => {
     const role = String(body.role || "");
     const active = body.active === true;
     const displayName = String(body.display_name || "").trim();
+    const staffCode = String(body.staff_code || "").trim().toUpperCase();
     if (!uid || !["cashier", "manager", "owner"].includes(role) || displayName.length < 2) {
       return json({ error: "invalid staff update" }, 400);
     }
     if (uid === caller.uid && !active) return json({ error: "you cannot deactivate your own account" }, 400);
+    if (staffCode && !/^[A-Z0-9][A-Z0-9_-]{2,19}$/.test(staffCode)) return json({ error: "invalid staff code" }, 400);
     const { data: target } = await admin.from("staff").select("role").eq("uid", uid).maybeSingle();
     if (!target) return json({ error: "staff account not found" }, 404);
     if ((target.role === "owner" || role === "owner") && caller.role !== "owner") {
       return json({ error: "only an owner may change owner accounts" }, 403);
     }
-    const { error } = await admin.from("staff").update({ role, active, display_name: displayName }).eq("uid", uid);
+    const { error } = await admin.from("staff").update({ role, active, display_name: displayName, staff_code: staffCode || null }).eq("uid", uid);
     if (error) return json({ error: error.message }, 400);
     await admin.from("audit_log").insert({
       actor_uid: caller.uid, action: "staff.update", entity_type: "staff", entity_id: uid,
-      detail: { display_name: displayName, role, active },
+      detail: { display_name: displayName, staff_code: staffCode || null, role, active },
     });
     return json({ success: true });
   }
@@ -101,9 +108,11 @@ Deno.serve(async (req) => {
   if (action === "reset_password") {
     const uid = String(body.uid || "");
     const password = String(body.password || "");
-    if (!uid || password.length < 8) return json({ error: "password must be at least 8 characters" }, 400);
+    if (!uid) return json({ error: "staff account required" }, 400);
     const { data: target } = await admin.from("staff").select("role").eq("uid", uid).maybeSingle();
     if (!target) return json({ error: "staff account not found" }, 404);
+    if (target.role === "cashier" && !/^\d{6}$/.test(password)) return json({ error: "PIN ต้องเป็นตัวเลข 6 หลัก" }, 400);
+    if (target.role !== "cashier" && password.length < 8) return json({ error: "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร" }, 400);
     if (target.role === "owner" && caller.role !== "owner") return json({ error: "only an owner may reset an owner password" }, 403);
     const { error } = await admin.auth.admin.updateUserById(uid, { password });
     if (error) return json({ error: error.message }, 400);
