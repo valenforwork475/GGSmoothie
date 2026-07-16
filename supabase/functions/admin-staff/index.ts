@@ -91,12 +91,27 @@ Deno.serve(async (req) => {
     }
     if (uid === caller.uid && !active) return json({ error: "you cannot deactivate your own account" }, 400);
     if (staffCode && !/^[A-Z0-9][A-Z0-9_-]{2,19}$/.test(staffCode)) return json({ error: "invalid staff code" }, 400);
-    const { data: target } = await admin.from("staff").select("role").eq("uid", uid).maybeSingle();
+    const { data: target } = await admin.from("staff").select("role,email,staff_code").eq("uid", uid).maybeSingle();
     if (!target) return json({ error: "staff account not found" }, 404);
     if ((target.role === "owner" || role === "owner") && caller.role !== "owner") {
       return json({ error: "only an owner may change owner accounts" }, 403);
     }
-    const { error } = await admin.from("staff").update({ role, active, display_name: displayName, staff_code: staffCode || null }).eq("uid", uid);
+    if (staffCode) {
+      const { data: duplicate } = await admin.from("staff").select("uid").eq("staff_code", staffCode).neq("uid", uid).maybeSingle();
+      if (duplicate) return json({ error: "รหัสพนักงานนี้ถูกใช้งานแล้ว" }, 400);
+    }
+    let nextEmail = target.email;
+    if (role === "cashier" && staffCode) {
+      nextEmail = `pos+${staffCode.toLowerCase()}@gg-smoothie.vercel.app`;
+      if (nextEmail !== target.email) {
+        const { error: authError } = await admin.auth.admin.updateUserById(uid, { email: nextEmail, email_confirm: true });
+        if (authError) return json({ error: authError.message }, 400);
+      }
+    }
+    if (role !== "cashier" && String(target.email || "").startsWith("pos+")) {
+      return json({ error: "กรุณาสร้างบัญชี Manager/Owner ใหม่ด้วยอีเมลจริง" }, 400);
+    }
+    const { error } = await admin.from("staff").update({ role, active, display_name: displayName, staff_code: staffCode || null, email: nextEmail }).eq("uid", uid);
     if (error) return json({ error: error.message }, 400);
     await admin.from("audit_log").insert({
       actor_uid: caller.uid, action: "staff.update", entity_type: "staff", entity_id: uid,
