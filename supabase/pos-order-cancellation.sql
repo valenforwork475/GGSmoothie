@@ -1,5 +1,6 @@
 -- POS order cancellation and automatic refund/stock restoration
 begin;
+alter table public.orders add column if not exists cancelled_at timestamptz;
 
 create or replace function public.cancel_pos_order(p_order_id uuid,p_reason text) returns json
 language plpgsql security definer set search_path=public as $$
@@ -36,7 +37,7 @@ begin
     end loop;
   end if;
 
-  update public.orders set status='cancelled',note=concat_ws(E'\n',nullif(note,''),'ยกเลิก: '||trim(p_reason)) where id=p_order_id;
+  update public.orders set status='cancelled',cancelled_at=now(),note=concat_ws(E'\n',nullif(note,''),'ยกเลิก: '||trim(p_reason)) where id=p_order_id;
   insert into public.audit_log(actor_uid,action,entity_type,entity_id,detail)
     values(auth.uid(),case when v_refund_id is null then 'order.cancel' else 'order.cancel_refund' end,'order',p_order_id::text,
       jsonb_build_object('reason',trim(p_reason),'amount',case when v_refund_id is null then 0 else v_order.total end,'refund_id',v_refund_id));
