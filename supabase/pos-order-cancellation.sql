@@ -9,10 +9,10 @@ begin
   if length(trim(coalesce(p_reason,''))) < 3 then raise exception 'reason required'; end if;
   select * into v_order from public.orders where id=p_order_id for update;
   if not found then raise exception 'order not found'; end if;
-  if v_order.status not in ('pending','confirmed') then raise exception 'order can no longer be cancelled'; end if;
+  if v_order.status not in ('pending','confirmed','done') then raise exception 'order can no longer be cancelled'; end if;
 
   -- Confirmed orders are treated as paid and require refund approval.
-  if v_order.status='confirmed' then
+  if v_order.status in ('confirmed','done') then
     if not public.staff_has_permission('refunds.approve') then raise exception 'manager approval required'; end if;
     if exists(select 1 from public.refunds where order_id=p_order_id and status='approved') then raise exception 'order already refunded'; end if;
     insert into public.refunds(order_id,amount,reason,status,requested_by,approved_by)
