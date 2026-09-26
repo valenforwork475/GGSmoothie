@@ -946,6 +946,7 @@ button { -webkit-tap-highlight-color:transparent; }
               <div style="margin-bottom:12px;padding:9px 12px;border-radius:8px;background:#EFF6FF;color:#1D4ED8;font-size:12.5px;font-weight:700">{{menuCreateMsg}}</div>
             </sc-if>
             <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:10px;align-items:end">
+              <div style="grid-column:1/-1;display:flex;align-items:center;gap:12px"><label style="min-height:72px;min-width:150px;padding:10px;border:1px dashed #94A3B8;border-radius:10px;background:#F8FAFC;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;font-weight:800;color:#475569"><input type="file" accept="image/*" onchange="{{onNewMenuImage}}" style="display:none">เลือกรูปเมนู</label><sc-if value="{{hasNewMenuImage}}"><img src="{{newMenuImage}}" alt="ตัวอย่างรูปเมนู" style="width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid #CBD5E1"></sc-if></div>
               <div>
                 <span style="display:block;font-size:11.5px;font-weight:700;margin-bottom:4px">ชื่อเมนู *</span>
                 <input type="text" placeholder="ชื่อเมนู" value="{{newMenuName}}" oninput="{{onNewMenuName}}" style="width:100%;height:40px;padding:0 10px;border-radius:8px;border:1px solid #CBD5E1;font-size:13px;box-sizing:border-box" />
@@ -960,6 +961,12 @@ button { -webkit-tap-highlight-color:transparent; }
                 <span style="display:block;font-size:11.5px;font-weight:700;margin-bottom:4px">ราคาขาย (บาท) *</span>
                 <input type="number" placeholder="0" value="{{newMenuPrice}}" oninput="{{onNewMenuPrice}}" style="width:100%;height:40px;padding:0 10px;border-radius:8px;border:1px solid #CBD5E1;font-size:13px;box-sizing:border-box" />
               </div>
+              <div>
+                <span style="display:block;font-size:11.5px;font-weight:700;margin-bottom:4px">VAT (%)</span>
+                <input type="number" min="0" max="100" step="0.01" value="{{newMenuVatRate}}" oninput="{{onNewMenuVatRate}}" style="width:100%;height:40px;padding:0 10px;border-radius:8px;border:1px solid #CBD5E1;font-size:13px;box-sizing:border-box" />
+              </div>
+              <label style="min-height:40px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:750"><input type="checkbox" checked="{{newMenuVatIncluded}}" onchange="{{onNewMenuVatIncluded}}"> ราคานี้รวม VAT แล้ว</label>
+              <div style="grid-column:1/-1;padding:10px 12px;border-radius:9px;background:#F1F5F9;color:#334155;font-size:12px;display:flex;gap:18px;flex-wrap:wrap"><span>VAT: <b>฿{{newMenuVatAmount}}</b></span><span>ราคาก่อน VAT: <b>฿{{newMenuPriceBeforeVat}}</b></span><span>ราคาสุทธิ: <b>฿{{newMenuPriceWithVat}}</b></span></div>
               <div style="grid-column:1/-1;margin-top:4px">
                 <button type="button" onclick="{{createPosMenu}}" style="width:100%;height:44px;border:0;border-radius:9px;background:#2563EB;color:#fff;font-weight:800;font-size:14px;cursor:pointer">+ บันทึกและเพิ่มเมนูพร้อมขายทันที</button>
               </div>
@@ -984,6 +991,10 @@ button { -webkit-tap-highlight-color:transparent; }
                   <span style="display:block;font-size:10px;opacity:0.5;margin-bottom:2px">ราคา (฿)</span>
                   <input type="number" value="{{m.price}}" onchange="{{m.onPriceChange}}" style="{{managePriceInputStyle}}" />
                 </div>
+                <div style="width:66px"><span style="display:block;font-size:10px;opacity:0.5;margin-bottom:2px">VAT %</span><input type="number" min="0" max="100" step="0.01" value="{{m.vatRate}}" onchange="{{m.onVatRateChange}}" style="{{managePriceInputStyle}}" /></div>
+                <label style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;white-space:nowrap"><input type="checkbox" checked="{{m.vatIncluded}}" onchange="{{m.onVatIncludedChange}}"> รวม VAT</label>
+                <label style="min-height:36px;padding:6px 9px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;color:#334155;font-size:11px;font-weight:750;display:flex;align-items:center;cursor:pointer"><input type="file" accept="image/*" onchange="{{m.onImageChange}}" style="display:none">รูปภาพ</label>
+                <span style="font-size:10px;color:#64748B;white-space:nowrap">VAT ฿{{m.vatAmount}}</span>
                 <div style="display:flex;align-items:center;gap:6px">
                   <div style="{{m.switchOuterStyle}}" onclick="{{m.toggleStock}}">
                     <div style="{{m.switchInnerStyle}}"></div>
@@ -993,6 +1004,19 @@ button { -webkit-tap-highlight-color:transparent; }
                 <button type="button" onclick="{{m.onDelete}}" style="padding:7px 11px;border:1px solid #FCA5A5;border-radius:8px;background:#FFF;color:#DC2626;font-size:12px;font-weight:700;cursor:pointer;margin-left:4px">ลบ</button>
               </div>
             </sc-for>
+          </div>
+
+          <div style="margin-top:24px;padding:16px;border:1px solid #CBD5E1;border-radius:12px;background:#fff">
+            <div style="font-weight:850;font-size:16px;color:#0F172A">ออฟชั่นเสริม</div>
+            <div style="font-size:12px;color:#64748B;margin-top:3px">สร้างชุดตัวเลือกและกำหนดเมนูที่จะใช้งาน</div>
+            <div style="display:grid;grid-template-columns:minmax(150px,1fr) 150px;gap:10px;margin-top:14px">
+              <label><span style="display:block;font-size:11px;font-weight:750;margin-bottom:4px">ชื่อชุดตัวเลือก</span><input value="{{newOptionName}}" oninput="{{onNewOptionName}}" placeholder="ชื่อชุดตัวเลือก" style="width:100%;height:40px;padding:0 10px;border:1px solid #CBD5E1;border-radius:8px;box-sizing:border-box"></label>
+              <label><span style="display:block;font-size:11px;font-weight:750;margin-bottom:4px">รูปแบบการเลือก</span><select value="{{newOptionType}}" onchange="{{onNewOptionType}}" style="width:100%;height:40px;padding:0 10px;border:1px solid #CBD5E1;border-radius:8px;background:#fff"><option value="single">เลือกได้ 1 รายการ</option><option value="multiple">เลือกได้หลายรายการ</option></select></label>
+              <label style="grid-column:1/-1"><span style="display:block;font-size:11px;font-weight:750;margin-bottom:4px">รายการตัวเลือก — ชื่อ | ราคาเพิ่ม (หนึ่งรายการต่อบรรทัด)</span><textarea value="{{newOptionChoices}}" oninput="{{onNewOptionChoices}}" rows="4" style="width:100%;padding:9px 10px;border:1px solid #CBD5E1;border-radius:8px;box-sizing:border-box;font:inherit;font-size:12px"></textarea></label>
+              <div style="grid-column:1/-1"><span style="display:block;font-size:11px;font-weight:750;margin-bottom:7px">ใช้กับเมนู</span><div style="display:flex;gap:7px;flex-wrap:wrap;max-height:150px;overflow:auto"><sc-for list="{{optionMenuChoices}}" as="menu"><label style="padding:7px 9px;border:1px solid #CBD5E1;border-radius:8px;font-size:11px;display:flex;align-items:center;gap:6px"><input type="checkbox" checked="{{menu.checked}}" onchange="{{menu.toggle}}">{{menu.name}}</label></sc-for></div></div>
+              <button type="button" onclick="{{saveOptionGroup}}" style="grid-column:1/-1;min-height:44px;border:0;border-radius:9px;background:#0F766E;color:#fff;font:inherit;font-weight:850">บันทึกออฟชั่นเสริม</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px"><sc-for list="{{optionGroupRows}}" as="group"><div style="padding:11px 12px;border:1px solid #E2E8F0;border-radius:10px;display:flex;align-items:center;gap:12px"><div style="flex:1"><b style="font-size:13px">{{group.name}}</b><div style="font-size:11px;color:#64748B;margin-top:3px">{{group.summary}}</div></div><button type="button" onclick="{{group.remove}}" style="min-height:36px;padding:6px 10px;border:1px solid #FCA5A5;border-radius:8px;background:#fff;color:#B91C1C;font:inherit;font-size:11px;font-weight:800">ลบ</button></div></sc-for></div>
           </div>
         </div>
       </sc-if>
@@ -1145,32 +1169,7 @@ button { -webkit-tap-highlight-color:transparent; }
         </div>
 
 
-        <div style="margin-top:14px">
-          <div style="{{optionLabelStyle}}">{{txt.sweetness}}</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <sc-for list="{{sweetOptions}}" as="sw" hint-placeholder-count="5">
-              <div style="{{sw.btnStyle}}" onclick="{{sw.onClick}}">{{sw.label}}</div>
-            </sc-for>
-          </div>
-        </div>
-
-        <div style="margin-top:14px">
-          <div style="{{optionLabelStyle}}">{{txt.ice}}</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <sc-for list="{{iceOptions}}" as="ic" hint-placeholder-count="3">
-              <div style="{{ic.btnStyle}}" onclick="{{ic.onClick}}">{{ic.label}}</div>
-            </sc-for>
-          </div>
-        </div>
-
-        <div style="margin-top:14px">
-          <div style="{{optionLabelStyle}}">{{txt.toppings}}</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-            <sc-for list="{{toppingOptions}}" as="tp" hint-placeholder-count="4">
-              <div style="{{tp.btnStyle}}" onclick="{{tp.onClick}}">{{tp.label}} <span style="opacity:0.6">+฿{{tp.price}}</span></div>
-            </sc-for>
-          </div>
-        </div>
+        <sc-for list="{{modalOptionGroups}}" as="group"><div style="margin-top:14px"><div style="{{optionLabelStyle}}">{{group.name}}</div><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{group.choices}}" as="choice"><button type="button" style="{{choice.btnStyle}}" onclick="{{choice.toggle}}">{{choice.label}} <sc-if value="{{choice.hasPrice}}"><span style="opacity:.65">+฿{{choice.price}}</span></sc-if></button></sc-for></div></div></sc-for>
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px">
           <div style="display:flex;align-items:center;gap:10px">
@@ -1427,7 +1426,8 @@ class Component extends DCLogic {
     newMemberPhone: '',
     memberError: null,
     memberLoading: false,
-    canCreateMenu:false,newMenuName:'',newMenuPrice:'',menuCreateMsg:null,
+    canCreateMenu:false,newMenuName:'',newMenuPrice:'',newMenuImage:'',newMenuVatRate:'7',newMenuVatIncluded:true,menuCreateMsg:null,
+    menuOptionGroups:[],newOptionName:'',newOptionType:'single',newOptionChoices:'',newOptionMenuIds:[],modalSelections:{},
     qrModalOpen: false,
     qrOrder: null,
     cancelOrder: null,
@@ -1461,6 +1461,10 @@ class Component extends DCLogic {
     try{localStorage.setItem('gg_pos_session',JSON.stringify({token,expiresAt:Number(expiresAt)||Math.floor(Date.now()/1000)+3300}))}catch(e){}
   }
   clearPosSession(){try{localStorage.removeItem('gg_pos_session')}catch(e){}}
+  imageToDataUrl(file,done){if(!file)return;const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const max=640,scale=Math.min(1,max/Math.max(img.width,img.height)),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);done(canvas.toDataURL('image/jpeg',.82))};img.src=reader.result};reader.readAsDataURL(file)}
+  persistOptionGroups(groups){try{localStorage.setItem('gg_pos_menu_options',JSON.stringify(groups))}catch(e){}this.setState({menuOptionGroups:groups})}
+  saveOptionGroup(){const s=this.state,name=String(s.newOptionName||'').trim(),lines=String(s.newOptionChoices||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);const choices=lines.map((line,index)=>{const parts=line.split('|');return{id:'o'+Date.now().toString(36)+index,label:String(parts[0]||'').trim(),price:Math.max(0,Number(parts[1])||0)}}).filter(x=>x.label);if(!name||!choices.length||!s.newOptionMenuIds.length){this.setState({menuCreateMsg:'กรอกชื่อออฟชั่น รายการตัวเลือก และเลือกเมนูที่ต้องการใช้งาน'});return}const group={id:'g'+Date.now().toString(36),name,type:s.newOptionType||'single',choices,menuIds:s.newOptionMenuIds};this.persistOptionGroups([...s.menuOptionGroups,group]);this.setState({newOptionName:'',newOptionChoices:'',newOptionMenuIds:[],menuCreateMsg:'บันทึกออฟชั่นเสริมแล้ว'})}
+  removeOptionGroup(id){this.persistOptionGroups(this.state.menuOptionGroups.filter(group=>group.id!==id))}
   api(method, pathQuery, body) {
     const k = this.key();
     const token = this.session();
@@ -1627,18 +1631,19 @@ class Component extends DCLogic {
   }
 
   componentDidMount() {
-    let heldBills=[],tableOrders={},tableCount=12,tableDisplayMode='auto',paymentMethodsConfig=[{id:'cash',label:'เงินสด',kind:'cash'},{id:'card',label:'บัตรเครดิต/เดบิต',kind:'electronic'}];
+    let heldBills=[],tableOrders={},tableCount=12,tableDisplayMode='auto',menuOptionGroups=[],paymentMethodsConfig=[{id:'cash',label:'เงินสด',kind:'cash'},{id:'card',label:'บัตรเครดิต/เดบิต',kind:'electronic'}];
     try{heldBills=JSON.parse(localStorage.getItem('gg_pos_held_bills')||'[]')||[]}catch(e){}
     try{tableOrders=JSON.parse(localStorage.getItem('gg_pos_table_orders')||'{}')||{}}catch(e){}
     try{tableCount=Math.max(1,Math.min(200,Number(localStorage.getItem('gg_pos_table_count'))||12))}catch(e){}
     try{tableDisplayMode=localStorage.getItem('gg_pos_table_display')||'auto'}catch(e){}
     try{const saved=JSON.parse(localStorage.getItem('gg_pos_payment_methods')||'null');if(Array.isArray(saved)&&saved.length)paymentMethodsConfig=saved}catch(e){}
+    try{const saved=JSON.parse(localStorage.getItem('gg_pos_menu_options')||'[]');if(Array.isArray(saved))menuOptionGroups=saved}catch(e){}
     let savedSession=null;
     try{savedSession=JSON.parse(localStorage.getItem('gg_pos_session')||'null')}catch(e){}
     const savedValid=!!(savedSession&&savedSession.token&&Number(savedSession.expiresAt||0)>Math.floor(Date.now()/1000)+30);
     this._sessionToken=savedValid?savedSession.token:'';
     if(!savedValid)this.clearPosSession();
-    this.setState({ sessionToken: savedValid?savedSession.token:'', currentShift: null, screen: 'tables', heldBills, tableOrders, tableCount,tableCountInput:String(tableCount),tableDisplayMode,paymentMethodsConfig },()=>{
+    this.setState({ sessionToken: savedValid?savedSession.token:'', currentShift: null, screen: 'tables', heldBills, tableOrders, tableCount,tableCountInput:String(tableCount),tableDisplayMode,paymentMethodsConfig,menuOptionGroups },()=>{
       if(!savedValid)return;
       if(savedSession.token===DEMO_SESSION){this.setState({canCreateMenu:true,canDiscount:true});return}
       Promise.all([
@@ -1661,7 +1666,7 @@ class Component extends DCLogic {
     if (this._shiftTimer) clearInterval(this._shiftTimer);
   }
 
-  createPosMenu(){const name=String(this.state.newMenuName||'').trim(),price=Number(this.state.newMenuPrice),category=String(this.state.newMenuCategory||this.state.menuItems.find(item=>item.category)?.category||'เครื่องดื่ม').trim();if(name.length<2||!Number.isFinite(price)||price<0){this.setState({menuCreateMsg:'กรอกชื่อและราคาให้ถูกต้อง'});return}const id='p'+Date.now().toString(36);if(this.session()===DEMO_SESSION){const item={id,dbId:id,name,desc:'',price,inStock:true,category,cal:0,p:0,f:0,sug:0,imageUrl:''};this.setState(x=>({menuItems:[...x.menuItems,item],newMenuName:'',newMenuPrice:'',menuCreateMsg:'เพิ่มเมนูใหม่พร้อมขายแล้ว'}));return}this.api('POST','menu_items',{id,name,description:'',price,category,active:true}).then(()=>{this.setState({newMenuName:'',newMenuPrice:'',menuCreateMsg:'เพิ่มเมนูสำเร็จ พร้อมเปิดขายใน POS แล้ว'});this.loadMenu()}).catch(()=>{this.api('POST','rpc/create_pos_menu',{p_name:name,p_description:'',p_price:price}).then(r=>{if(r&&r.id)this.menuPatch(r.id,{active:true,category});this.setState({newMenuName:'',newMenuPrice:'',menuCreateMsg:'เพิ่มเมนูสำเร็จ'});this.loadMenu()}).catch(e=>this.setState({menuCreateMsg:e.message||'เพิ่มเมนูไม่สำเร็จ'}))})}
+  createPosMenu(){const s=this.state,name=String(s.newMenuName||'').trim(),price=Number(s.newMenuPrice),category=String(s.newMenuCategory||s.menuItems.find(item=>item.category)?.category||'เครื่องดื่ม').trim(),vatRate=Math.max(0,Number(s.newMenuVatRate)||0),vatIncluded=!!s.newMenuVatIncluded,imageUrl=s.newMenuImage||'';if(name.length<2||!Number.isFinite(price)||price<0){this.setState({menuCreateMsg:'กรอกชื่อและราคาให้ถูกต้อง'});return}const id='p'+Date.now().toString(36),reset={newMenuName:'',newMenuPrice:'',newMenuImage:'',menuCreateMsg:'เพิ่มเมนูใหม่พร้อมขายแล้ว'};if(this.session()===DEMO_SESSION){const item={id,dbId:id,name,desc:'',price,inStock:true,category,vatRate,vatIncluded,cal:0,p:0,f:0,sug:0,imageUrl};this.setState(x=>({menuItems:[...x.menuItems,item],...reset}));return}this.api('POST','menu_items',{id,name,description:'',price,category,active:true,vat_rate:vatRate,vat_included:vatIncluded,image_url:imageUrl}).then(()=>{this.setState(reset);this.loadMenu()}).catch(()=>{this.api('POST','rpc/create_pos_menu',{p_name:name,p_description:'',p_price:price}).then(r=>{if(r&&r.id)this.menuPatch(r.id,{active:true,category,vat_rate:vatRate,vat_included:vatIncluded,image_url:imageUrl});this.setState(reset);this.loadMenu()}).catch(e=>this.setState({menuCreateMsg:e.message||'เพิ่มเมนูไม่สำเร็จ'}))})}
   deletePosMenu(dbId){if(!dbId||!confirm('คุณต้องการลบเมนูนี้ออกจากระบบใช่หรือไม่?'))return;if(this.session()===DEMO_SESSION){this.setState(x=>({menuItems:x.menuItems.filter(m=>m.dbId!==dbId&&m.id!==dbId)}));return;}this.api('DELETE','menu_items?id=eq.'+encodeURIComponent(dbId)).then(()=>this.loadMenu()).catch(e=>alert(e.message||'ลบเมนูไม่สำเร็จ'))}
 
   // ===================== MENU (ตาราง menu_items) =====================
@@ -1772,28 +1777,17 @@ class Component extends DCLogic {
   }
 
   openModal(item) {
-    this.setState({ modalItem: item, modalSweet: '100%', modalIce: 'ปกติ', modalToppings: [], modalQty: 1 });
+    this.setState({ modalItem: item, modalSelections: {}, modalQty: 1 });
   }
   addItemDirect(item,displayName){if(!item||!item.inStock)return;this.setState(prev=>{const existing=prev.cart.find(line=>line.menuId===item.id&&!(line.modText||''));if(existing){return{cart:prev.cart.map(line=>line.cartId===existing.cartId?{...line,qty:line.qty+1}:line),discountAmount:0,discountLabel:'',promoCode:'',promoMsg:null,manualDiscount:''}}const line={cartId:'c'+Date.now()+Math.random(),menuId:item.id,name:displayName||item.name,category:item.category||'Main',printerRoute:item.printerRoute||'main',vatIncluded:item.vatIncluded!==false,vatRate:Number(item.vatRate||0),serviceChargeEligible:item.serviceChargeEligible!==false,modText:'',qty:1,unitPrice:Number(item.price)||0};return{cart:[...prev.cart,line],discountAmount:0,discountLabel:'',promoCode:'',promoMsg:null,manualDiscount:''}})}
   closeModal() { this.setState({ modalItem: null }); }
-  toggleTopping(id) {
-    this.setState((s) => ({ modalToppings: s.modalToppings.includes(id) ? s.modalToppings.filter((t) => t !== id) : [...s.modalToppings, id] }));
-  }
+  toggleMenuOption(groupId,choiceId,type){this.setState(s=>{const current=s.modalSelections[groupId]||[];return{modalSelections:{...s.modalSelections,[groupId]:type==='single'?[choiceId]:(current.includes(choiceId)?current.filter(id=>id!==choiceId):[...current,choiceId])}}})}
   addToCart() {
     const s = this.state;
     const item = s.modalItem;
     if (!item) return;
-    const unit = this.unitPrice(item.price, s.modalToppings);
-    const english = s.lang === 'en';
-    const toppingNames = s.modalToppings.map((id) => {
-      const topping = TOPPINGS.find((t) => t.id === id) || {};
-      return english ? ({ chia:'Chia seeds', popping:'Popping boba', whip:'Whipped cream', granola:'Granola' }[id] || topping.label) : topping.label;
-    });
-    const iceLabel = english ? ({ 'ปกติ':'Regular', 'น้อย':'Less', 'ไม่ใส่':'No ice' }[s.modalIce] || s.modalIce) : s.modalIce;
-    const modText = english
-      ? ['Sweetness ' + s.modalSweet, 'Ice: ' + iceLabel].concat(toppingNames).join(' · ')
-      : ['หวาน ' + s.modalSweet, 'น้ำแข็ง' + s.modalIce].concat(toppingNames).join(' · ');
-    const line = { cartId: 'c' + Date.now() + Math.random(), name: item.name, category: item.category || 'Main', printerRoute:item.printerRoute||'main', vatIncluded:item.vatIncluded!==false, vatRate:Number(item.vatRate||0), serviceChargeEligible:item.serviceChargeEligible!==false, modText, qty: s.modalQty, unitPrice: unit };
+    const groups=s.menuOptionGroups.filter(group=>(group.menuIds||[]).includes(item.id));let extra=0;const labels=[];groups.forEach(group=>(s.modalSelections[group.id]||[]).forEach(id=>{const choice=(group.choices||[]).find(x=>x.id===id);if(choice){extra+=Number(choice.price)||0;labels.push(group.name+': '+choice.label)}}));
+    const line = { cartId: 'c' + Date.now() + Math.random(), menuId:item.id,name: item.name, category: item.category || 'Main', printerRoute:item.printerRoute||'main', vatIncluded:item.vatIncluded!==false, vatRate:Number(item.vatRate||0), serviceChargeEligible:item.serviceChargeEligible!==false, modText:labels.join(' · '), qty: s.modalQty, unitPrice:Number(item.price)+extra };
     this.setState((prev) => ({ cart: [...prev.cart, line], modalItem: null, discountAmount:0, discountLabel:'', promoCode:'', promoMsg:null, manualDiscount:'' }));
   }
 
@@ -2109,7 +2103,7 @@ class Component extends DCLogic {
           name: displayItem.name,
           category: displayItem.category,
           price: item.price,
-          onOpen: () => this.addItemDirect(item,displayItem.name),
+          onOpen: () => s.menuOptionGroups.some(group=>(group.menuIds||[]).includes(item.id)) ? this.openModal({...item,name:displayItem.name}) : this.addItemDirect(item,displayItem.name),
           thumbStyle: `width:52px;height:52px;border-radius:8px;flex:none;background:#EEF1F4;color:#6B7280;display:flex;align-items:center;justify-content:center;border:1px solid #E1E5EA`,
           thumbCardStyle: `height:92px;border-radius:10px 10px 0 0;background:#EEF1F4;color:#6B7280;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #E1E5EA;background-image:${item.imageUrl ? `url(\"${item.imageUrl}\")` : 'none'};background-size:cover;background-position:center`,
           photoLabel: item.imageUrl ? '' : 'PRODUCT PHOTO',
@@ -2216,7 +2210,7 @@ class Component extends DCLogic {
 
     const existingMenuCategories = Array.from(new Set(s.menuItems.map(item=>String(item.category||'').trim()).filter(Boolean)));
     const menuCategoryOptions = (existingMenuCategories.length ? existingMenuCategories : ['เครื่องดื่ม']).map(value=>({value,label:value}));
-    const manageRowStyle = `display:flex;align-items:center;gap:10px;padding:8px 14px;background:${c.cardBg};border-radius:10px`;
+    const manageRowStyle = `display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 14px;background:${c.cardBg};border-radius:10px`;
     const manageInputStyle = `flex:1;padding:7px 10px;border-radius:8px;border:1px solid rgba(0,0,0,0.1);font-size:13px;font-family:inherit;font-weight:600;background:transparent;color:${c.ink}`;
     const managePriceInputStyle = `width:44px;padding:3px 4px;border-radius:6px;border:1px solid rgba(0,0,0,0.1);font-size:13px;font-family:inherit;font-weight:700;background:transparent;color:${c.ink}`;
     const manageRows = s.menuItems.map((m, idx) => ({
@@ -2226,6 +2220,9 @@ class Component extends DCLogic {
       category: m.category || 'เครื่องดื่ม',
       categoryOptions: menuCategoryOptions,
       price: m.price,
+      vatRate:Number(m.vatRate)||0,
+      vatIncluded:m.vatIncluded!==false,
+      vatAmount:(m.vatIncluded!==false?(Number(m.price)*(Number(m.vatRate)||0)/(100+(Number(m.vatRate)||0))):(Number(m.price)*(Number(m.vatRate)||0)/100)).toFixed(2),
       statusLabel: m.inStock ? 'เปิดขาย' : 'ปิดขาย',
       onNameChange: (e) => {
         const v = e.target.value;
@@ -2242,6 +2239,9 @@ class Component extends DCLogic {
         this.setState((prev) => { const arr = [...prev.menuItems]; arr[idx] = { ...arr[idx], price: v }; return { menuItems: arr }; });
         this.menuPatch(m.dbId, { price: v });
       },
+      onVatRateChange:e=>{const v=Math.max(0,Number(e.target.value)||0);this.setState(prev=>{const arr=[...prev.menuItems];arr[idx]={...arr[idx],vatRate:v};return{menuItems:arr}});this.menuPatch(m.dbId,{vat_rate:v})},
+      onVatIncludedChange:e=>{const v=!!e.target.checked;this.setState(prev=>{const arr=[...prev.menuItems];arr[idx]={...arr[idx],vatIncluded:v};return{menuItems:arr}});this.menuPatch(m.dbId,{vat_included:v})},
+      onImageChange:e=>this.imageToDataUrl(e.target.files&&e.target.files[0],data=>{this.setState(prev=>{const arr=[...prev.menuItems];arr[idx]={...arr[idx],imageUrl:data};return{menuItems:arr,menuCreateMsg:'บันทึกรูปเมนูแล้ว'}});this.menuPatch(m.dbId,{image_url:data})}),
       toggleStock: () => {
         const next = !m.inStock;
         this.setState((prev) => { const arr = [...prev.menuItems]; arr[idx] = { ...arr[idx], inStock: next }; return { menuItems: arr }; });
@@ -2251,6 +2251,8 @@ class Component extends DCLogic {
       switchOuterStyle: `width:44px;height:24px;border-radius:12px;padding:2px;cursor:pointer;background:${m.inStock ? c.accent : 'rgba(0,0,0,0.15)'};display:flex;align-items:center;justify-content:${m.inStock ? 'flex-end' : 'flex-start'}`,
       switchInnerStyle: `width:20px;height:20px;border-radius:50%;background:#fff`,
     }));
+    const optionMenuChoices=s.menuItems.map(item=>({name:item.name,checked:s.newOptionMenuIds.includes(item.id),toggle:()=>this.setState(prev=>({newOptionMenuIds:prev.newOptionMenuIds.includes(item.id)?prev.newOptionMenuIds.filter(id=>id!==item.id):[...prev.newOptionMenuIds,item.id]}))}));
+    const optionGroupRows=s.menuOptionGroups.map(group=>({name:group.name,summary:`${group.choices.length} ตัวเลือก · ใช้กับ ${(group.menuIds||[]).length} เมนู`,remove:()=>this.removeOptionGroup(group.id)}));
 
     // ---- web queue cards ----
     const queueCardStyle = `background:${c.cardBg};border-radius:14px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,0.07)`;
@@ -2329,28 +2331,12 @@ class Component extends DCLogic {
     const connMsgStyle = `margin-top:12px;font-size:12.5px;font-weight:600;color:${s.connMsgOk ? '#15803D' : '#D93838'}`;
 
     const modalItem = s.modalItem;
-    const modalUnit = modalItem ? this.unitPrice(modalItem.price, s.modalToppings) : 0;
+    const activeModalGroups=modalItem?s.menuOptionGroups.filter(group=>(group.menuIds||[]).includes(modalItem.id)):[];
+    let modalExtra=0;activeModalGroups.forEach(group=>(s.modalSelections[group.id]||[]).forEach(id=>{const choice=(group.choices||[]).find(x=>x.id===id);if(choice)modalExtra+=Number(choice.price)||0}));
+    const modalUnit = modalItem ? Number(modalItem.price)+modalExtra : 0;
 
     const optionLabelStyle = `font-size:11.5px;font-weight:700;opacity:0.55;margin-bottom:7px;text-transform:uppercase;letter-spacing:0.03em`;
-    const sweetOptions = SWEETS.map((sw) => ({
-      label: sw,
-      onClick: () => this.setState({ modalSweet: sw }),
-      btnStyle: `padding:8px 12px;border-radius:9px;font-weight:600;font-size:12px;cursor:pointer;border:2px solid ${s.modalSweet === sw ? c.accent : 'rgba(0,0,0,0.1)'};background:${s.modalSweet === sw ? c.accent + '1a' : 'transparent'}`,
-    }));
-    const iceOptions = ICES.map((ic) => ({
-      label: english ? ({ 'ปกติ':'Regular', 'น้อย':'Less', 'ไม่ใส่':'No ice' }[ic] || ic) : ic,
-      onClick: () => this.setState({ modalIce: ic }),
-      btnStyle: `padding:8px 12px;border-radius:9px;font-weight:600;font-size:12px;cursor:pointer;border:2px solid ${s.modalIce === ic ? c.accent : 'rgba(0,0,0,0.1)'};background:${s.modalIce === ic ? c.accent + '1a' : 'transparent'}`,
-    }));
-    const toppingOptions = TOPPINGS.map((tp) => {
-      const on = s.modalToppings.includes(tp.id);
-      return {
-        label: english ? ({ chia:'Chia seeds', popping:'Popping boba', whip:'Whipped cream', granola:'Granola' }[tp.id] || tp.label) : tp.label,
-        price: tp.price,
-        onClick: () => this.toggleTopping(tp.id),
-        btnStyle: `padding:8px 10px;border-radius:9px;font-weight:600;font-size:11.5px;cursor:pointer;border:2px solid ${on ? c.accent : 'rgba(0,0,0,0.1)'};background:${on ? c.accent + '1a' : 'transparent'}`,
-      };
-    });
+    const modalOptionGroups=activeModalGroups.map(group=>({name:group.name,choices:(group.choices||[]).map(choice=>{const on=(s.modalSelections[group.id]||[]).includes(choice.id);return{label:choice.label,price:Number(choice.price)||0,hasPrice:Number(choice.price)>0,toggle:()=>this.toggleMenuOption(group.id,choice.id,group.type),btnStyle:`min-height:40px;padding:8px 12px;border-radius:9px;font:inherit;font-weight:700;font-size:12px;cursor:pointer;border:2px solid ${on?c.accent:'rgba(0,0,0,.1)'};background:${on?c.accent+'1a':'#fff'}`}})}));
 
     const languageChoiceStyle = (active) => `min-height:44px;border:1px solid ${active ? '#2563EB' : '#C9D0D9'};border-radius:8px;background:${active ? '#E8F0FE' : '#FFFFFF'};color:${active ? '#1D4ED8' : '#374151'};font:inherit;font-size:13px;font-weight:850;cursor:pointer`;
     const languageThaiStyle = languageChoiceStyle(!english);
@@ -2443,7 +2429,8 @@ class Component extends DCLogic {
       lastOrderQueue: s.lastOrder ? this.queueFmt(s.lastOrder.queue) : '',
       lastOrderTotalFmt: s.lastOrder ? this.fmt(s.lastOrder.total) : '0',
       newOrder: () => this.setState({ screen: 'tables', lastOrder: null }), goHistory: () => { this.setState({ screen: 'history', lastOrder: null }); if (this.key()) this.loadHistory(); }, goManageScreen: () => this.setState({ screen: 'manage' }),
-      canCreateMenu:s.canCreateMenu,newMenuName:s.newMenuName,newMenuCategory:s.newMenuCategory||menuCategoryOptions[0].value,newMenuPrice:s.newMenuPrice,menuCategoryOptions,onNewMenuName:e=>this.setState({newMenuName:e.target.value,menuCreateMsg:null}),onNewMenuCategory:e=>this.setState({newMenuCategory:e.target.value}),onNewMenuPrice:e=>this.setState({newMenuPrice:e.target.value,menuCreateMsg:null}),createPosMenu:()=>this.createPosMenu(),hasMenuCreateMsg:!!s.menuCreateMsg,menuCreateMsg:s.menuCreateMsg||'',menuItemsCount:s.menuItems.length,
+      canCreateMenu:s.canCreateMenu,newMenuName:s.newMenuName,newMenuCategory:s.newMenuCategory||menuCategoryOptions[0].value,newMenuPrice:s.newMenuPrice,newMenuImage:s.newMenuImage,hasNewMenuImage:!!s.newMenuImage,newMenuVatRate:s.newMenuVatRate,newMenuVatIncluded:s.newMenuVatIncluded,menuCategoryOptions,onNewMenuName:e=>this.setState({newMenuName:e.target.value,menuCreateMsg:null}),onNewMenuCategory:e=>this.setState({newMenuCategory:e.target.value}),onNewMenuPrice:e=>this.setState({newMenuPrice:e.target.value,menuCreateMsg:null}),onNewMenuImage:e=>this.imageToDataUrl(e.target.files&&e.target.files[0],data=>this.setState({newMenuImage:data})),onNewMenuVatRate:e=>this.setState({newMenuVatRate:e.target.value}),onNewMenuVatIncluded:e=>this.setState({newMenuVatIncluded:!!e.target.checked}),newMenuVatAmount:(s.newMenuVatIncluded?(Number(s.newMenuPrice)||0)*(Number(s.newMenuVatRate)||0)/(100+(Number(s.newMenuVatRate)||0)):(Number(s.newMenuPrice)||0)*(Number(s.newMenuVatRate)||0)/100).toFixed(2),newMenuPriceBeforeVat:(s.newMenuVatIncluded?(Number(s.newMenuPrice)||0)/(1+(Number(s.newMenuVatRate)||0)/100):(Number(s.newMenuPrice)||0)).toFixed(2),newMenuPriceWithVat:(s.newMenuVatIncluded?(Number(s.newMenuPrice)||0):(Number(s.newMenuPrice)||0)*(1+(Number(s.newMenuVatRate)||0)/100)).toFixed(2),createPosMenu:()=>this.createPosMenu(),hasMenuCreateMsg:!!s.menuCreateMsg,menuCreateMsg:s.menuCreateMsg||'',menuItemsCount:s.menuItems.length,
+      newOptionName:s.newOptionName,newOptionType:s.newOptionType,newOptionChoices:s.newOptionChoices,onNewOptionName:e=>this.setState({newOptionName:e.target.value}),onNewOptionType:e=>this.setState({newOptionType:e.target.value}),onNewOptionChoices:e=>this.setState({newOptionChoices:e.target.value}),optionMenuChoices,optionGroupRows,saveOptionGroup:()=>this.saveOptionGroup(),
       historyRows,historyCount:s.history.length,historyCancelledCount:s.history.filter(x=>x.status===STATUS_TH.cancelled||x.status==='ยกเลิก').length,hasHistoryNotice:!!s.historyNotice,historyNotice:s.historyNotice||'',manageRowStyle, manageInputStyle, managePriceInputStyle, manageRows,
       refreshQueue: () => this.loadQueue(),
       hasQueueError: !!s.queueError, queueError: s.queueError || '',
@@ -2496,7 +2483,7 @@ class Component extends DCLogic {
       login: () => this.login(),
       logout: () => this.logout(),
       goSettings: () => this.setState({ screen: 'settings' }), closeModalIfBackdrop: () => this.closeModal(), stopProp: (e) => e.stopPropagation(),
-      optionLabelStyle, sweetOptions, iceOptions, toppingOptions,
+      optionLabelStyle, modalOptionGroups,
       modalQty: s.modalQty, modalIncQty: () => this.setState((p) => ({ modalQty: p.modalQty + 1 })),
       modalDecQty: () => this.setState((p) => ({ modalQty: Math.max(1, p.modalQty - 1) })),
       modalTotalFmt: this.fmt(modalUnit * s.modalQty),
