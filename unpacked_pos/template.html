@@ -687,7 +687,7 @@ button { -webkit-tap-highlight-color:transparent; }
     <div class="pos-drawer-backdrop" role="presentation" onclick="{{closeMenuDrawer}}">
       <aside class="pos-drawer" role="dialog" aria-modal="true" aria-label="เมนูหลัก" onclick="{{keepMenuDrawerOpen}}">
         <div class="pos-drawer-head"><div><div style="font-size:18px;font-weight:950;color:#0F172A">เมนูหลัก</div><div style="font-size:12px;color:#64748B;margin-top:2px">เลือกงานที่ต้องการได้ทันที</div></div><button type="button" class="pos-drawer-close" aria-label="ปิดเมนู" onclick="{{closeMenuDrawer}}">×</button></div>
-        <nav aria-label="รายการเมนู" style="flex:1;overflow:auto;padding:8px 0"><sc-for list="{{navItems}}" as="nav"><button type="button" class="pos-drawer-item" aria-current="{{nav.current}}" onclick="{{nav.onClick}}"><span class="pos-drawer-icon" aria-hidden="true">{{nav.icon}}</span><span>{{nav.label}}</span><sc-if value="{{nav.hasBadge}}"><span style="min-width:24px;height:24px;padding:0 6px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:#DC2626;color:#fff;font-size:11px">{{nav.badge}}</span></sc-if></button></sc-for></nav>
+        <nav aria-label="รายการเมนู" style="flex:1;overflow:auto;padding:8px 0"><sc-for list="{{navItems}}" as="nav"><button type="button" class="pos-drawer-item" aria-current="{{nav.current}}" onclick="{{nav.onClick}}"><span>{{nav.label}}</span><sc-if value="{{nav.hasBadge}}"><span style="min-width:24px;height:24px;padding:0 6px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:#DC2626;color:#fff;font-size:11px">{{nav.badge}}</span></sc-if></button></sc-for></nav>
         <div style="padding:14px 18px;border-top:1px solid #E5E7EB"><div style="font-size:12px;color:#64748B;margin-bottom:10px">{{txt.userLoggedIn}}</div><button type="button" onclick="{{logout}}" style="width:100%;min-height:48px;border:1px solid #FCA5A5;border-radius:10px;background:#FFF;color:#B91C1C;font:inherit;font-weight:850">{{txt.logout}}</button></div>
       </aside>
     </div>
@@ -709,7 +709,7 @@ button { -webkit-tap-highlight-color:transparent; }
         <section style="max-width:1100px;margin:0 auto;">
           <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;">
             <div><h1 style="margin:0;font-size:24px;line-height:1.25;font-weight:950;color:#0F172A;">ผังโต๊ะ</h1><p style="margin:5px 0 0;font-size:13px;color:#64748B;">เลือกโต๊ะเพื่อเปิดออเดอร์ เพิ่มรายการ หรือเรียกเช็กบิล</p></div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11px;font-weight:800;"><span style="padding:7px 10px;border-radius:999px;background:#F1F5F9;color:#475569;">● ว่าง {{vacantTableCount}}</span><span style="padding:7px 10px;border-radius:999px;background:#DBEAFE;color:#1D4ED8;">● มีลูกค้า {{occupiedTableCount}}</span><button type="button" onclick="{{goManageScreen}}" style="min-height:42px;padding:8px 15px;border:0;border-radius:9px;background:#166534;color:#fff;font:inherit;font-weight:900;box-shadow:0 5px 14px rgba(22,101,52,.3)">➕ เพิ่มเมนูใหม่</button><button type="button" onclick="{{openTakeaway}}" style="min-height:42px;padding:8px 15px;border:0;border-radius:9px;background:#F97316;color:#fff;font:inherit;font-weight:900;box-shadow:0 5px 14px rgba(249,115,22,.22)">Takeaway · อาหารกลับบ้าน</button><button type="button" onclick="{{addOneTable}}" style="min-height:42px;padding:8px 13px;border:0;border-radius:9px;background:#2563EB;color:#fff;font:inherit;font-weight:850;">+ เพิ่มโต๊ะ</button></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11px;font-weight:800;"><span style="padding:7px 10px;border-radius:999px;background:#F1F5F9;color:#475569;">ว่าง {{vacantTableCount}}</span><span style="padding:7px 10px;border-radius:999px;background:#DBEAFE;color:#1D4ED8;">มีลูกค้า {{occupiedTableCount}}</span><button type="button" onclick="{{openTakeaway}}" style="min-height:42px;padding:8px 15px;border:0;border-radius:9px;background:#F97316;color:#fff;font:inherit;font-weight:900;box-shadow:0 5px 14px rgba(249,115,22,.22)">Takeaway · อาหารกลับบ้าน</button><button type="button" onclick="{{addOneTable}}" style="min-height:42px;padding:8px 13px;border:0;border-radius:9px;background:#2563EB;color:#fff;font:inherit;font-weight:850;">เพิ่มโต๊ะ</button></div>
           </div>
           <div class="pos-table-grid" style="{{tableGridStyle}}">
             <sc-for list="{{restaurantTables}}" as="tb">
@@ -727,7 +727,6 @@ button { -webkit-tap-highlight-color:transparent; }
         <div class="pos-order-workspace" style="{{orderWorkspaceStyle}}">
           <section class="pos-product-pane" style="{{productPaneStyle}}">
           <div class="pos-product-toolbar" style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
-            <button type="button" onclick="{{goManageScreen}}" style="min-height:40px;padding:9px 16px;border-radius:8px;font-size:14px;font-weight:850;cursor:pointer;background:#15803D;color:#FFFFFF;border:0;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(21,128,61,.25)">➕ เพิ่มเมนูใหม่</button>
             <sc-for list="{{categories}}" as="cat" hint-placeholder-count="3">
               <div style="{{cat.chipStyle}}" onclick="{{cat.onClick}}">{{cat.label}}</div>
             </sc-for>
@@ -744,7 +743,7 @@ button { -webkit-tap-highlight-color:transparent; }
                     <div style="font-size:11px;opacity:0.6">{{item.category}}</div>
                   </div>
                   <div style="font-weight:800;font-size:14px;white-space:nowrap">฿{{item.price}}</div>
-                  <div class="pos-product-add" style="{{addBtnStyle}}"><span>+</span><span class="pos-product-add-label">{{txt.chooseOptions}}</span></div>
+                  <div class="pos-product-add" style="{{addBtnStyle}}"><span>+</span><span class="pos-product-add-label">เพิ่ม</span></div>
                 </div>
               </sc-for>
             </div>
@@ -759,7 +758,7 @@ button { -webkit-tap-highlight-color:transparent; }
                     <div style="font-weight:800;font-size:15px;line-height:1.35;min-height:40px">{{item.name}}</div>
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
                       <div class="pos-product-price" style="font-weight:900;font-size:16px">฿{{item.price}}</div>
-                      <div class="pos-product-add" style="{{addBtnStyle}}"><span>+</span><span class="pos-product-add-label">{{txt.chooseOptions}}</span></div>
+                      <div class="pos-product-add" style="{{addBtnStyle}}"><span>+</span><span class="pos-product-add-label">เพิ่ม</span></div>
                     </div>
                   </div>
                 </button>
@@ -936,12 +935,12 @@ button { -webkit-tap-highlight-color:transparent; }
       <sc-if value="{{screenIsManage}}" hint-placeholder-val="{{false}}">
         <div>
           <div style="margin-bottom:16px">
-            <div style="font-weight:800;font-size:18px">🍔 จัดการและเพิ่มเมนูอาหาร</div>
+            <div style="font-weight:800;font-size:18px">จัดการเมนูอาหาร</div>
             <div style="font-size:12px;opacity:.7;margin-top:4px">เพิ่มเมนูใหม่ ปรับราคา หรือเปิด/ปิดการขายได้ทันทีจากเครื่อง POS</div>
           </div>
 
           <div style="margin-bottom:20px;padding:16px;border:1px solid #BFDBFE;border-radius:12px;background:linear-gradient(145deg, #FFFFFF, #F8FAFF)">
-            <div style="font-weight:800;font-size:15px;color:#1E40AF;margin-bottom:4px">➕ เพิ่มเมนูใหม่เข้า POS</div>
+            <div style="font-weight:800;font-size:15px;color:#1E40AF;margin-bottom:4px">เพิ่มเมนูใหม่เข้า POS</div>
             <div style="font-size:12px;color:#4B5563;margin-bottom:12px">กรอกชื่อและราคาขาย เมนูจะถูกเพิ่มและเปิดขายบน POS ทันที</div>
             <sc-if value="{{hasMenuCreateMsg}}">
               <div style="margin-bottom:12px;padding:9px 12px;border-radius:8px;background:#EFF6FF;color:#1D4ED8;font-size:12.5px;font-weight:700">{{menuCreateMsg}}</div>
@@ -976,7 +975,7 @@ button { -webkit-tap-highlight-color:transparent; }
             </div>
           </div>
 
-          <div style="font-weight:800;font-size:15px;margin-bottom:10px">📋 รายการเมนูทั้งหมด ({{menuItemsCount}} รายการ)</div>
+          <div style="font-weight:800;font-size:15px;margin-bottom:10px">รายการเมนูทั้งหมด ({{menuItemsCount}} รายการ)</div>
           <div style="display:flex;flex-direction:column;gap:10px">
             <sc-for list="{{manageRows}}" as="m">
               <div style="{{manageRowStyle}}">
@@ -1005,7 +1004,7 @@ button { -webkit-tap-highlight-color:transparent; }
                   </div>
                   <span style="font-size:11px;font-weight:700;width:38px">{{m.statusLabel}}</span>
                 </div>
-                <button type="button" onclick="{{m.onDelete}}" style="padding:7px 11px;border:1px solid #FCA5A5;border-radius:8px;background:#FFF;color:#DC2626;font-size:12px;font-weight:700;cursor:pointer;margin-left:4px">🗑️ ลบ</button>
+                <button type="button" onclick="{{m.onDelete}}" style="padding:7px 11px;border:1px solid #FCA5A5;border-radius:8px;background:#FFF;color:#DC2626;font-size:12px;font-weight:700;cursor:pointer;margin-left:4px">ลบ</button>
               </div>
             </sc-for>
           </div>
@@ -1041,9 +1040,9 @@ button { -webkit-tap-highlight-color:transparent; }
                     </sc-if>
                   </div>
                   <div style="display:flex; gap:6px; flex-wrap:wrap; width:100%; margin-top:4px;">
-                    <div style="flex:1; min-width:90px; text-align:center; padding:9px 6px; border-radius:10px; border:1px solid rgba(0,0,0,0.12); cursor:pointer; font-size:11px; font-weight:700; background:#fff;" onclick="{{q.onPrintSticker}}">🏷️ {{txt.printSticker}}</div>
-                    <div style="flex:1; min-width:90px; text-align:center; padding:9px 6px; border-radius:10px; border:1px solid rgba(0,0,0,0.12); cursor:pointer; font-size:11px; font-weight:700; background:#fff;" onclick="{{q.onPrintReceipt}}">🧾 {{txt.printReceipt}}</div>
-                    <div style="flex:1; min-width:90px; text-align:center; padding:9px 6px; border-radius:10px; border:1px solid rgba(0,0,0,0.12); cursor:pointer; font-size:11px; font-weight:700; background:#fff;" onclick="{{q.onShowQr}}">📱 {{txt.loyaltyQr}}</div>
+                    <div style="flex:1; min-width:90px; text-align:center; padding:9px 6px; border-radius:10px; border:1px solid rgba(0,0,0,0.12); cursor:pointer; font-size:11px; font-weight:700; background:#fff;" onclick="{{q.onPrintSticker}}">{{txt.printSticker}}</div>
+                    <div style="flex:1; min-width:90px; text-align:center; padding:9px 6px; border-radius:10px; border:1px solid rgba(0,0,0,0.12); cursor:pointer; font-size:11px; font-weight:700; background:#fff;" onclick="{{q.onPrintReceipt}}">{{txt.printReceipt}}</div>
+                    <div style="flex:1; min-width:90px; text-align:center; padding:9px 6px; border-radius:10px; border:1px solid rgba(0,0,0,0.12); cursor:pointer; font-size:11px; font-weight:700; background:#fff;" onclick="{{q.onShowQr}}">{{txt.loyaltyQr}}</div>
                   </div>
                 </div>
               </div>
@@ -1676,7 +1675,7 @@ class Component extends DCLogic {
     if (this._shiftTimer) clearInterval(this._shiftTimer);
   }
 
-  createPosMenu(){const name=String(this.state.newMenuName||'').trim(),price=Number(this.state.newMenuPrice),category=String(this.state.newMenuCategory||'เครื่องดื่ม').trim(),desc=String(this.state.newMenuDesc||'').trim();if(name.length<2||!Number.isFinite(price)||price<0){this.setState({menuCreateMsg:'กรอกชื่อและราคาให้ถูกต้อง'});return}const id='p'+Date.now().toString(36);if(this.session()===DEMO_SESSION){const item={id,dbId:id,name,desc,price,inStock:true,category,cal:0,p:0,f:0,sug:0,imageUrl:''};this.setState(x=>({menuItems:[...x.menuItems,item],newMenuName:'',newMenuDesc:'',newMenuPrice:'',menuCreateMsg:'✨ เพิ่มเมนูใหม่พร้อมขายแล้ว!'}));return}this.api('POST','menu_items',{id,name,description:desc,price,category,active:true}).then(()=>{this.setState({newMenuName:'',newMenuDesc:'',newMenuPrice:'',menuCreateMsg:'✨ เพิ่มเมนูสำเร็จ — พร้อมเปิดขายใน POS ทันที!'});this.loadMenu()}).catch(()=>{this.api('POST','rpc/create_pos_menu',{p_name:name,p_description:desc,p_price:price}).then(r=>{if(r&&r.id)this.menuPatch(r.id,{active:true,category});this.setState({newMenuName:'',newMenuDesc:'',newMenuPrice:'',menuCreateMsg:'✨ เพิ่มเมนูสำเร็จ!'});this.loadMenu()}).catch(e=>this.setState({menuCreateMsg:e.message||'เพิ่มเมนูไม่สำเร็จ'}))})}
+  createPosMenu(){const name=String(this.state.newMenuName||'').trim(),price=Number(this.state.newMenuPrice),category=String(this.state.newMenuCategory||'เครื่องดื่ม').trim(),desc=String(this.state.newMenuDesc||'').trim();if(name.length<2||!Number.isFinite(price)||price<0){this.setState({menuCreateMsg:'กรอกชื่อและราคาให้ถูกต้อง'});return}const id='p'+Date.now().toString(36);if(this.session()===DEMO_SESSION){const item={id,dbId:id,name,desc,price,inStock:true,category,cal:0,p:0,f:0,sug:0,imageUrl:''};this.setState(x=>({menuItems:[...x.menuItems,item],newMenuName:'',newMenuDesc:'',newMenuPrice:'',menuCreateMsg:'เพิ่มเมนูใหม่พร้อมขายแล้ว'}));return}this.api('POST','menu_items',{id,name,description:desc,price,category,active:true}).then(()=>{this.setState({newMenuName:'',newMenuDesc:'',newMenuPrice:'',menuCreateMsg:'เพิ่มเมนูสำเร็จ พร้อมเปิดขายใน POS แล้ว'});this.loadMenu()}).catch(()=>{this.api('POST','rpc/create_pos_menu',{p_name:name,p_description:desc,p_price:price}).then(r=>{if(r&&r.id)this.menuPatch(r.id,{active:true,category});this.setState({newMenuName:'',newMenuDesc:'',newMenuPrice:'',menuCreateMsg:'เพิ่มเมนูสำเร็จ'});this.loadMenu()}).catch(e=>this.setState({menuCreateMsg:e.message||'เพิ่มเมนูไม่สำเร็จ'}))})}
   deletePosMenu(dbId){if(!dbId||!confirm('คุณต้องการลบเมนูนี้ออกจากระบบใช่หรือไม่?'))return;if(this.session()===DEMO_SESSION){this.setState(x=>({menuItems:x.menuItems.filter(m=>m.dbId!==dbId&&m.id!==dbId)}));return;}this.api('DELETE','menu_items?id=eq.'+encodeURIComponent(dbId)).then(()=>this.loadMenu()).catch(e=>alert(e.message||'ลบเมนูไม่สำเร็จ'))}
 
   // ===================== MENU (ตาราง menu_items) =====================
@@ -1789,6 +1788,7 @@ class Component extends DCLogic {
   openModal(item) {
     this.setState({ modalItem: item, modalSweet: '100%', modalIce: 'ปกติ', modalToppings: [], modalQty: 1 });
   }
+  addItemDirect(item,displayName){if(!item||!item.inStock)return;this.setState(prev=>{const existing=prev.cart.find(line=>line.menuId===item.id&&!(line.modText||''));if(existing){return{cart:prev.cart.map(line=>line.cartId===existing.cartId?{...line,qty:line.qty+1}:line),discountAmount:0,discountLabel:'',promoCode:'',promoMsg:null,manualDiscount:''}}const line={cartId:'c'+Date.now()+Math.random(),menuId:item.id,name:displayName||item.name,category:item.category||'Main',printerRoute:item.printerRoute||'main',vatIncluded:item.vatIncluded!==false,vatRate:Number(item.vatRate||0),serviceChargeEligible:item.serviceChargeEligible!==false,modText:'',qty:1,unitPrice:Number(item.price)||0};return{cart:[...prev.cart,line],discountAmount:0,discountLabel:'',promoCode:'',promoMsg:null,manualDiscount:''}})}
   closeModal() { this.setState({ modalItem: null }); }
   toggleTopping(id) {
     this.setState((s) => ({ modalToppings: s.modalToppings.includes(id) ? s.modalToppings.filter((t) => t !== id) : [...s.modalToppings, id] }));
@@ -2073,9 +2073,9 @@ class Component extends DCLogic {
     const quickPayStyle = `width:100%;min-height:52px;border:0;border-radius:9px;background:${s.cart.length ? '#2563EB' : '#D1D5DB'};color:${s.cart.length ? '#FFFFFF' : '#6B7280'};font:inherit;font-size:16px;font-weight:900;cursor:${s.cart.length ? 'pointer' : 'not-allowed'};box-shadow:none`;
 
     const pendingCount = s.webOrders.filter((o) => o.status === 'pending').length;
-    const screenLabels = { tables: 'โต๊ะ', queue: txt.navQueue, history: txt.navHistory, members: txt.navMembers, manage: '➕ เพิ่ม/จัดการเมนู', settings: txt.navSettings };
+    const screenLabels = { tables: 'โต๊ะ', queue: txt.navQueue, history: txt.navHistory, members: txt.navMembers, manage: 'จัดการเมนู', settings: txt.navSettings };
     const navKeys = ['tables', 'queue', 'history', 'members', 'manage', 'shift', 'settings'];
-    const navIcons = {tables:'▦',queue:'⇄',history:'▤',members:'♙',manage:'▣',shift:'◷',settings:'⚙'};
+    const navIcons = {tables:'',queue:'',history:'',members:'',manage:'',shift:'',settings:''};
     const navItems = navKeys.map((key) => {
       const active = s.screen === key || (key === 'tables' && (s.screen === 'order' || s.screen === 'cart' || s.screen === 'checkout' || s.screen === 'confirmed'));
       return {
@@ -2100,6 +2100,7 @@ class Component extends DCLogic {
     const showRailLabel = true;
 
     const filteredItems = s.menuItems
+      .filter((m) => m.inStock)
       .filter((m) => s.category === 'ทั้งหมด' || m.category === s.category)
       .filter((m) => {
         const translated = MENU_EN[m.name];
@@ -2114,7 +2115,7 @@ class Component extends DCLogic {
           name: displayItem.name,
           category: displayItem.category,
           price: item.price,
-          onOpen: () => this.openModal(displayItem),
+          onOpen: () => this.addItemDirect(item,displayItem.name),
           thumbStyle: `width:52px;height:52px;border-radius:8px;flex:none;background:#EEF1F4;color:#6B7280;display:flex;align-items:center;justify-content:center;border:1px solid #E1E5EA`,
           thumbCardStyle: `height:92px;border-radius:10px 10px 0 0;background:#EEF1F4;color:#6B7280;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #E1E5EA;background-image:${item.imageUrl ? `url(\"${item.imageUrl}\")` : 'none'};background-size:cover;background-position:center`,
           photoLabel: item.imageUrl ? '' : 'PRODUCT PHOTO',
