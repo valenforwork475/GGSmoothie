@@ -2,7 +2,7 @@
   "redirects": [
     {
       "source": "/pos",
-      "destination": "/POS-1c-standalone.html?v=v5",
+      "destination": "/POS-direct.html?v=v6",
       "permanent": false
     },
     {
@@ -13,7 +13,7 @@
   ],
   "headers": [
     {
-      "source": "/(POS-1c-standalone.html|sw.js|backoffice/.*)",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -26,23 +26,6 @@
         {
           "key": "Expires",
           "value": "0"
-        }
-      ]
-    },
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Frame-Options",
-          "value": "SAMEORIGIN"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
         }
       ]
     }
