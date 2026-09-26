@@ -687,7 +687,7 @@ button { -webkit-tap-highlight-color:transparent; }
     <div class="pos-drawer-backdrop" role="presentation" onclick="{{closeMenuDrawer}}">
       <aside class="pos-drawer" role="dialog" aria-modal="true" aria-label="เมนูหลัก" onclick="{{keepMenuDrawerOpen}}">
         <div class="pos-drawer-head"><div><div style="font-size:18px;font-weight:950;color:#0F172A">เมนูหลัก</div><div style="font-size:12px;color:#64748B;margin-top:2px">เลือกงานที่ต้องการได้ทันที</div></div><button type="button" class="pos-drawer-close" aria-label="ปิดเมนู" onclick="{{closeMenuDrawer}}">×</button></div>
-        <nav aria-label="รายการเมนู" style="flex:1;overflow:auto;padding:8px 0"><sc-for list="{{navItems}}" as="nav"><button type="button" class="pos-drawer-item" aria-current="{{nav.current}}" onclick="{{nav.onClick}}"><span>{{nav.label}}</span><sc-if value="{{nav.hasBadge}}"><span style="min-width:24px;height:24px;padding:0 6px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:#DC2626;color:#fff;font-size:11px">{{nav.badge}}</span></sc-if></button></sc-for></nav>
+        <nav aria-label="รายการเมนู" style="flex:1;overflow:auto;padding:8px 0"><sc-for list="{{navItems}}" as="nav"><button type="button" class="pos-drawer-item" aria-current="{{nav.current}}" onclick="{{nav.onClick}}"><span class="pos-drawer-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{nav.iconPath}}"></path></svg></span><span>{{nav.label}}</span><sc-if value="{{nav.hasBadge}}"><span style="min-width:24px;height:24px;padding:0 6px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:#DC2626;color:#fff;font-size:11px">{{nav.badge}}</span></sc-if></button></sc-for></nav>
         <div style="padding:14px 18px;border-top:1px solid #E5E7EB"><div style="font-size:12px;color:#64748B;margin-bottom:10px">{{txt.userLoggedIn}}</div><button type="button" onclick="{{logout}}" style="width:100%;min-height:48px;border:1px solid #FCA5A5;border-radius:10px;background:#FFF;color:#B91C1C;font:inherit;font-weight:850">{{txt.logout}}</button></div>
       </aside>
     </div>
@@ -948,26 +948,17 @@ button { -webkit-tap-highlight-color:transparent; }
             <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:10px;align-items:end">
               <div>
                 <span style="display:block;font-size:11.5px;font-weight:700;margin-bottom:4px">ชื่อเมนู *</span>
-                <input type="text" placeholder="เช่น ชานมไข่มุก" value="{{newMenuName}}" oninput="{{onNewMenuName}}" style="width:100%;height:40px;padding:0 10px;border-radius:8px;border:1px solid #CBD5E1;font-size:13px;box-sizing:border-box" />
+                <input type="text" placeholder="ชื่อเมนู" value="{{newMenuName}}" oninput="{{onNewMenuName}}" style="width:100%;height:40px;padding:0 10px;border-radius:8px;border:1px solid #CBD5E1;font-size:13px;box-sizing:border-box" />
               </div>
               <div>
                 <span style="display:block;font-size:11.5px;font-weight:700;margin-bottom:4px">หมวดหมู่</span>
                 <select value="{{newMenuCategory}}" onchange="{{onNewMenuCategory}}" style="width:100%;height:40px;padding:0 10px;border-radius:8px;border:1px solid #CBD5E1;font-size:13px;background:#fff;box-sizing:border-box">
-                  <option value="เครื่องดื่ม">เครื่องดื่ม</option>
-                  <option value="เมนูปั่น">เมนูปั่น / สมูทตี้</option>
-                  <option value="ของทานเล่น">ของทานเล่น</option>
-                  <option value="เส้น">เส้น / พาสต้า</option>
-                  <option value="สเต็ก">สเต็ก / อาหารจานเดียว</option>
-                  <option value="อื่นๆ">อื่นๆ</option>
+                  <sc-for list="{{menuCategoryOptions}}" as="cat"><option value="{{cat.value}}">{{cat.label}}</option></sc-for>
                 </select>
               </div>
               <div>
                 <span style="display:block;font-size:11.5px;font-weight:700;margin-bottom:4px">ราคาขาย (บาท) *</span>
                 <input type="number" placeholder="0" value="{{newMenuPrice}}" oninput="{{onNewMenuPrice}}" style="width:100%;height:40px;padding:0 10px;border-radius:8px;border:1px solid #CBD5E1;font-size:13px;box-sizing:border-box" />
-              </div>
-              <div style="grid-column:1/-1">
-                <span style="display:block;font-size:11.5px;font-weight:700;margin-bottom:4px">รายละเอียด (เช่น หวานน้อย, เย็น)</span>
-                <input type="text" placeholder="คำอธิบายสั้นๆ" value="{{newMenuDesc}}" oninput="{{onNewMenuDesc}}" style="width:100%;height:40px;padding:0 10px;border-radius:8px;border:1px solid #CBD5E1;font-size:13px;box-sizing:border-box" />
               </div>
               <div style="grid-column:1/-1;margin-top:4px">
                 <button type="button" onclick="{{createPosMenu}}" style="width:100%;height:44px;border:0;border-radius:9px;background:#2563EB;color:#fff;font-weight:800;font-size:14px;cursor:pointer">+ บันทึกและเพิ่มเมนูพร้อมขายทันที</button>
@@ -986,12 +977,7 @@ button { -webkit-tap-highlight-color:transparent; }
                 <div style="width:110px">
                   <span style="display:block;font-size:10px;opacity:0.5;margin-bottom:2px">หมวดหมู่</span>
                   <select value="{{m.category}}" onchange="{{m.onCategoryChange}}" style="{{manageInputStyle}}">
-                    <option value="เครื่องดื่ม">เครื่องดื่ม</option>
-                    <option value="เมนูปั่น">เมนูปั่น</option>
-                    <option value="ของทานเล่น">ของทานเล่น</option>
-                    <option value="เส้น">เส้น</option>
-                    <option value="สเต็ก">สเต็ก</option>
-                    <option value="อื่นๆ">อื่นๆ</option>
+                    <sc-for list="{{m.categoryOptions}}" as="cat"><option value="{{cat.value}}">{{cat.label}}</option></sc-for>
                   </select>
                 </div>
                 <div style="width:70px">
@@ -1441,7 +1427,7 @@ class Component extends DCLogic {
     newMemberPhone: '',
     memberError: null,
     memberLoading: false,
-    canCreateMenu:false,newMenuName:'',newMenuDesc:'',newMenuPrice:'',menuCreateMsg:null,
+    canCreateMenu:false,newMenuName:'',newMenuPrice:'',menuCreateMsg:null,
     qrModalOpen: false,
     qrOrder: null,
     cancelOrder: null,
@@ -1675,7 +1661,7 @@ class Component extends DCLogic {
     if (this._shiftTimer) clearInterval(this._shiftTimer);
   }
 
-  createPosMenu(){const name=String(this.state.newMenuName||'').trim(),price=Number(this.state.newMenuPrice),category=String(this.state.newMenuCategory||'เครื่องดื่ม').trim(),desc=String(this.state.newMenuDesc||'').trim();if(name.length<2||!Number.isFinite(price)||price<0){this.setState({menuCreateMsg:'กรอกชื่อและราคาให้ถูกต้อง'});return}const id='p'+Date.now().toString(36);if(this.session()===DEMO_SESSION){const item={id,dbId:id,name,desc,price,inStock:true,category,cal:0,p:0,f:0,sug:0,imageUrl:''};this.setState(x=>({menuItems:[...x.menuItems,item],newMenuName:'',newMenuDesc:'',newMenuPrice:'',menuCreateMsg:'เพิ่มเมนูใหม่พร้อมขายแล้ว'}));return}this.api('POST','menu_items',{id,name,description:desc,price,category,active:true}).then(()=>{this.setState({newMenuName:'',newMenuDesc:'',newMenuPrice:'',menuCreateMsg:'เพิ่มเมนูสำเร็จ พร้อมเปิดขายใน POS แล้ว'});this.loadMenu()}).catch(()=>{this.api('POST','rpc/create_pos_menu',{p_name:name,p_description:desc,p_price:price}).then(r=>{if(r&&r.id)this.menuPatch(r.id,{active:true,category});this.setState({newMenuName:'',newMenuDesc:'',newMenuPrice:'',menuCreateMsg:'เพิ่มเมนูสำเร็จ'});this.loadMenu()}).catch(e=>this.setState({menuCreateMsg:e.message||'เพิ่มเมนูไม่สำเร็จ'}))})}
+  createPosMenu(){const name=String(this.state.newMenuName||'').trim(),price=Number(this.state.newMenuPrice),category=String(this.state.newMenuCategory||this.state.menuItems.find(item=>item.category)?.category||'เครื่องดื่ม').trim();if(name.length<2||!Number.isFinite(price)||price<0){this.setState({menuCreateMsg:'กรอกชื่อและราคาให้ถูกต้อง'});return}const id='p'+Date.now().toString(36);if(this.session()===DEMO_SESSION){const item={id,dbId:id,name,desc:'',price,inStock:true,category,cal:0,p:0,f:0,sug:0,imageUrl:''};this.setState(x=>({menuItems:[...x.menuItems,item],newMenuName:'',newMenuPrice:'',menuCreateMsg:'เพิ่มเมนูใหม่พร้อมขายแล้ว'}));return}this.api('POST','menu_items',{id,name,description:'',price,category,active:true}).then(()=>{this.setState({newMenuName:'',newMenuPrice:'',menuCreateMsg:'เพิ่มเมนูสำเร็จ พร้อมเปิดขายใน POS แล้ว'});this.loadMenu()}).catch(()=>{this.api('POST','rpc/create_pos_menu',{p_name:name,p_description:'',p_price:price}).then(r=>{if(r&&r.id)this.menuPatch(r.id,{active:true,category});this.setState({newMenuName:'',newMenuPrice:'',menuCreateMsg:'เพิ่มเมนูสำเร็จ'});this.loadMenu()}).catch(e=>this.setState({menuCreateMsg:e.message||'เพิ่มเมนูไม่สำเร็จ'}))})}
   deletePosMenu(dbId){if(!dbId||!confirm('คุณต้องการลบเมนูนี้ออกจากระบบใช่หรือไม่?'))return;if(this.session()===DEMO_SESSION){this.setState(x=>({menuItems:x.menuItems.filter(m=>m.dbId!==dbId&&m.id!==dbId)}));return;}this.api('DELETE','menu_items?id=eq.'+encodeURIComponent(dbId)).then(()=>this.loadMenu()).catch(e=>alert(e.message||'ลบเมนูไม่สำเร็จ'))}
 
   // ===================== MENU (ตาราง menu_items) =====================
@@ -2075,7 +2061,15 @@ class Component extends DCLogic {
     const pendingCount = s.webOrders.filter((o) => o.status === 'pending').length;
     const screenLabels = { tables: 'โต๊ะ', queue: txt.navQueue, history: txt.navHistory, members: txt.navMembers, manage: 'จัดการเมนู', settings: txt.navSettings };
     const navKeys = ['tables', 'queue', 'history', 'members', 'manage', 'shift', 'settings'];
-    const navIcons = {tables:'',queue:'',history:'',members:'',manage:'',shift:'',settings:''};
+    const navIcons = {
+      tables:'M4 5h6v6H4z M14 5h6v6h-6z M4 15h6v4H4z M14 15h6v4h-6z',
+      queue:'M7 7h11 M15 4l3 3-3 3 M17 17H6 M9 14l-3 3 3 3',
+      history:'M3 12a9 9 0 1 0 3-6.7L3 8 M3 3v5h5 M12 7v5l3 2',
+      members:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M22 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75',
+      manage:'M4 5h16v14H4z M8 9h8 M8 13h5 M8 17h3',
+      shift:'M12 2v4 M12 18v4 M4.93 4.93l2.83 2.83 M16.24 16.24l2.83 2.83 M2 12h4 M18 12h4 M4.93 19.07l2.83-2.83 M16.24 7.76l2.83-2.83',
+      settings:'M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7 M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.12 3.67-.08-.03a1.7 1.7 0 0 0-1.8.34l-.04.04a1.7 1.7 0 0 0-.5 1.04H8.74a1.7 1.7 0 0 0-.5-1.04l-.04-.04a1.7 1.7 0 0 0-1.8-.34l-.08.03-2.12-3.67.06-.06A1.7 1.7 0 0 0 4.6 15v-.08A1.7 1.7 0 0 0 3.5 13.4H3V9.16h.5A1.7 1.7 0 0 0 4.6 7.64v-.08a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.12-3.67.08.03a1.7 1.7 0 0 0 1.8-.34l.04-.04A1.7 1.7 0 0 0 8.74.56h6.52a1.7 1.7 0 0 0 .5 1.04l.04.04a1.7 1.7 0 0 0 1.8.34l.08-.03 2.12 3.67-.06.06a1.7 1.7 0 0 0-.34 1.88v.08a1.7 1.7 0 0 0 1.1 1.52h.5v4.24h-.5a1.7 1.7 0 0 0-1.1 1.52z'
+    };
     const navItems = navKeys.map((key) => {
       const active = s.screen === key || (key === 'tables' && (s.screen === 'order' || s.screen === 'cart' || s.screen === 'checkout' || s.screen === 'confirmed'));
       return {
@@ -2087,7 +2081,7 @@ class Component extends DCLogic {
           if (key === 'members' && this.key()) this.loadMembers();
           if (key === 'shift') this.loadShift();
         },
-        icon: navIcons[key],
+        iconPath: navIcons[key],
         current: active ? 'page' : false,
         tabStyle: `display:none`,
         railStyle: `width:100%;min-height:58px;padding:9px 8px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;background:${active ? '#E8F0FE' : 'transparent'};color:${active ? '#1D4ED8' : '#374151'};opacity:1;border:1px solid ${active ? '#BFDBFE' : 'transparent'};box-sizing:border-box`,
@@ -2220,6 +2214,8 @@ class Component extends DCLogic {
       onShowQr: () => this.openQrModal({ id: o.uid, queue_no: o.queue_no, items: o.items, customer_name: o.customer_name }),
     }));
 
+    const existingMenuCategories = Array.from(new Set(s.menuItems.map(item=>String(item.category||'').trim()).filter(Boolean)));
+    const menuCategoryOptions = (existingMenuCategories.length ? existingMenuCategories : ['เครื่องดื่ม']).map(value=>({value,label:value}));
     const manageRowStyle = `display:flex;align-items:center;gap:10px;padding:8px 14px;background:${c.cardBg};border-radius:10px`;
     const manageInputStyle = `flex:1;padding:7px 10px;border-radius:8px;border:1px solid rgba(0,0,0,0.1);font-size:13px;font-family:inherit;font-weight:600;background:transparent;color:${c.ink}`;
     const managePriceInputStyle = `width:44px;padding:3px 4px;border-radius:6px;border:1px solid rgba(0,0,0,0.1);font-size:13px;font-family:inherit;font-weight:700;background:transparent;color:${c.ink}`;
@@ -2228,6 +2224,7 @@ class Component extends DCLogic {
       dbId: m.dbId,
       name: m.name,
       category: m.category || 'เครื่องดื่ม',
+      categoryOptions: menuCategoryOptions,
       price: m.price,
       statusLabel: m.inStock ? 'เปิดขาย' : 'ปิดขาย',
       onNameChange: (e) => {
@@ -2446,7 +2443,7 @@ class Component extends DCLogic {
       lastOrderQueue: s.lastOrder ? this.queueFmt(s.lastOrder.queue) : '',
       lastOrderTotalFmt: s.lastOrder ? this.fmt(s.lastOrder.total) : '0',
       newOrder: () => this.setState({ screen: 'tables', lastOrder: null }), goHistory: () => { this.setState({ screen: 'history', lastOrder: null }); if (this.key()) this.loadHistory(); }, goManageScreen: () => this.setState({ screen: 'manage' }),
-      canCreateMenu:s.canCreateMenu,newMenuName:s.newMenuName,newMenuCategory:s.newMenuCategory||'เครื่องดื่ม',newMenuDesc:s.newMenuDesc,newMenuPrice:s.newMenuPrice,onNewMenuName:e=>this.setState({newMenuName:e.target.value,menuCreateMsg:null}),onNewMenuCategory:e=>this.setState({newMenuCategory:e.target.value}),onNewMenuDesc:e=>this.setState({newMenuDesc:e.target.value}),onNewMenuPrice:e=>this.setState({newMenuPrice:e.target.value,menuCreateMsg:null}),createPosMenu:()=>this.createPosMenu(),hasMenuCreateMsg:!!s.menuCreateMsg,menuCreateMsg:s.menuCreateMsg||'',menuItemsCount:s.menuItems.length,
+      canCreateMenu:s.canCreateMenu,newMenuName:s.newMenuName,newMenuCategory:s.newMenuCategory||menuCategoryOptions[0].value,newMenuPrice:s.newMenuPrice,menuCategoryOptions,onNewMenuName:e=>this.setState({newMenuName:e.target.value,menuCreateMsg:null}),onNewMenuCategory:e=>this.setState({newMenuCategory:e.target.value}),onNewMenuPrice:e=>this.setState({newMenuPrice:e.target.value,menuCreateMsg:null}),createPosMenu:()=>this.createPosMenu(),hasMenuCreateMsg:!!s.menuCreateMsg,menuCreateMsg:s.menuCreateMsg||'',menuItemsCount:s.menuItems.length,
       historyRows,historyCount:s.history.length,historyCancelledCount:s.history.filter(x=>x.status===STATUS_TH.cancelled||x.status==='ยกเลิก').length,hasHistoryNotice:!!s.historyNotice,historyNotice:s.historyNotice||'',manageRowStyle, manageInputStyle, managePriceInputStyle, manageRows,
       refreshQueue: () => this.loadQueue(),
       hasQueueError: !!s.queueError, queueError: s.queueError || '',
