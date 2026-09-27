@@ -704,7 +704,7 @@ button { -webkit-tap-highlight-color:transparent; }
 
   <div class="pos-body" style="{{bodyRowStyle}}">
 
-    <main class="pos-content" style="{{contentStyle}}">
+    <main id="pos-main-content" class="pos-content" style="{{contentStyle}}">
 
       <sc-if value="{{screenIsTables}}" hint-placeholder-val="{{false}}">
         <section style="max-width:1100px;margin:0 auto;">
@@ -1102,6 +1102,7 @@ button { -webkit-tap-highlight-color:transparent; }
 
         <div style="max-width:560px">
       <sc-if value="{{screenIsSettings}}" hint-placeholder-val="{{false}}">
+          <div style="position:fixed;right:14px;bottom:88px;z-index:45;display:flex;flex-direction:column;gap:8px"><button type="button" onclick="{{scrollSettingsUp}}" aria-label="เลื่อนขึ้น" style="width:48px;height:48px;border:1px solid #CBD5E1;border-radius:12px;background:#fff;color:#1D4ED8;font:inherit;font-size:24px;font-weight:900;box-shadow:0 6px 18px rgba(15,23,42,.16)">↑</button><button type="button" onclick="{{scrollSettingsDown}}" aria-label="เลื่อนลง" style="width:48px;height:48px;border:0;border-radius:12px;background:#2563EB;color:#fff;font:inherit;font-size:24px;font-weight:900;box-shadow:0 6px 18px rgba(37,99,235,.25)">↓</button></div>
           <div style="font-weight:800;font-size:18px;margin-bottom:14px">{{txt.settings}}</div>
           <div style="{{settingsCardStyle}}">
             <sc-if value="{{!!sessionToken}}" hint-placeholder-val="{{true}}">
@@ -2062,7 +2063,7 @@ class Component extends DCLogic {
     const tabBarStyle = `display:none`;
     const bodyRowStyle = `flex:1;display:flex;min-height:0`;
     const railStyle = `width:112px;flex:none;background:#FFFFFF;display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:12px 8px;border-right:1px solid #DDE2E8`;
-    const contentStyle = `flex:1;min-width:0;overflow:auto;padding:16px;background:#F5F6F8`;
+    const contentStyle = `flex:1 1 0%;min-width:0;height:calc(100vh - 64px);max-height:calc(100vh - 64px);overflow-x:hidden;overflow-y:scroll;padding:16px;background:#F5F6F8;-webkit-overflow-scrolling:touch;touch-action:pan-y`;
     const orderWorkspaceStyle = `display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,360px);gap:16px;height:calc(100vh - 100px);min-height:520px`;
     const productPaneStyle = `min-width:0;overflow:auto;padding-right:2px`;
     const quickCartStyle = `min-width:0;height:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D7DCE2;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px rgba(15,23,42,.06);overflow:hidden`;
@@ -2388,7 +2389,7 @@ class Component extends DCLogic {
       screenIsTables:s.screen==='tables',restaurantTables,restaurantTableRows,tableRowGap:compactTables?'7px':'10px',occupiedTableCount,vacantTableCount:restaurantTables.length-occupiedTableCount,activeTableLabel:s.activeTable||'—',activeOrderLabel:String(s.activeTable||'').startsWith('TA-')?'Takeaway '+s.activeTable:'โต๊ะ '+(s.activeTable||'—'),orderActionLabel:String(s.activeTable||'').startsWith('TA-')?'ไปหน้าชำระเงิน':'ส่งรายการเข้าครัว',openTakeaway:()=>this.openTakeaway(),completeOrderSelection:()=>this.completeOrderSelection(),sendTableToKitchen:()=>this.sendTableToKitchen(),addOneTable:()=>{const numeric=s.tableRows.flat().map(Number).filter(Number.isFinite),next=String((numeric.length?Math.max(...numeric):0)+1),rows=s.tableRows.map(row=>[...row]);if(!rows.length)rows.push([]);rows[rows.length-1].push(next);const text=rows.map(row=>row.join(', ')).join('\n');try{localStorage.setItem('gg_pos_table_layout',JSON.stringify(rows));localStorage.setItem('gg_pos_table_layout_text',text);localStorage.setItem('gg_pos_table_count',String(rows.flat().length))}catch(e){}this.setState({tableRows:rows,tableLayoutText:text,tableCount:rows.flat().length,tableCountInput:String(rows.flat().length)})},
       screenIsOrder: s.screen === 'order', screenIsCart: s.screen === 'cart', screenIsCheckout: s.screen === 'checkout',
       screenIsConfirmed: s.screen === 'confirmed', screenIsHistory: s.screen === 'history', screenIsManage: s.screen === 'manage',
-      screenIsQueue: s.screen === 'queue', screenIsSettings: s.screen === 'settings', screenIsMembers: s.screen === 'members',settingsMainOpen:s.settingsSection==='main',settingsTableLayoutOpen:s.settingsSection==='tables',openTableLayoutSettings:()=>this.setState({settingsSection:'tables'}),closeTableLayoutSettings:()=>this.setState({settingsSection:'main'}),
+      screenIsQueue: s.screen === 'queue', screenIsSettings: s.screen === 'settings', screenIsMembers: s.screen === 'members',settingsMainOpen:s.settingsSection==='main',settingsTableLayoutOpen:s.settingsSection==='tables',openTableLayoutSettings:()=>this.setState({settingsSection:'tables'},()=>{const el=document.getElementById('pos-main-content');if(el)el.scrollTop=0}),closeTableLayoutSettings:()=>this.setState({settingsSection:'main'},()=>{const el=document.getElementById('pos-main-content');if(el)el.scrollTop=0}),scrollSettingsUp:()=>{const el=document.getElementById('pos-main-content');if(el)el.scrollBy({top:-Math.max(260,el.clientHeight*.7),behavior:'smooth'})},scrollSettingsDown:()=>{const el=document.getElementById('pos-main-content');if(el)el.scrollBy({top:Math.max(260,el.clientHeight*.7),behavior:'smooth'})},
       screenIsShift: s.screen === 'shift',
       coName: s.coName, coPhone: s.coPhone,
       onCoNameChange: (e) => this.setState({ coName: e.target.value }),
