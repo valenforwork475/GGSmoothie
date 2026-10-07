@@ -3,3 +3,10 @@ backups/
 
 .vercel
 supabase/.temp/
+
+node_modules/
+desktop-app/node_modules/
+desktop-app/dist/
+android-app/app/build/
+android-app/.gradle/
+
