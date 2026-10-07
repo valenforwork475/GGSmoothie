@@ -732,7 +732,7 @@ button { -webkit-tap-highlight-color:transparent; }
         <section class="pos-table-page" style="max-width:1100px;margin:0 auto;">
           <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;">
             <div><div style="display:flex;align-items:center;gap:8px;"><h1 style="margin:0;font-size:24px;line-height:1.25;font-weight:950;color:#0F172A;">ผังโต๊ะ</h1><sc-if value="{{isWaiterMode}}"><span style="padding:5px 8px;border-radius:999px;background:#DCFCE7;color:#166534;font-size:10px;font-weight:900;">iPad รับออเดอร์</span></sc-if></div><p style="margin:5px 0 0;font-size:13px;color:#64748B;">แตะโต๊ะเพื่อดูรายการ เพิ่มอาหาร หรือชำระเงิน</p></div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11px;font-weight:800;"><span style="padding:7px 10px;border-radius:999px;background:#F1F5F9;color:#475569;">ทั้งหมด {{totalTableCount}} โต๊ะ</span><span style="padding:7px 10px;border-radius:999px;background:#ECFDF5;color:#047857;">ว่าง {{vacantTableCount}} โต๊ะ</span><span style="padding:7px 10px;border-radius:999px;background:#DBEAFE;color:#1D4ED8;">มีลูกค้า {{occupiedTableCount}} โต๊ะ</span><button type="button" onclick="{{openMergeTablesModal}}" style="min-height:42px;padding:8px 14px;border:1px solid #93C5FD;border-radius:9px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-size:13.5px;font-weight:900;box-shadow:0 1px 2px rgba(15,23,42,.05);display:flex;align-items:center;gap:6px;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>รวมโต๊ะคิดเงิน</button><button type="button" onclick="{{openTakeaway}}" style="min-height:42px;padding:8px 16px;border:1px solid #CBD5E1;border-radius:9px;background:#FFFFFF;color:#1F2937;font:inherit;font-size:14px;font-weight:900;box-shadow:0 1px 2px rgba(15,23,42,.05)">Takeaway · อาหารกลับบ้าน</button></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11px;font-weight:800;"><span style="padding:7px 10px;border-radius:999px;background:#F1F5F9;color:#475569;">ทั้งหมด {{totalTableCount}} โต๊ะ</span><span style="padding:7px 10px;border-radius:999px;background:#ECFDF5;color:#047857;">ว่าง {{vacantTableCount}} โต๊ะ</span><span style="padding:7px 10px;border-radius:999px;background:#DBEAFE;color:#1D4ED8;">มีลูกค้า {{occupiedTableCount}} โต๊ะ</span><button type="button" onclick="{{openMergeTablesModal}}" style="min-height:42px;padding:8px 14px;border:1px solid #93C5FD;border-radius:9px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-size:13.5px;font-weight:900;box-shadow:0 1px 2px rgba(15,23,42,.05);display:flex;align-items:center;gap:6px;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>รวมโต๊ะ</button><button type="button" onclick="{{openMoveTableModal}}" style="min-height:42px;padding:8px 14px;border:1px solid #CBD5E1;border-radius:9px;background:#FFFFFF;color:#334155;font:inherit;font-size:13.5px;font-weight:900;box-shadow:0 1px 2px rgba(15,23,42,.05);display:flex;align-items:center;gap:6px;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M7 16V4M7 4L3 8M7 4L11 8M17 8V20M17 20L21 16M17 20L13 16"></path></svg>ย้ายโต๊ะ</button><button type="button" onclick="{{openTakeaway}}" style="min-height:42px;padding:8px 16px;border:1px solid #CBD5E1;border-radius:9px;background:#FFFFFF;color:#1F2937;font:inherit;font-size:14px;font-weight:900;box-shadow:0 1px 2px rgba(15,23,42,.05)">Takeaway · อาหารกลับบ้าน</button></div>
           </div>
           <sc-if value="{{hasTableSyncError}}"><div role="status" style="margin:-8px 0 14px;padding:10px 12px;border:1px solid #FCD34D;border-radius:9px;background:#FFFBEB;color:#92400E;font-size:12px;font-weight:750;">{{tableSyncError}}</div></sc-if>
           <div class="pos-table-map" data-table-map="true" style="width:100%;min-height:420px;overflow:auto;padding:18px;border:1px solid #DCE4EE;border-radius:16px;background-color:#F8FAFC;background-image:linear-gradient(#E9EEF5 1px,transparent 1px),linear-gradient(90deg,#E9EEF5 1px,transparent 1px);background-size:28px 28px;box-shadow:inset 0 1px 4px rgba(15,23,42,.04);box-sizing:border-box;display:flex;flex-direction:column;gap:14px">
@@ -864,10 +864,6 @@ button { -webkit-tap-highlight-color:transparent; }
                 <span style="font-size:28px;line-height:1;font-weight:950;letter-spacing:-.03em;">฿{{totalFmt}}</span>
               </div>
               <sc-if value="{{isRestaurantTable}}">
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-                  <button type="button" onclick="{{openMergeIntoCurrentModal}}" style="min-height:38px;padding:6px 10px;border:1px solid #93C5FD;border-radius:8px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-size:12px;font-weight:850;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>รวมโต๊ะ</button>
-                  <button type="button" onclick="{{openMoveTableModal}}" style="min-height:38px;padding:6px 10px;border:1px solid #CBD5E1;border-radius:8px;background:#FFFFFF;color:#334155;font:inherit;font-size:12px;font-weight:850;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M7 16V4M7 4L3 8M7 4L11 8M17 8V20M17 20L21 16M17 20L13 16"></path></svg>ย้ายโต๊ะ</button>
-                </div>
                 <div style="{{tableActionGridStyle}}">
                   <button disabled="{{tableSaveDisabled}}" onclick="{{saveTableOrder}}" style="{{quickSaveStyle}}">{{tableSaveLabel}}</button>
                   <sc-if value="{{showTablePayment}}"><button disabled="{{tableSaveDisabled}}" onclick="{{payTableOrder}}" style="{{quickPayStyle}}">ชำระเงิน</button></sc-if>
@@ -916,7 +912,7 @@ button { -webkit-tap-highlight-color:transparent; }
         <div class="pos-checkout-screen">
           <div style="font-weight:800;font-size:18px;margin-bottom:14px">{{txt.checkout}}</div>
           <div class="checkout-order-panel" style="{{checkoutSummaryStyle}}">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px"><b style="font-size:13px;color:#0F172A">รายการออเดอร์</b><sc-if value="{{isRestaurantTable}}"><div style="display:flex;gap:6px"><button type="button" onclick="{{openMergeIntoCurrentModal}}" style="padding:4px 9px;border:1px solid #93C5FD;border-radius:7px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-size:11.5px;font-weight:850;cursor:pointer;display:inline-flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>รวมโต๊ะ</button><button type="button" onclick="{{openMoveTableModal}}" style="padding:4px 9px;border:1px solid #CBD5E1;border-radius:7px;background:#FFFFFF;color:#334155;font:inherit;font-size:11.5px;font-weight:850;cursor:pointer;display:inline-flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M7 16V4M7 4L3 8M7 4L11 8M17 8V20M17 20L21 16M17 20L13 16"></path></svg>ย้ายโต๊ะ</button></div></sc-if></div>
+            <div style="margin-bottom:8px"><b style="font-size:13px;color:#0F172A">รายการออเดอร์</b></div>
             <sc-for list="{{cartLines}}" as="line" hint-placeholder-count="2">
               <div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid #E2E8F0">
                 <div style="min-width:0"><b style="display:block;font-size:12.5px;color:#0F172A">{{line.name}}</b><span style="display:block;margin-top:2px;font-size:11px;color:#64748B">{{line.modText}}</span></div>
@@ -1022,7 +1018,7 @@ button { -webkit-tap-highlight-color:transparent; }
           <sc-if value="{{manageCategoryOrderOpen}}">
             <div style="max-width:720px;margin:0 auto">
               <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px"><button type="button" onclick="{{closeCategoryOrder}}" style="width:44px;height:44px;border:1px solid #CBD5E1;border-radius:10px;background:#fff;color:#334155;font:inherit;font-size:20px;font-weight:900">←</button><div><div style="font-weight:900;font-size:20px;color:#0F172A">จัดลำดับหมวดเมนู</div><div style="font-size:12px;color:#64748B;margin-top:3px">หมวดบนสุดจะเปิดเป็นหมวดแรกในหน้าคีย์ออเดอร์</div></div></div>
-              <div style="padding:16px;border:1px solid #CBD5E1;border-radius:12px;background:#fff;display:flex;flex-direction:column;gap:8px"><sc-for list="{{categoryOrderRows}}" as="cat"><div style="min-height:52px;padding:7px 9px;border:1px solid #E2E8F0;border-radius:9px;display:flex;align-items:center;gap:9px;background:#F8FAFC"><span style="width:30px;height:30px;border-radius:8px;background:#DBEAFE;color:#1D4ED8;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900">{{cat.position}}</span><b style="flex:1;font-size:14px">{{cat.name}}</b><span style="font-size:11px;color:#64748B">{{cat.itemCount}} เมนู</span><button type="button" disabled="{{cat.first}}" onclick="{{cat.up}}" aria-label="เลื่อนหมวดขึ้น" style="width:44px;height:44px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;font-size:18px">↑</button><button type="button" disabled="{{cat.last}}" onclick="{{cat.down}}" aria-label="เลื่อนหมวดลง" style="width:44px;height:44px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;font-size:18px">↓</button><button type="button" disabled="{{cat.onlyCategory}}" onclick="{{cat.remove}}" aria-label="ลบหมวด {{cat.name}}" style="min-width:62px;height:44px;padding:0 10px;border:1px solid #FCA5A5;border-radius:8px;background:#fff;color:#B91C1C;font:inherit;font-size:11px;font-weight:850">ลบ</button></div></sc-for></div>
+              <div style="padding:16px;border:1px solid #CBD5E1;border-radius:12px;background:#fff;display:flex;flex-direction:column;gap:8px"><sc-for list="{{categoryOrderRows}}" as="cat"><div style="min-height:52px;padding:7px 9px;border:1px solid #E2E8F0;border-radius:9px;display:flex;align-items:center;gap:9px;background:#F8FAFC"><span style="width:30px;height:30px;border-radius:8px;background:#DBEAFE;color:#1D4ED8;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900">{{cat.position}}</span><b style="flex:1;font-size:14px">{{cat.name}}</b><span style="font-size:11px;color:#64748B">{{cat.itemCount}} เมนู</span><button type="button" onclick="{{cat.setNoPrint}}" title="ตั้งให้ทุกเมนูในหมวดนี้ไม่ออกเครื่องปริ้น" style="padding:4px 9px;border:1px solid #CBD5E1;border-radius:7px;background:#F8FAFC;color:#475569;font:inherit;font-size:10.5px;font-weight:800;cursor:pointer">ไม่ออกเครื่องปริ้น</button><button type="button" onclick="{{cat.setMainPrinter}}" title="ตั้งให้ทุกเมนูในหมวดนี้ออกครัวหลัก" style="padding:4px 9px;border:1px solid #BFDBFE;border-radius:7px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-size:10.5px;font-weight:800;cursor:pointer">ครัวหลัก</button><button type="button" disabled="{{cat.first}}" onclick="{{cat.up}}" aria-label="เลื่อนหมวดขึ้น" style="width:44px;height:44px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;font-size:18px">↑</button><button type="button" disabled="{{cat.last}}" onclick="{{cat.down}}" aria-label="เลื่อนหมวดลง" style="width:44px;height:44px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;font-size:18px">↓</button><button type="button" disabled="{{cat.onlyCategory}}" onclick="{{cat.remove}}" aria-label="ลบหมวด {{cat.name}}" style="min-width:62px;height:44px;padding:0 10px;border:1px solid #FCA5A5;border-radius:8px;background:#fff;color:#B91C1C;font:inherit;font-size:11px;font-weight:850">ลบ</button></div></sc-for></div>
             </div>
           </sc-if>
           <sc-if value="{{manageMainOpen}}">
@@ -1052,6 +1048,14 @@ button { -webkit-tap-highlight-color:transparent; }
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:7px"><button type="button" onclick="{{useExistingCategory}}" style="{{existingCategoryModeStyle}}">เลือกหมวดเดิม</button><button type="button" onclick="{{useCustomCategory}}" style="{{customCategoryModeStyle}}">+ สร้างหมวดใหม่</button></div>
                 <sc-if value="{{existingCategoryMode}}"><select value="{{newMenuCategory}}" onchange="{{onNewMenuCategory}}" style="width:100%;height:40px;padding:0 10px;border-radius:8px;border:1px solid #CBD5E1;font-size:13px;background:#fff;box-sizing:border-box"><sc-for list="{{menuCategoryOptions}}" as="cat"><option value="{{cat.value}}">{{cat.label}}</option></sc-for></select></sc-if>
                 <sc-if value="{{customCategoryMode}}"><input type="text" autofocus placeholder="พิมพ์ชื่อหมวดใหม่" value="{{newMenuCustomCategory}}" oninput="{{onNewMenuCustomCategory}}" style="width:100%;height:40px;padding:0 10px;border-radius:8px;border:2px solid #2563EB;font-size:13px;background:#fff;box-sizing:border-box" /></sc-if>
+              </div>
+              <div>
+                <span style="display:block;font-size:11.5px;font-weight:700;margin-bottom:4px">เครื่องพิมพ์ *</span>
+                <select value="{{newMenuPrinterRoute}}" onchange="{{onNewMenuPrinterRoute}}" style="width:100%;height:40px;padding:0 10px;border-radius:8px;border:1px solid #CBD5E1;font-size:13px;background:#fff;box-sizing:border-box;font-weight:700">
+                  <option value="main">ครัวหลัก (สเต็ก)</option>
+                  <option value="kitchen">ครัวเสริม (ของทานเล่น)</option>
+                  <option value="none">ไม่ออกเครื่องปริ้น</option>
+                </select>
               </div>
               <div>
                 <span style="display:block;font-size:11.5px;font-weight:700;margin-bottom:4px">ราคาขาย (บาท) *</span>
@@ -1084,6 +1088,14 @@ button { -webkit-tap-highlight-color:transparent; }
                 <div style="width:110px">
                   <span style="display:block;font-size:10px;opacity:0.5;margin-bottom:2px">หมวดหมู่</span>
                   <select value="{{m.category}}" onchange="{{m.onCategoryChange}}" style="{{manageInputStyle}};width:100%;background:#fff"><sc-for list="{{m.categoryOptions}}" as="cat"><option value="{{cat.value}}">{{cat.label}}</option></sc-for></select>
+                </div>
+                <div style="width:135px">
+                  <span style="display:block;font-size:10px;opacity:0.5;margin-bottom:2px">เครื่องพิมพ์</span>
+                  <select value="{{m.printerRoute}}" onchange="{{m.onPrinterRouteChange}}" style="{{manageInputStyle}};width:100%;background:#fff;font-weight:750">
+                    <option value="main">ครัวหลัก (สเต็ก)</option>
+                    <option value="kitchen">ครัวเสริม (ของทานเล่น)</option>
+                    <option value="none">ไม่ออกเครื่องปริ้น</option>
+                  </select>
                 </div>
                 <div style="width:70px">
                   <span style="display:block;font-size:10px;opacity:0.5;margin-bottom:2px">ราคา (฿)</span>
@@ -1362,9 +1374,20 @@ button { -webkit-tap-highlight-color:transparent; }
         </div>
 
         <div style="margin-bottom:14px;padding:11px 13px;border-radius:10px;background:#F8FAFC;border:1px solid #E2E8F0">
-          <div style="font-size:12.5px;color:#475569">
-            โต๊ะปัจจุบัน: <strong style="color:#0F172A">โต๊ะ {{moveSourceTable}}</strong> · {{moveSourceItemCount}} รายการ · ยอดรวม ฿{{moveSourceTotalFmt}}
-          </div>
+          <sc-if value="{{hasMultipleOccupiedTables}}">
+            <label style="display:block;font-size:12px;font-weight:800;color:#334155;margin-bottom:6px">เลือกโต๊ะต้นทางที่ต้องการย้าย:</label>
+            <select value="{{moveSourceTable}}" onchange="{{onSelectMoveSourceTable}}" style="width:100%;height:38px;padding:0 10px;border-radius:8px;border:1px solid #CBD5E1;background:#fff;font-size:13px;font-weight:800;color:#0F172A;box-sizing:border-box">
+              <sc-for list="{{moveSourceChoices}}" as="sc">
+                <option value="{{sc.tableNo}}">โต๊ะ {{sc.tableNo}} ({{sc.itemCount}} รายการ · ฿{{sc.total}})</option>
+              </sc-for>
+            </select>
+            <div style="font-size:11.5px;color:#64748B;margin-top:6px">ยอดรวม: ฿{{moveSourceTotalFmt}}</div>
+          </sc-if>
+          <sc-if value="{{singleOccupiedTable}}">
+            <div style="font-size:12.5px;color:#475569">
+              โต๊ะต้นทาง: <strong style="color:#0F172A">โต๊ะ {{moveSourceTable}}</strong> · {{moveSourceItemCount}} รายการ · ยอดรวม ฿{{moveSourceTotalFmt}}
+            </div>
+          </sc-if>
         </div>
 
         <div style="margin-bottom:16px">
@@ -1736,7 +1759,7 @@ class Component extends DCLogic {
     newMemberPhone: '',
     memberError: null,
     memberLoading: false,
-    canCreateMenu:false,newMenuName:'',newMenuNameEn:'',newMenuNameEnManual:false,newMenuCategory:'สเต็ก',newMenuCategoryMode:'existing',newMenuCustomCategory:'',newMenuPrice:'',newMenuImage:'',newMenuVatRate:'7',newMenuVatIncluded:true,menuCreateMsg:null,saveToast:null,backConfirmOpen:false,checkoutAdjustConfirm:null,
+    canCreateMenu:false,newMenuName:'',newMenuNameEn:'',newMenuNameEnManual:false,newMenuCategory:'สเต็ก',newMenuCategoryMode:'existing',newMenuCustomCategory:'',newMenuPrice:'',newMenuPrinterRoute:'main',newMenuImage:'',newMenuVatRate:'7',newMenuVatIncluded:true,menuCreateMsg:null,saveToast:null,backConfirmOpen:false,checkoutAdjustConfirm:null,
     menuOptionGroups:[],menuCategoryOrder:[],editingOptionGroupId:null,newOptionName:'',newOptionNameEn:'',newOptionType:'single',newOptionChoices:[{id:'draft-1',label:'',labelEn:'',price:''}],newOptionMenuIds:[],modalSelections:{},
     qrModalOpen: false,
     qrOrder: null,
@@ -1801,6 +1824,16 @@ class Component extends DCLogic {
   loadOptionGroups(){if(!this.session()||this.session()===DEMO_SESSION)return Promise.resolve(this.state.menuOptionGroups);return this.api('POST','rpc/load_pos_menu_options',{}).then(groups=>{const clean=Array.isArray(groups)?groups:[];this.persistOptionGroups(clean);return clean}).catch(e=>{this.setState({menuCreateMsg:'โหลดออฟชั่นจากฐานข้อมูลไม่สำเร็จ: '+(e.message||'')});return this.state.menuOptionGroups})}
   loadCategoryOrder(){if(!this.session()||this.session()===DEMO_SESSION)return;this.api('POST','rpc/get_pos_menu_category_order',{}).then(order=>{if(Array.isArray(order)){try{localStorage.setItem('gg_pos_category_order',JSON.stringify(order))}catch(e){}this.setState({menuCategoryOrder:order})}}).catch(()=>{})}
   moveMenuCategory(name,direction){const used=this.state.menuItems.map(item=>String(item.category||'').trim()).filter(Boolean),all=Array.from(new Set([...this.state.menuCategoryOrder,...used])).filter(category=>used.includes(category)),index=all.indexOf(name),next=index+direction;if(index<0||next<0||next>=all.length)return;[all[index],all[next]]=[all[next],all[index]];try{localStorage.setItem('gg_pos_category_order',JSON.stringify(all))}catch(e){}this.setState({menuCategoryOrder:all});if(this.session()&&this.session()!==DEMO_SESSION)this.api('POST','rpc/save_pos_menu_category_order',{p_order:all}).then(()=>this.showSaveNotice('บันทึกลำดับหมวดแล้ว')).catch(e=>this.setState({menuCreateMsg:e.message||'บันทึกลำดับหมวดไม่สำเร็จ'}));else this.showSaveNotice('บันทึกลำดับหมวดแล้ว')}
+  setCategoryPrinterRoute(categoryName, route){
+    const items=this.state.menuItems.filter(m=>(m.category||'เครื่องดื่ม')===categoryName);
+    if(!items.length)return;
+    const label=route==='none'?'ไม่ออกเครื่องปริ้น':(route==='kitchen'?'ครัวเสริม':'ครัวหลัก');
+    this.setState(prev=>({
+      menuItems:prev.menuItems.map(m=>(m.category||'เครื่องดื่ม')===categoryName?{...m,printerRoute:route}:m),
+      menuCreateMsg:`ตั้งค่าหมวด "${categoryName}" เป็น "${label}" ทุกเมนูแล้ว`
+    }));
+    items.forEach(m=>this.menuPatch(m.dbId,{printer_route:route}));
+  }
   deleteMenuCategory(name){const categories=Array.from(new Set(this.state.menuItems.map(item=>String(item.category||'').trim()).filter(Boolean))),fallback=categories.find(category=>category!==name),affected=this.state.menuItems.filter(item=>item.category===name);if(!fallback){alert('ต้องมีอย่างน้อย 1 หมวดหมู่');return}if(!confirm(`ลบหมวด “${name}” ใช่หรือไม่?${affected.length?`\nเมนู ${affected.length} รายการจะย้ายไปหมวด “${fallback}”`:''}`))return;const nextOrder=this.state.menuCategoryOrder.filter(category=>category!==name),applyLocal=()=>{try{localStorage.setItem('gg_pos_category_order',JSON.stringify(nextOrder))}catch(e){}this.setState(prev=>({menuCategoryOrder:nextOrder,menuItems:prev.menuItems.map(item=>item.category===name?{...item,category:fallback}:item)}));this.showSaveNotice('ลบหมวดแล้ว')};if(this.session()===DEMO_SESSION){applyLocal();return}Promise.all([...affected.map(item=>this.menuPatch(item.dbId,{category:fallback})),this.api('POST','rpc/save_pos_menu_category_order',{p_order:nextOrder})]).then(applyLocal).catch(e=>this.setState({menuCreateMsg:e.message||'ลบหมวดไม่สำเร็จ'}))}
   resetOptionEditor(extra={}){this.setState({editingOptionGroupId:null,newOptionName:'',newOptionNameEn:'',newOptionType:'single',newOptionChoices:[{id:'draft-'+Date.now(),label:'',labelEn:'',price:''}],newOptionMenuIds:[],...extra})}
   editOptionGroup(group){if(!group)return;this.setState({editingOptionGroupId:group.id,newOptionName:group.name||'',newOptionNameEn:group.nameEn||'',newOptionType:group.type||'single',newOptionChoices:(group.choices||[]).map((choice,index)=>({id:choice.id||('draft-'+Date.now()+index),label:choice.label||'',labelEn:choice.labelEn||'',price:choice.price==null?'':choice.price})),newOptionMenuIds:[...(group.menuIds||[])],menuCreateMsg:'กำลังแก้ไขออฟชั่น “'+(group.name||'')+'”'},()=>{const el=document.getElementById('pos-option-editor');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})})}
@@ -2062,7 +2095,7 @@ class Component extends DCLogic {
     if (this._nativePrintSessionTimer) clearInterval(this._nativePrintSessionTimer);
   }
 
-  createPosMenu(){const s=this.state,name=String(s.newMenuName||'').trim(),nameEn=String(s.newMenuNameEn||autoEnglishMenuName(name)).trim(),rawPrice=String(s.newMenuPrice??'').trim(),price=Number(rawPrice),category=String(s.newMenuCategoryMode==='custom'?s.newMenuCustomCategory:s.newMenuCategory||'').trim(),vatRate=Math.max(0,Number(s.newMenuVatRate)||0),vatIncluded=!!s.newMenuVatIncluded,imageUrl=s.newMenuImage||'';if(name.length<2||!category||!rawPrice||!Number.isFinite(price)||price<0){this.setState({menuCreateMsg:'กรอกชื่อ หมวดหมู่ และราคาให้ถูกต้อง'});return}const id='p'+Date.now().toString(36),reset={newMenuName:'',newMenuNameEn:'',newMenuNameEnManual:false,newMenuCategory:'สเต็ก',newMenuCategoryMode:'existing',newMenuCustomCategory:'',newMenuPrice:'',newMenuImage:'',newMenuVatRate:'7',newMenuVatIncluded:true,menuCreateMsg:'เพิ่มเมนูใหม่พร้อมขายแล้ว'};const finish=()=>this.setState(reset,()=>{this.showSaveNotice('เพิ่มเมนูและชื่ออังกฤษพร้อมขายแล้ว');this.loadMenu()});if(this.session()===DEMO_SESSION){const item={id,dbId:id,name,nameEn,desc:'',price,inStock:true,category,vatRate,vatIncluded,cal:0,p:0,f:0,sug:0,imageUrl};this.setState(x=>({menuItems:[...x.menuItems,item],...reset}),()=>this.showSaveNotice('เพิ่มเมนูและชื่ออังกฤษพร้อมขายแล้ว'));return}this.api('POST','menu_items',{id,name,name_en:nameEn,description:'',price,category,active:true,vat_rate:vatRate,vat_included:vatIncluded,image_url:imageUrl}).then(finish).catch(()=>{this.api('POST','rpc/create_pos_menu',{p_name:name,p_description:'',p_price:price}).then(r=>r&&r.id?this.menuPatch(r.id,{name_en:nameEn,active:true,category,vat_rate:vatRate,vat_included:vatIncluded,image_url:imageUrl}):null).then(saved=>{if(!saved)throw new Error('บันทึกเมนูไม่สำเร็จ');finish()}).catch(e=>this.setState({menuCreateMsg:e.message||'เพิ่มเมนูไม่สำเร็จ'}))})}
+  createPosMenu(){const s=this.state,name=String(s.newMenuName||'').trim(),nameEn=String(s.newMenuNameEn||autoEnglishMenuName(name)).trim(),rawPrice=String(s.newMenuPrice??'').trim(),price=Number(rawPrice),category=String(s.newMenuCategoryMode==='custom'?s.newMenuCustomCategory:s.newMenuCategory||'').trim(),vatRate=Math.max(0,Number(s.newMenuVatRate)||0),vatIncluded=!!s.newMenuVatIncluded,imageUrl=s.newMenuImage||'';if(name.length<2||!category||!rawPrice||!Number.isFinite(price)||price<0){this.setState({menuCreateMsg:'กรอกชื่อ หมวดหมู่ และราคาให้ถูกต้อง'});return}const id='p'+Date.now().toString(36),reset={newMenuName:'',newMenuNameEn:'',newMenuNameEnManual:false,newMenuCategory:'สเต็ก',newMenuCategoryMode:'existing',newMenuCustomCategory:'',newMenuPrice:'',newMenuImage:'',newMenuVatRate:'7',newMenuVatIncluded:true,menuCreateMsg:'เพิ่มเมนูใหม่พร้อมขายแล้ว'};const finish=()=>this.setState(reset,()=>{this.showSaveNotice('เพิ่มเมนูและชื่ออังกฤษพร้อมขายแล้ว');this.loadMenu()});if(this.session()===DEMO_SESSION){const pRoute=s.newMenuPrinterRoute||(category.includes('ไม่ออก')||category.includes('ไม่ต้องออก')?'none':'main');const item={id,dbId:id,name,nameEn,desc:'',price,inStock:true,category,printerRoute:pRoute,vatRate,vatIncluded,cal:0,p:0,f:0,sug:0,imageUrl};this.setState(x=>({menuItems:[...x.menuItems,item],...reset}),()=>this.showSaveNotice('เพิ่มเมนูและชื่ออังกฤษพร้อมขายแล้ว'));return}this.api('POST','menu_items',{id,name,name_en:nameEn,description:'',price,category,active:true,printer_route:s.newMenuPrinterRoute||'main',vat_rate:vatRate,vat_included:vatIncluded,image_url:imageUrl}).then(finish).catch(()=>{this.api('POST','rpc/create_pos_menu',{p_name:name,p_description:'',p_price:price}).then(r=>r&&r.id?this.menuPatch(r.id,{name_en:nameEn,active:true,category,printer_route:s.newMenuPrinterRoute||'main',vat_rate:vatRate,vat_included:vatIncluded,image_url:imageUrl}):null).then(saved=>{if(!saved)throw new Error('บันทึกเมนูไม่สำเร็จ');finish()}).catch(e=>this.setState({menuCreateMsg:e.message||'เพิ่มเมนูไม่สำเร็จ'}))})}
   deletePosMenu(dbId){if(!dbId||!confirm('คุณต้องการลบเมนูนี้ออกจากระบบใช่หรือไม่?'))return;if(this.session()===DEMO_SESSION){this.setState(x=>({menuItems:x.menuItems.filter(m=>m.dbId!==dbId&&m.id!==dbId)}));return;}this.api('DELETE','menu_items?id=eq.'+encodeURIComponent(dbId)).then(()=>this.loadMenu()).catch(e=>alert(e.message||'ลบเมนูไม่สำเร็จ'))}
 
   // ===================== MENU (ตาราง menu_items) =====================
@@ -2588,11 +2621,15 @@ class Component extends DCLogic {
 
   openMoveTableModal(tableNo = '') {
     const s = this.state;
-    const src = String(tableNo || s.activeTable || '');
-    if (!src) return;
+    const occupied = Object.keys(s.tableOrders).filter(k => (s.tableOrders[k]?.cart || []).length > 0 && !String(k).startsWith('TA-'));
+    const src = String(tableNo || s.activeTable || occupied[0] || '');
+    if (!occupied.length) {
+      this.setState({ orderError: 'ยังไม่มีโต๊ะที่มีรายการอาหารให้ย้าย' });
+      return;
+    }
     this.setState({
       moveTableModalOpen: true,
-      moveSourceTable: src,
+      moveSourceTable: src || occupied[0],
       moveDestTable: '',
       orderError: null
     });
@@ -3047,11 +3084,11 @@ class Component extends DCLogic {
     const taxInvoiceRows=s.history.filter(o=>o.isDone&&o.status!==STATUS_TH.cancelled).filter(o=>!taxQuery||String(this.queueFmt(o.queue_no)+' '+(o.customer_name||o.id||'')+' '+o.total).toLowerCase().includes(taxQuery)).map(o=>({receiptNo:this.queueFmt(o.queue_no),customer:o.customer_name||o.id||'ลูกค้าหน้าร้าน',time:o.time,total:this.fmt(o.total),issue:()=>this.openTaxInvoice(o)}));
 
     const existingMenuCategories = Array.from(new Set(s.menuItems.map(item=>String(item.category||'').trim()).filter(Boolean)));
-    const categoryDefaults=['สเต็ก','เส้น','เครื่องดื่ม','ของทานเล่น'];
+    const categoryDefaults=['สเต็ก','เส้น','เครื่องดื่ม','ของทานเล่น','ไม่ต้องออกเครื่องปริ้น'];
     const availableMenuCategories=existingMenuCategories.length?existingMenuCategories:categoryDefaults;
     const orderedMenuCategories=Array.from(new Set([...s.menuCategoryOrder,...availableMenuCategories])).filter(name=>availableMenuCategories.includes(name));
     const menuCategoryOptions = orderedMenuCategories.map(value=>({value,label:value}));
-    const categoryOrderRows=orderedMenuCategories.map((name,index)=>({name,position:index+1,itemCount:s.menuItems.filter(item=>item.category===name).length,onlyCategory:orderedMenuCategories.length<=1,first:index===0,last:index===orderedMenuCategories.length-1,up:()=>this.moveMenuCategory(name,-1),down:()=>this.moveMenuCategory(name,1),remove:()=>this.deleteMenuCategory(name)}));
+    const categoryOrderRows=orderedMenuCategories.map((name,index)=>({name,position:index+1,itemCount:s.menuItems.filter(item=>item.category===name).length,onlyCategory:orderedMenuCategories.length<=1,first:index===0,last:index===orderedMenuCategories.length-1,up:()=>this.moveMenuCategory(name,-1),down:()=>this.moveMenuCategory(name,1),remove:()=>this.deleteMenuCategory(name),setNoPrint:()=>this.setCategoryPrinterRoute(name,'none'),setMainPrinter:()=>this.setCategoryPrinterRoute(name,'main'),setKitchenPrinter:()=>this.setCategoryPrinterRoute(name,'kitchen')}));
     const manageRowStyle = `display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 14px;background:${c.cardBg};border-radius:10px`;
     const manageInputStyle = `flex:1;padding:7px 10px;border-radius:8px;border:1px solid rgba(0,0,0,0.1);font-size:13px;font-family:inherit;font-weight:600;background:transparent;color:${c.ink}`;
     const managePriceInputStyle = `width:44px;padding:3px 4px;border-radius:6px;border:1px solid rgba(0,0,0,0.1);font-size:13px;font-family:inherit;font-weight:700;background:transparent;color:${c.ink}`;
@@ -3333,6 +3370,12 @@ class Component extends DCLogic {
       closeMoveTableModal:()=>this.closeMoveTableModal(),
       confirmMoveTable:()=>this.confirmMoveTable(),
       moveTableModalOpen:!!s.moveTableModalOpen,
+      hasMultipleOccupiedTables:occupiedOrderKeys.length>1,
+      singleOccupiedTable:occupiedOrderKeys.length<=1,
+      moveSourceChoices:occupiedOrderKeys.map(k=>({tableNo:k,itemCount:(s.tableOrders[k]?.cart||[]).length,total:this.fmt(this.cartTotals(s.tableOrders[k]?.cart||[]).total)})),
+      onSelectMoveSourceTable:e=>{const val=e.target.value;this.setState({moveSourceTable:val,moveDestTable:''});},
+      newMenuPrinterRoute:s.newMenuPrinterRoute||'main',
+      onNewMenuPrinterRoute:e=>this.setState({newMenuPrinterRoute:e.target.value}),
       moveSourceTable:moveSourceKey,
       moveSourceTotalFmt,
       moveSourceItemCount,
