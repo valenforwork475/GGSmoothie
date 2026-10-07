@@ -1703,6 +1703,7 @@ class Component extends DCLogic {
     moveTableModalOpen: false,
     moveSourceTable: '',
     moveDestTable: '',
+    skipKitchenPrint: false,
     mergeTargetTable: '',
     selectedMergeSourceTables: [],
     mergedTableNos: [],
@@ -2230,7 +2231,43 @@ class Component extends DCLogic {
     if(!this.isSavedTableLine(line)){this.removeLine(cartId);return}
     const key=String(s.activeTable||''),previous=s.tableOrders[key],nextCart=s.cart.filter(item=>item.cartId!==cartId),reason='พนักงานยกเลิกรายการจากโต๊ะ';
     this.setState({cart:nextCart,savingTable:true,orderError:null});
-    try{let saved={...previous,cart:nextCart,updatedAt:new Date().toISOString(),version:(previous&&previous.version||0)+1};if(this.session()!==DEMO_SESSION){const row=await this.api('POST','rpc/upsert_pos_table_order',{p_table_no:key,p_guest_count:s.activeGuestCount||1,p_cart:nextCart,p_note:s.note||'',p_co_phone:s.coPhone||'',p_expected_version:s.activeTableVersion||0,p_kitchen_pending:false});saved=this.normalizeTableOrder(row)}this.printCancelledOrder({table:key,items:[{menu_id:line.menuId,name:line.name,qty:line.qty,price:line.unitPrice,desc:line.modText,printerRoute:line.printerRoute,category:line.category}]},reason);const tableOrders={...this.state.tableOrders,[key]:saved};this.persistTableOrders(tableOrders);this.setState({tableOrders,activeTableVersion:saved.version||0,savingTable:false,orderError:'ยกเลิกรายการแล้ว และพิมพ์ใบยกเลิกไปยังครัว'});}catch(error){this.setState({cart:s.cart,savingTable:false,orderError:'ยกเลิกรายการในระบบไม่สำเร็จ กรุณาลองใหม่'});}
+    try{
+      if (nextCart.length === 0) {
+        // รายการสุดท้ายถูกยกเลิก -> เคลียร์โต๊ะให้ว่างทันที
+        if (this.session() !== DEMO_SESSION) {
+          await this.api('POST', 'rpc/delete_pos_table_order', { p_table_no: key }).catch(() => {});
+        }
+        this.printCancelledOrder({ table: key, items: [{ menu_id: line.menuId, name: line.name, qty: line.qty, price: line.unitPrice, desc: line.modText, printerRoute: line.printerRoute, category: line.category }] }, reason);
+        const tableOrders = { ...this.state.tableOrders };
+        delete tableOrders[key];
+        this.persistTableOrders(tableOrders);
+        this.setState({
+          tableOrders,
+          activeTable: null,
+          activeTableVersion: 0,
+          cart: [],
+          screen: 'tables',
+          savingTable: false,
+          orderError: null
+        }, () => {
+          this.showSaveNotice('ยกเลิกรายการสุดท้ายแล้ว โต๊ะกลับมาว่างเรียบร้อย และส่งใบยกเลิกเข้าครัว');
+          const main = document.getElementById('pos-main-content');
+          if (main) main.scrollTop = 0;
+        });
+        return;
+      }
+      let saved = { ...previous, cart: nextCart, updatedAt: new Date().toISOString(), version: (previous && previous.version || 0) + 1 };
+      if (this.session() !== DEMO_SESSION) {
+        const row = await this.api('POST', 'rpc/upsert_pos_table_order', { p_table_no: key, p_guest_count: s.activeGuestCount || 1, p_cart: nextCart, p_note: s.note || '', p_co_phone: s.coPhone || '', p_expected_version: s.activeTableVersion || 0, p_kitchen_pending: false });
+        saved = this.normalizeTableOrder(row);
+      }
+      this.printCancelledOrder({ table: key, items: [{ menu_id: line.menuId, name: line.name, qty: line.qty, price: line.unitPrice, desc: line.modText, printerRoute: line.printerRoute, category: line.category }] }, reason);
+      const tableOrders = { ...this.state.tableOrders, [key]: saved };
+      this.persistTableOrders(tableOrders);
+      this.setState({ tableOrders, activeTableVersion: saved.version || 0, savingTable: false, orderError: 'ยกเลิกรายการแล้ว และพิมพ์ใบยกเลิกไปยังครัว' });
+    } catch(error) {
+      this.setState({ cart: s.cart, savingTable: false, orderError: 'ยกเลิกรายการในระบบไม่สำเร็จ กรุณาลองใหม่' });
+    }
   }
 
   grossUnitPrice(line){const base=Number(line&&line.unitPrice)||0,rate=Math.max(0,Number(line&&line.vatRate)||0);return Math.round((line&&line.vatIncluded===false?base*(1+rate/100):base)*100)/100}
@@ -2359,9 +2396,12 @@ class Component extends DCLogic {
   printNativeOrderData(order){
     const nativePrinter=window.GGPrinter;if(!nativePrinter||typeof nativePrinter.printOrder!=='function')return false;
     let printedCount = 0;
+    if (order.skipKitchenPrint || this.state.skipKitchenPrint) return false;
     (order.cart||[]).forEach((line, idx)=>{
+      if (line.skipKitchenPrint) return;
       const category=String(line.category||'').toLowerCase();
       const route=line.printerRoute||((category.includes('appetizer')||category.includes('special')||category.includes('แอป')||category.includes('สเป')||category.includes('ของทานเล่น'))?'kitchen':'main');
+      if (route === 'none' || route === 'skip' || route === 'no_print') return;
       const payload = {
         table: order.tableNo,
         guests: String(order.tableNo||'').startsWith('TA-') ? 0 : (order.guestCount||1),
@@ -2380,7 +2420,12 @@ class Component extends DCLogic {
   printNativeReceipt(total,payment){
     const s=this.state,nativePrinter=window.GGPrinter;if(!nativePrinter||typeof nativePrinter.printOrder!=='function')return;
     const totals=this.cartTotals(s.cart);
-    const receiptItems=s.cart.map(line=>({name:line.name,qty:line.qty,detail:line.modText||'',price:this.grossUnitPrice(line)}));
+    const isMerged = s.mergedTableNos && s.mergedTableNos.length;
+    const receiptItems = s.cart.map(line => {
+      const srcTable = line.sourceTable || (line.modText && line.modText.includes('[จากโต๊ะ') ? (line.modText.match(/\[จากโต๊ะ ([^\]]+)\]/) || [])[1] : s.activeTable);
+      const itemDetail = isMerged ? ('[โต๊ะ ' + srcTable + '] ' + (line.modText || '')).trim() : (line.modText || '');
+      return { name: line.name, qty: line.qty, detail: itemDetail, price: this.grossUnitPrice(line) };
+    });
     if(totals.discount>0)receiptItems.push({name:s.discountLabel||'ส่วนลด',qty:1,detail:'ส่วนลด',price:-totals.discount});
     if(totals.couponTotal>0)receiptItems.push({name:'คูปองส่วนลด ฿100 × '+totals.couponCount,qty:1,detail:'คูปองแทนเงินสด',price:-totals.couponTotal});
     if(totals.rounding!==0)receiptItems.push({name:'ปัดเศษสตางค์',qty:1,detail:(totals.rounding>0?'+':'-')+'ตามหลักสากล',price:totals.rounding});
@@ -2391,7 +2436,12 @@ class Component extends DCLogic {
     const s=this.state;if(!s.activeTable||!s.cart.length){this.setState({orderError:'ยังไม่มีรายการอาหารสำหรับพิมพ์บิล'});return}
     const totals=this.cartTotals(s.cart),nativePrinter=window.GGPrinter;
     if(!nativePrinter||typeof nativePrinter.printOrder!=='function'){this.setState({orderError:'ไม่พบเครื่องพิมพ์ใบรายการอาหาร'});return}
-    const billItems=s.cart.map(line=>({name:line.name,qty:line.qty,detail:line.modText||'',price:this.grossUnitPrice(line)}));
+    const isMerged = s.mergedTableNos && s.mergedTableNos.length;
+    const billItems = s.cart.map(line => {
+      const srcTable = line.sourceTable || (line.modText && line.modText.includes('[จากโต๊ะ') ? (line.modText.match(/\[จากโต๊ะ ([^\]]+)\]/) || [])[1] : s.activeTable);
+      const itemDetail = isMerged ? ('[โต๊ะ ' + srcTable + '] ' + (line.modText || '')).trim() : (line.modText || '');
+      return { name: line.name, qty: line.qty, detail: itemDetail, price: this.grossUnitPrice(line) };
+    });
     if(totals.discount>0)billItems.push({name:s.discountLabel||'ส่วนลด',qty:1,detail:'ส่วนลด',price:-totals.discount});
     if(totals.couponTotal>0)billItems.push({name:'คูปองส่วนลด ฿100 × '+totals.couponCount,qty:1,detail:'คูปองแทนเงินสด',price:-totals.couponTotal});
     if(totals.rounding!==0)billItems.push({name:'ปัดเศษสตางค์',qty:1,detail:(totals.rounding>0?'+':'-')+'ตามหลักสากล',price:totals.rounding});
@@ -2406,10 +2456,10 @@ class Component extends DCLogic {
     const s=this.state;if(!s.activeTable){this.setState({orderError:'กรุณาเลือกโต๊ะก่อน'});return}if(!s.cart.length){this.setState({orderError:'กรุณาเพิ่มรายการอาหารก่อนส่งครัว'});return}
     const key=String(s.activeTable),previous=s.tableOrders[key],now=new Date().toISOString(),nativePrint=this.hasNativePrinter();
     this.setState({savingTable:true,orderError:null});
-    if(nativePrint)this.printNativeTableOrder();
+    if(nativePrint && !s.skipKitchenPrint)this.printNativeTableOrder();
     try{
-      let saved={tableNo:s.activeTable,guestCount:s.activeGuestCount||1,status:'occupied',cart:s.cart,note:s.note,coPhone:s.coPhone,openedAt:previous&&previous.openedAt||now,updatedAt:now,version:(previous&&previous.version||0)+1,kitchenPending:!nativePrint};
-      if(this.session()!==DEMO_SESSION){const row=await this.api('POST','rpc/upsert_pos_table_order',{p_table_no:key,p_guest_count:s.activeGuestCount||1,p_cart:s.cart,p_note:s.note||'',p_co_phone:s.coPhone||'',p_expected_version:s.activeTableVersion||0,p_kitchen_pending:!nativePrint});saved=this.normalizeTableOrder(row)}
+      let saved={tableNo:s.activeTable,guestCount:s.activeGuestCount||1,status:'occupied',cart:s.cart,note:s.note,coPhone:s.coPhone,openedAt:previous&&previous.openedAt||now,updatedAt:now,version:(previous&&previous.version||0)+1,kitchenPending:(!nativePrint && !s.skipKitchenPrint)};
+      if(this.session()!==DEMO_SESSION){const row=await this.api('POST','rpc/upsert_pos_table_order',{p_table_no:key,p_guest_count:s.activeGuestCount||1,p_cart:s.cart,p_note:s.note||'',p_co_phone:s.coPhone||'',p_expected_version:s.activeTableVersion||0,p_kitchen_pending:(!nativePrint && !s.skipKitchenPrint)});saved=this.normalizeTableOrder(row)}
       const tableOrders={...this.state.tableOrders,[key]:saved};this.persistTableOrders(tableOrders);
       this.setState({tableOrders,activeTable:null,activeTableVersion:0,cart:[],note:'',coName:'หน้าร้าน',coPhone:'',screen:'tables',orderError:null,savingTable:false},()=>{this.showSaveNotice('บันทึกออเดอร์และส่งเข้าครัวแล้ว');const main=document.getElementById('pos-main-content');if(main)main.scrollTop=0});
     }catch(error){this.setState({savingTable:false,orderError:String(error.message||'').includes('changed on another device')?'โต๊ะนี้มีรายการใหม่จากอีกเครื่อง กรุณากลับหน้าโต๊ะแล้วเปิดใหม่':'บันทึกโต๊ะไม่สำเร็จ กรุณาตรวจอินเทอร์เน็ตแล้วลองอีกครั้ง'})}
@@ -2462,7 +2512,7 @@ class Component extends DCLogic {
 
     let targetOrder = s.tableOrders[target] || { tableNo: target, guestCount: 1, cart: [], note: '' };
     // If target table is currently active in editor, use current cart
-    const currentCart = (s.activeTable === target && s.cart.length) ? s.cart : (targetOrder.cart || []);
+    const currentCart = ((s.activeTable === target && s.cart.length) ? s.cart : (targetOrder.cart || [])).map(l => ({ ...l, sourceTable: l.sourceTable || target }));
     let combinedCart = [...currentCart];
     let totalGuests = Number(targetOrder.guestCount) || 1;
     let combinedNotes = [targetOrder.note || ''];
@@ -2477,7 +2527,8 @@ class Component extends DCLogic {
         combinedCart.push({
           ...line,
           cartId: 'merged-' + src + '-' + Date.now() + '-' + idx + '-' + Math.random().toString(36).substr(2, 4),
-          modText: [line.modText, '[จากโต๊ะ ' + src + ']'].filter(Boolean).join(' · ')
+          modText: [line.modText, '[จากโต๊ะ ' + src + ']'].filter(Boolean).join(' · '),
+          sourceTable: src
         });
       });
     }
@@ -2680,12 +2731,12 @@ class Component extends DCLogic {
       if(couponTotal>0)items.push({kind:'coupon',menu_id:null,name:'คูปองส่วนลด ฿100 × '+couponCount,qty:1,price:-couponTotal,desc:'คูปองแทนเงินสด'});
       if(rounding!==0)items.push({kind:'rounding',menu_id:null,name:'ปัดเศษ',qty:1,price:rounding,desc:'ปัดเศษ'});
       const demoOrder={id:'demo-'+Date.now(),queue_no:SEQ,customer_name:s.coName||'หน้าร้าน',phone:s.coPhone||'',items,total,pay_method:savedPayMethod,paymentLabel:selectedPayment.label,status:'done',source:'pos',note:[s.note||'',discount>0?'ส่วนลด: '+(s.discountLabel||discount):'',couponTotal>0?'คูปอง ฿100: '+couponCount+' ใบ':'',rounding!==0?'ปัดเศษ: '+(rounding>0?'+':'')+rounding:''].filter(Boolean).join(' · ')||null,created_at:new Date().toISOString()};
-      if(String(s.activeTable||'').startsWith('TA-')||!Number(s.activeTableVersion||0))this.printNativeTableOrder();
+      if(!s.skipKitchenPrint && (String(s.activeTable||'').startsWith('TA-')||!Number(s.activeTableVersion||0)))this.printNativeTableOrder();
       this.printNativeReceipt(total,demoOrder.pay_method);
       if(selectedPayment.kind==='cash'&&s.activeTable&&!String(s.activeTable).startsWith('TA-'))this.openNativeCashDrawer();
       const shift=s.currentShift,expected=shift&&demoOrder.pay_method==='cash'?Number(shift.expected_cash||0)+total:Number(shift?.expected_cash||0);
       const tableOrders=this.closePaidTable(s.activeTable)||s.tableOrders;
-      this.setState({lastOrder:{queue:SEQ,total},lastPaidOrder:{uid:demoOrder.id,queue_no:SEQ,isDone:true,items:s.cart.map(x=>({name:x.name,qty:x.qty,price:this.grossUnitPrice(x),desc:x.modText||''})),total},history:[{id:s.coName&&s.coName!=='หน้าร้าน'?s.coName:'หน้าร้าน',uid:demoOrder.id,time:new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}),items:items.map(x=>({name:x.name,qty:x.qty,modText:x.desc||''})),total,paymentLabel:selectedPayment.label,status:STATUS_TH.done,isDone:true,source:'pos',pay_method:demoOrder.pay_method,queue_no:SEQ},...s.history],tableOrders,activeTable:null,currentShift:shift?{...shift,expected_cash:expected}:shift,cart:[],screen:'confirmed',note:'',paymentMethod:null,cashReceived:'',paymentVerified:false,promoCode:'',promoMsg:null,discountAmount:0,discountLabel:'',manualDiscount:'',couponCount:0,orderError:null,coName:'หน้าร้าน',coPhone:'',activeMember:null,mergedTableNos:[]});
+      this.setState({lastOrder:{queue:SEQ,total},lastPaidOrder:{uid:demoOrder.id,queue_no:SEQ,isDone:true,items:s.cart.map(x=>({name:x.name,qty:x.qty,price:this.grossUnitPrice(x),desc:x.modText||''})),total},history:[{id:s.coName&&s.coName!=='หน้าร้าน'?s.coName:'หน้าร้าน',uid:demoOrder.id,time:new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}),items:items.map(x=>({name:x.name,qty:x.qty,modText:x.desc||''})),total,paymentLabel:selectedPayment.label,status:STATUS_TH.done,isDone:true,source:'pos',pay_method:demoOrder.pay_method,queue_no:SEQ},...s.history],tableOrders,activeTable:null,currentShift:shift?{...shift,expected_cash:expected}:shift,cart:[],screen:'confirmed',note:'',paymentMethod:null,cashReceived:'',paymentVerified:false,promoCode:'',promoMsg:null,discountAmount:0,discountLabel:'',manualDiscount:'',couponCount:0,orderError:null,coName:'หน้าร้าน',coPhone:'',activeMember:null,mergedTableNos:[],skipKitchenPrint:false});
       return;
     }
     this.setState({ sending: true, orderError: null });
@@ -2709,7 +2760,7 @@ class Component extends DCLogic {
       if(selectedPayment.kind==='cash'&&s.activeTable&&!String(s.activeTable).startsWith('TA-'))this.openNativeCashDrawer();
       const tableOrders=this.closePaidTable(s.activeTable)||s.tableOrders;
       const paidOrder={uid:o.id,queue_no:o.queue_no,isDone:true,items:s.cart.map(x=>({name:x.name,qty:x.qty,price:this.grossUnitPrice(x),desc:x.modText||''})),total};
-      this.setState({ sending: false, lastOrder: { queue: o.queue_no, total },lastPaidOrder:paidOrder, tableOrders,activeTable:null,cart: [], screen: 'confirmed', note: '', paymentMethod: null, cashReceived:'', paymentVerified:false, promoCode:'', promoMsg:null, discountAmount:0, discountLabel:'', manualDiscount:'', couponCount:0, coName: 'หน้าร้าน', coPhone: '', activeMember: null, mergedTableNos:[] });
+      this.setState({ sending: false, lastOrder: { queue: o.queue_no, total },lastPaidOrder:paidOrder, tableOrders,activeTable:null,cart: [], screen: 'confirmed', note: '', paymentMethod: null, cashReceived:'', paymentVerified:false, promoCode:'', promoMsg:null, discountAmount:0, discountLabel:'', manualDiscount:'', couponCount:0, coName: 'หน้าร้าน', coPhone: '', activeMember: null, mergedTableNos:[], skipKitchenPrint:false });
       this.loadQueue();
     }).catch((error) => {
       this.setState({ sending: false, orderError: 'ส่งออเดอร์ไม่สำเร็จ — '+(error&&error.message?error.message:'กรุณาเข้าสู่ระบบใหม่หรือติดต่อผู้ดูแล') });
@@ -3015,6 +3066,13 @@ class Component extends DCLogic {
       vatRate:Number(m.vatRate)||0,
       vatIncluded:m.vatIncluded!==false,
       vatAmount:(m.vatIncluded!==false?(Number(m.price)*(Number(m.vatRate)||0)/(100+(Number(m.vatRate)||0))):(Number(m.price)*(Number(m.vatRate)||0)/100)).toFixed(2),
+      printerRoute: m.printerRoute || 'main',
+      printerRouteLabel: (m.printerRoute==='kitchen')?'ครัวเสริม (ของทานเล่น)':(m.printerRoute==='none')?'ไม่ออกครัว (None)':'ครัวหลัก (สเต็ก)',
+      onPrinterRouteChange: (e) => {
+        const v = e.target.value;
+        this.setState((prev) => { const arr = [...prev.menuItems]; arr[idx] = { ...arr[idx], printerRoute: v }; return { menuItems: arr }; });
+        this.menuPatch(m.dbId, { printer_route: v });
+      },
       statusLabel: m.inStock ? 'เปิดขาย' : 'ปิดขาย',
       onNameChange: (e) => {
         const v = e.target.value;
@@ -3268,6 +3326,8 @@ class Component extends DCLogic {
       isB, isC,isWaiterMode:WAITER_MODE,showTablePayment:!WAITER_MODE,tableActionGridStyle:`display:grid;grid-template-columns:${WAITER_MODE?'1fr':'1fr 1fr'};gap:8px`, tabBarStyle, bodyRowStyle, railStyle, contentStyle, navItems, showRailLabel, orderWorkspaceStyle, productPaneStyle, quickCartStyle, quickNoteStyle, quickPayStyle,quickSaveStyle,orderMoreItemStyle,backToTablesFromOrder:()=>this.backToTablesFromOrder(),
       screenIsTables:s.screen==='tables',
       canMergeTables,
+      skipKitchenPrint: !!s.skipKitchenPrint,
+      toggleSkipKitchenPrint: () => this.setState(prev => ({ skipKitchenPrint: !prev.skipKitchenPrint })),
       canMoveCurrentTable:!!s.activeTable&&!String(s.activeTable).startsWith('TA-'),
       openMoveTableModal:()=>this.openMoveTableModal(),
       closeMoveTableModal:()=>this.closeMoveTableModal(),
