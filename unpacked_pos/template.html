@@ -659,6 +659,7 @@ button { -webkit-tap-highlight-color:transparent; }
           <sc-if value="{{loginError}}"><div role="alert" style="margin-top:12px;padding:10px 12px;border-radius:9px;background:#FEF2F2;color:#B91C1C;font-size:12px;font-weight:750;line-height:1.5">{{loginError}}</div></sc-if>
           <button onclick="{{login}}" style="width:100%;min-height:50px;margin-top:20px;border:0;border-radius:10px;background:#2563EB;color:#FFFFFF;font:inherit;font-size:15px;font-weight:900;box-shadow:0 8px 18px rgba(37,99,235,.20);cursor:pointer">{{loginLabel}}</button>
           <div style="display:flex;align-items:center;justify-content:center;gap:7px;margin-top:16px;color:#94A3B8;font-size:10.5px"><span aria-hidden="true" style="width:7px;height:7px;border-radius:50%;background:#22C55E"></span>{{txt.secureSession}}</div>
+          <div style="margin-top:8px;color:#94A3B8;font-size:10.5px;text-align:center">SkyPOS Web v2.5 · Sunmi {{sunmiAppVersionText}}</div>
         </section>
       </div>
     </div>
@@ -1222,7 +1223,40 @@ button { -webkit-tap-highlight-color:transparent; }
           <div style="font-weight:800;font-size:18px;margin-bottom:14px">{{txt.settings}}</div>
           <div class="pos-settings-card" style="{{settingsCardStyle}}">
             <sc-if value="{{!!sessionToken}}" hint-placeholder-val="{{true}}">
-              <sc-if value="{{settingsMainOpen}}"><div style="font-weight:700;margin-bottom:16px;">{{txt.userLoggedIn}}</div><sc-if value="{{canManagePayments}}"><button type="button" onclick="{{openTableLayoutSettings}}" style="width:100%;min-height:72px;padding:14px 16px;margin-bottom:16px;border:1px solid #BFDBFE;border-radius:12px;background:#F8FAFF;color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer"><span><b style="display:block;font-size:15px">จัดการผังโต๊ะ</b><span style="display:block;margin-top:4px;font-size:12px;color:#64748B">จำนวนโต๊ะ เลขโต๊ะ ขนาด และรูปทรง</span></span><span style="font-size:22px;color:#2563EB">›</span></button></sc-if></sc-if>
+              <sc-if value="{{settingsMainOpen}}">
+              <div style="padding:16px;border:1px solid #CBD5E1;border-radius:12px;background:#FFFFFF;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+                  <div>
+                    <div style="font-size:15px;font-weight:900;color:#0F172A">ข้อมูลเวอร์ชัน & อุปกรณ์ POS</div>
+                    <div style="font-size:11.5px;color:#64748B;margin-top:2px">ตรวจสอบเวอร์ชันของแอป SkyPOS บนเครื่อง Sunmi และระบบ POS</div>
+                  </div>
+                  <span style="{{appVersionBadgeStyle}}">{{appVersionLabel}}</span>
+                </div>
+
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:14px">
+                  <div style="padding:12px 14px;border:1px solid #E2E8F0;border-radius:10px;background:#F8FAFC">
+                    <div style="font-size:11px;color:#64748B;font-weight:750">แอป SkyPOS บนเครื่อง Sunmi (Android)</div>
+                    <div style="font-size:16px;font-weight:950;color:#0F172A;margin-top:3px">{{sunmiAppVersionText}}</div>
+                    <div style="font-size:11px;color:{{sunmiDrawerSupportColor}};font-weight:800;margin-top:3px">{{sunmiDrawerSupportText}}</div>
+                  </div>
+                  <div style="padding:12px 14px;border:1px solid #E2E8F0;border-radius:10px;background:#F8FAFC">
+                    <div style="font-size:11px;color:#64748B;font-weight:750">ระบบ POS Web Engine</div>
+                    <div style="font-size:16px;font-weight:950;color:#0F172A;margin-top:3px">v2.5 (ล่าสุด · 2026)</div>
+                    <div style="font-size:11px;color:#166534;font-weight:800;margin-top:3px">ออนไลน์พร้อมใช้งานสมบูรณ์</div>
+                  </div>
+                </div>
+
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <button type="button" onclick="{{manualOpenCashDrawer}}" style="min-height:44px;padding:8px 16px;border:1px solid #93C5FD;border-radius:9px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-size:13px;font-weight:850;cursor:pointer;display:inline-flex;align-items:center;gap:6px">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v10H4z M7 11h10 M8 15h2 M14 15h2 M6 7V5h12v2"></path></svg>
+                    ทดสอบเปิดลิ้นชักเงิน
+                  </button>
+                  <a href="/downloads/SkyPOS-SUNMI-1.3.4.apk" download style="min-height:44px;padding:8px 16px;border:1px solid #CBD5E1;border-radius:9px;background:#FFFFFF;color:#334155;text-decoration:none;font-size:13px;font-weight:850;display:inline-flex;align-items:center;gap:6px">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
+                    ดาวน์โหลด SkyPOS v1.3.4 (APK ล่าสุด)
+                  </a>
+                </div>
+              </div><div style="font-weight:700;margin-bottom:16px;">{{txt.userLoggedIn}}</div><sc-if value="{{canManagePayments}}"><button type="button" onclick="{{openTableLayoutSettings}}" style="width:100%;min-height:72px;padding:14px 16px;margin-bottom:16px;border:1px solid #BFDBFE;border-radius:12px;background:#F8FAFF;color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer"><span><b style="display:block;font-size:15px">จัดการผังโต๊ะ</b><span style="display:block;margin-top:4px;font-size:12px;color:#64748B">จำนวนโต๊ะ เลขโต๊ะ ขนาด และรูปทรง</span></span><span style="font-size:22px;color:#2563EB">›</span></button></sc-if></sc-if>
               <sc-if value="{{settingsTableLayoutOpen}}"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:10px"><button type="button" onclick="{{closeTableLayoutSettings}}" aria-label="ย้อนกลับ" style="width:44px;height:44px;border:1px solid #CBD5E1;border-radius:10px;background:#fff;color:#334155;font:inherit;font-size:22px">‹</button><div><b style="display:block;font-size:17px">จัดการผังโต๊ะ</b><span style="font-size:12px;color:#64748B">กำหนดรูปแบบให้เหมาะกับพื้นที่ร้าน</span></div></div><button type="button" disabled="{{tableLayoutSaving}}" onclick="{{saveTableLayout}}" style="min-height:46px;padding:9px 18px;border:0;border-radius:10px;background:#2563EB;color:#fff;font:inherit;font-weight:900;opacity:{{tableLayoutSaving?'.6':'1'}}">{{tableLayoutSaveLabel}}</button></div><sc-if value="{{hasConnMsg}}"><div role="status" style="margin-bottom:14px;padding:11px 13px;border:1px solid {{connMsgOk?'#86EFAC':'#FCA5A5'}};border-radius:10px;background:{{connMsgOk?'#F0FDF4':'#FEF2F2'}};color:{{connMsgOk?'#166534':'#991B1B'}};font-size:12px;font-weight:800">{{connMsg}}</div></sc-if>
               <sc-if value="{{canManagePayments}}"><div style="padding:16px;border:1px solid #DCE4EE;border-radius:14px;background:#F8FAFC;margin-bottom:16px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div style="font-size:15px;font-weight:900">จัดโต๊ะแยกตามแถว</div><div style="font-size:12px;color:#64748B;margin-top:4px">เพิ่มโต๊ะในแต่ละแถว แล้วใช้ลูกศรย้ายตำแหน่งได้ตามผังร้านจริง</div></div><button type="button" onclick="{{addTableEditorRow}}" style="min-height:44px;padding:8px 14px;border:1px solid #93C5FD;border-radius:9px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-size:12px;font-weight:900">＋ เพิ่มแถว</button></div><div style="display:flex;flex-direction:column;gap:12px;margin-top:14px"><sc-for list="{{tableEditorRows}}" as="row"><section style="padding:12px;border:1px solid #CBD5E1;border-radius:12px;background:#fff"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px"><b style="font-size:13px">แถว {{row.number}} · {{row.count}} โต๊ะ</b><div style="display:flex;gap:6px"><button type="button" onclick="{{row.add}}" style="min-height:36px;padding:6px 10px;border:1px solid #93C5FD;border-radius:8px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-size:11px;font-weight:850">เพิ่มโต๊ะ</button><button type="button" onclick="{{row.remove}}" style="min-height:36px;padding:6px 10px;border:1px solid #FCA5A5;border-radius:8px;background:#fff;color:#B91C1C;font:inherit;font-size:11px;font-weight:850">ลบแถว</button></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{row.tables}}" as="table"><div style="width:150px;padding:9px;border:1px solid #E2E8F0;border-radius:10px;background:#F8FAFC"><label style="display:block;font-size:10px;font-weight:800;color:#64748B">เลขโต๊ะ<input value="{{table.label}}" oninput="{{table.rename}}" style="width:100%;height:38px;margin-top:4px;padding:0 8px;border:1px solid #CBD5E1;border-radius:8px;box-sizing:border-box;text-align:center;font:inherit;font-weight:900"></label><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:7px"><button type="button" onclick="{{table.left}}" aria-label="ย้ายซ้าย">←</button><button type="button" onclick="{{table.right}}" aria-label="ย้ายขวา">→</button><button type="button" onclick="{{table.up}}" aria-label="ย้ายขึ้น">↑</button><button type="button" onclick="{{table.down}}" aria-label="ย้ายลง">↓</button><button type="button" onclick="{{table.remove}}" aria-label="ลบโต๊ะ" style="color:#B91C1C">×</button></div><div style="display:flex;gap:4px;margin-top:7px"><sc-for list="{{table.shapes}}" as="shape"><button type="button" onclick="{{shape.select}}" aria-pressed="{{shape.active}}" style="{{shape.style}}">{{shape.label}}</button></sc-for></div></div></sc-for></div></section></sc-for></div></div></sc-if>
               </sc-if>
@@ -3527,7 +3561,41 @@ class Component extends DCLogic {
       hasQueueError: !!s.queueError, queueError: s.queueError || '',
       queueEmpty: !s.queueError && s.webOrders.length === 0,
       queueCards, queueCardStyle, queueNoStyle, cancelBtnStyle,
-      settingsCardStyle,testMainPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('main'),testKitchenPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('kitchen'),testReceiptPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('receipt'),canManagePayments:s.canCreateMenu,tableCountInput:s.tableCountInput,onTableCountInput:e=>this.setState({tableCountInput:e.target.value,connMsg:null}),saveTableCount:()=>this.saveTableCount(),tableDisplayChoices:[],tableEditorRows,canvasEditorTables,canvasSelectionButtons,selectedCanvasCount:s.selectedCanvasTables.length,canvasWidthInput:s.canvasWidthInput,canvasHeightInput:s.canvasHeightInput,onCanvasWidthInput:e=>this.setState({canvasWidthInput:e.target.value}),onCanvasHeightInput:e=>this.setState({canvasHeightInput:e.target.value}),selectAllCanvasTables:()=>this.selectAllCanvasTables(),clearCanvasTableSelection:()=>this.clearCanvasTableSelection(),applyCanvasTableSize:()=>this.applyCanvasTableSize(),arrangeCanvasTables:()=>this.arrangeCanvasTables(),addCanvasTable:()=>this.addCanvasTable(),addTableEditorRow:()=>this.addTableEditorRow(),tableLayoutSaving:s.tableLayoutSaving,tableLayoutSaveLabel:s.tableLayoutSaving?'กำลังบันทึก...':'บันทึกผังโต๊ะ',saveTableLayout:()=>this.saveTableLayout(),tableShapeChoices:[],
+      // Version & Device detection
+    sunmiAppVersionText: (() => {
+      const p = window.GGPrinter;
+      if (!p) return 'Web Browser (ไม่ใช่แอป Sunmi)';
+      let cfg = {};
+      try { cfg = JSON.parse(p.getConfig ? p.getConfig() : '{}'); } catch(_e) {}
+      if (cfg.appVersion) return 'v' + cfg.appVersion;
+      if (typeof p.openCashDrawer === 'function') return 'v1.3.3+';
+      return 'รุ่นเก่า (v1.3.1 หรือก่อนหน้า)';
+    })(),
+    sunmiDrawerSupportText: (() => {
+      const p = window.GGPrinter;
+      if (!p) return 'เปิดผ่านเว็บบราวเซอร์ (คำสั่งเปิดลิ้นชักทำงานบนเครื่อง Sunmi)';
+      if (typeof p.openCashDrawer === 'function') return 'พร้อมใช้งาน · รองรับเปิดลิ้นชักเงินอัตโนมัติ';
+      return 'รุ่นเก่า — ยังไม่รองรับเปิดลิ้นชัก กรุณากดดาวน์โหลดอัปเดตเป็น v1.3.4 ด้านล่าง';
+    })(),
+    sunmiDrawerSupportColor: (() => {
+      const p = window.GGPrinter;
+      if (!p) return '#D97706';
+      if (typeof p.openCashDrawer === 'function') return '#166534';
+      return '#DC2626';
+    })(),
+    appVersionLabel: (() => {
+      const p = window.GGPrinter;
+      if (!p) return 'Browser Mode';
+      if (typeof p.openCashDrawer === 'function') return 'Sunmi POS (ล่าสุด)';
+      return 'Sunmi POS (ควรอัปเดต)';
+    })(),
+    appVersionBadgeStyle: (() => {
+      const p = window.GGPrinter;
+      if (!p) return 'padding:5px 10px;border-radius:7px;background:#FEF3C7;color:#92400E;font-size:11.5px;font-weight:850';
+      if (typeof p.openCashDrawer === 'function') return 'padding:5px 10px;border-radius:7px;background:#DCFCE7;color:#166534;font-size:11.5px;font-weight:850';
+      return 'padding:5px 10px;border-radius:7px;background:#FEE2E2;color:#991B1B;font-size:11.5px;font-weight:850';
+    })(),
+    settingsCardStyle,testMainPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('main'),testKitchenPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('kitchen'),testReceiptPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('receipt'),canManagePayments:s.canCreateMenu,tableCountInput:s.tableCountInput,onTableCountInput:e=>this.setState({tableCountInput:e.target.value,connMsg:null}),saveTableCount:()=>this.saveTableCount(),tableDisplayChoices:[],tableEditorRows,canvasEditorTables,canvasSelectionButtons,selectedCanvasCount:s.selectedCanvasTables.length,canvasWidthInput:s.canvasWidthInput,canvasHeightInput:s.canvasHeightInput,onCanvasWidthInput:e=>this.setState({canvasWidthInput:e.target.value}),onCanvasHeightInput:e=>this.setState({canvasHeightInput:e.target.value}),selectAllCanvasTables:()=>this.selectAllCanvasTables(),clearCanvasTableSelection:()=>this.clearCanvasTableSelection(),applyCanvasTableSize:()=>this.applyCanvasTableSize(),arrangeCanvasTables:()=>this.arrangeCanvasTables(),addCanvasTable:()=>this.addCanvasTable(),addTableEditorRow:()=>this.addTableEditorRow(),tableLayoutSaving:s.tableLayoutSaving,tableLayoutSaveLabel:s.tableLayoutSaving?'กำลังบันทึก...':'บันทึกผังโต๊ะ',saveTableLayout:()=>this.saveTableLayout(),tableShapeChoices:[],
       hasOpenShift:!!s.currentShift,hasLastShiftSummary:!!s.lastShiftSummary,noOpenShift:!s.currentShift&&!s.lastShiftSummary,goShiftManagement:()=>this.setState({screen:'shift'}),
       lastShiftTotal:s.lastShiftSummary?this.fmt(s.lastShiftSummary.total):'0',lastShiftBillCount:s.lastShiftSummary?s.lastShiftSummary.billCount:0,lastShiftCancelledCount:s.lastShiftSummary?s.lastShiftSummary.cancelledCount:0,lastShiftCancelledTotal:s.lastShiftSummary?this.fmt(s.lastShiftSummary.cancelledTotal):'0',lastShiftPayments:s.lastShiftSummary?(s.lastShiftSummary.payments||[]).map(x=>({label:x.label,amount:this.fmt(x.amount)})):[],lastShiftPrintMessage:s.lastShiftSummary&&s.lastShiftSummary.printed?'พิมพ์รายงานฉบับเต็มและใบสรุปยอดแล้ว':'ไม่พบเครื่องพิมพ์ กรุณาตรวจการเชื่อมต่อ',finishClosedShift:()=>this.logout(),
       shiftStartRequired: !!s.sessionToken && !s.currentShift && s.screen !== 'shift' && !WAITER_MODE,
