@@ -732,7 +732,7 @@ button { -webkit-tap-highlight-color:transparent; }
         <section class="pos-table-page" style="max-width:1100px;margin:0 auto;">
           <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;">
             <div><div style="display:flex;align-items:center;gap:8px;"><h1 style="margin:0;font-size:24px;line-height:1.25;font-weight:950;color:#0F172A;">ผังโต๊ะ</h1><sc-if value="{{isWaiterMode}}"><span style="padding:5px 8px;border-radius:999px;background:#DCFCE7;color:#166534;font-size:10px;font-weight:900;">iPad รับออเดอร์</span></sc-if></div><p style="margin:5px 0 0;font-size:13px;color:#64748B;">แตะโต๊ะเพื่อดูรายการ เพิ่มอาหาร หรือชำระเงิน</p></div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11px;font-weight:800;"><span style="padding:7px 10px;border-radius:999px;background:#F1F5F9;color:#475569;">ทั้งหมด {{totalTableCount}} โต๊ะ</span><span style="padding:7px 10px;border-radius:999px;background:#ECFDF5;color:#047857;">ว่าง {{vacantTableCount}} โต๊ะ</span><span style="padding:7px 10px;border-radius:999px;background:#DBEAFE;color:#1D4ED8;">มีลูกค้า {{occupiedTableCount}} โต๊ะ</span><button type="button" onclick="{{openTakeaway}}" style="min-height:42px;padding:8px 16px;border:1px solid #CBD5E1;border-radius:9px;background:#FFFFFF;color:#1F2937;font:inherit;font-size:14px;font-weight:900;box-shadow:0 1px 2px rgba(15,23,42,.05)">Takeaway · อาหารกลับบ้าน</button></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11px;font-weight:800;"><span style="padding:7px 10px;border-radius:999px;background:#F1F5F9;color:#475569;">ทั้งหมด {{totalTableCount}} โต๊ะ</span><span style="padding:7px 10px;border-radius:999px;background:#ECFDF5;color:#047857;">ว่าง {{vacantTableCount}} โต๊ะ</span><span style="padding:7px 10px;border-radius:999px;background:#DBEAFE;color:#1D4ED8;">มีลูกค้า {{occupiedTableCount}} โต๊ะ</span><sc-if value="{{canMergeTables}}"><button type="button" onclick="{{openMergeTablesModal}}" style="min-height:42px;padding:8px 14px;border:1px solid #93C5FD;border-radius:9px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-size:13.5px;font-weight:900;box-shadow:0 1px 2px rgba(15,23,42,.05);display:flex;align-items:center;gap:6px;cursor:pointer">🔗 รวมโต๊ะคิดเงิน</button></sc-if><button type="button" onclick="{{openTakeaway}}" style="min-height:42px;padding:8px 16px;border:1px solid #CBD5E1;border-radius:9px;background:#FFFFFF;color:#1F2937;font:inherit;font-size:14px;font-weight:900;box-shadow:0 1px 2px rgba(15,23,42,.05)">Takeaway · อาหารกลับบ้าน</button></div>
           </div>
           <sc-if value="{{hasTableSyncError}}"><div role="status" style="margin:-8px 0 14px;padding:10px 12px;border:1px solid #FCD34D;border-radius:9px;background:#FFFBEB;color:#92400E;font-size:12px;font-weight:750;">{{tableSyncError}}</div></sc-if>
           <div class="pos-table-map" data-table-map="true" style="width:100%;min-height:420px;overflow:auto;padding:18px;border:1px solid #DCE4EE;border-radius:16px;background-color:#F8FAFC;background-image:linear-gradient(#E9EEF5 1px,transparent 1px),linear-gradient(90deg,#E9EEF5 1px,transparent 1px);background-size:28px 28px;box-shadow:inset 0 1px 4px rgba(15,23,42,.04);box-sizing:border-box;display:flex;flex-direction:column;gap:14px">
@@ -912,7 +912,7 @@ button { -webkit-tap-highlight-color:transparent; }
         <div class="pos-checkout-screen">
           <div style="font-weight:800;font-size:18px;margin-bottom:14px">{{txt.checkout}}</div>
           <div class="checkout-order-panel" style="{{checkoutSummaryStyle}}">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px"><b style="font-size:13px;color:#0F172A">รายการออเดอร์</b></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px"><b style="font-size:13px;color:#0F172A">รายการออเดอร์</b><sc-if value="{{canMergeIntoCurrentTable}}"><button type="button" onclick="{{openMergeIntoCurrentModal}}" style="padding:4px 9px;border:1px solid #93C5FD;border-radius:7px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-size:11.5px;font-weight:850;cursor:pointer">🔗 รวมบิลกับโต๊ะอื่น</button></sc-if></div>
             <sc-for list="{{cartLines}}" as="line" hint-placeholder-count="2">
               <div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid #E2E8F0">
                 <div style="min-width:0"><b style="display:block;font-size:12.5px;color:#0F172A">{{line.name}}</b><span style="display:block;margin-top:2px;font-size:11px;color:#64748B">{{line.modText}}</span></div>
@@ -1275,6 +1275,76 @@ button { -webkit-tap-highlight-color:transparent; }
     </div>
   </sc-if>
 
+  <!-- ===================== MERGE TABLES MODAL ===================== -->
+  <sc-if value="{{mergeModalOpen}}" hint-placeholder-val="{{false}}">
+    <div class="pos-modal-overlay" style="{{modalOverlayStyle}}" onclick="{{closeMergeTablesModal}}">
+      <div class="pos-modal-card" role="dialog" aria-modal="true" data-merge-modal="true" style="{{modalCardStyle}};max-width:480px" onclick="{{stopProp}}">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px">
+          <div>
+            <div style="font-size:20px;font-weight:950;color:#0F172A">🔗 รวมโต๊ะเพื่อคิดเงิน</div>
+            <div style="font-size:13px;color:#64748B;margin-top:3px">ย้ายรายการอาหารจากโต๊ะอื่นมารวมบิลเพื่อคิดเงินพร้อมกัน</div>
+          </div>
+          <button type="button" aria-label="ปิด" onclick="{{closeMergeTablesModal}}" style="width:40px;height:40px;border:0;border-radius:10px;background:#F1F5F9;font:inherit;font-size:20px;cursor:pointer">×</button>
+        </div>
+
+        <div style="margin-bottom:14px;padding:12px 14px;border-radius:10px;background:#EFF6FF;border:1px solid #BFDBFE">
+          <label style="display:block;font-size:12px;font-weight:850;color:#1D4ED8;margin-bottom:8px">📌 เลือกโต๊ะหลัก (ที่จะใช้เช็คบิล/เก็บเงิน)</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{mergeTargetChoices}}" as="tc">
+              <button type="button" onclick="{{tc.select}}" style="{{tc.style}}">โต๊ะ {{tc.label}} (฿{{tc.total}})</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="margin-bottom:14px">
+          <label style="display:block;font-size:13px;font-weight:850;color:#334155;margin-bottom:8px">เลือกโต๊ะที่ต้องการนำมารวมกับ โต๊ะ {{mergeTargetTable}}:</label>
+          <div style="max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{mergeSourceRows}}" as="sr">
+              <div role="button" tabindex="0" onclick="{{sr.toggle}}" style="{{sr.rowStyle}}">
+                <input type="checkbox" checked="{{sr.checked}}" style="width:20px;height:20px;pointer-events:none;accent-color:#2563EB">
+                <div style="flex:1;min-width:0">
+                  <div style="display:flex;align-items:center;justify-content:space-between">
+                    <strong style="font-size:14px;color:#0F172A">โต๊ะ {{sr.label}}</strong>
+                    <span style="font-size:14px;font-weight:900;color:#1D4ED8">฿{{sr.total}}</span>
+                  </div>
+                  <div style="font-size:11.5px;color:#64748B;margin-top:2px">{{sr.itemCount}} รายการ · {{sr.guestCount}} คน</div>
+                  <div style="font-size:11px;color:#94A3B8;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{sr.previewItems}}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <sc-if value="{{hasMergeSourcesSelected}}">
+          <div style="margin-bottom:14px;padding:12px 14px;border-radius:10px;background:#F8FAFC;border:1px solid #E2E8F0">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#64748B;margin-bottom:4px">
+              <span>ยอดเดิม โต๊ะ {{mergeTargetTable}}:</span>
+              <span>฿{{mergeTargetTotalFmt}}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#166534;font-weight:750;margin-bottom:6px">
+              <span>+ ยอดจาก {{mergeSelectedCount}} โต๊ะที่เลือก:</span>
+              <span>+฿{{mergeSourceTotalFmt}}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:6px;border-top:1px dashed #CBD5E1">
+              <span style="font-size:14px;font-weight:900;color:#0F172A">ยอดรวมทั้งสิ้นหลังรวม:</span>
+              <span style="font-size:18px;font-weight:950;color:#2563EB">฿{{mergeGrandTotalFmt}}</span>
+            </div>
+            <div style="margin-top:6px;font-size:11px;color:#D97706;font-weight:700">
+              ⚠️ โต๊ะที่นำมารวมจะถูกเคลียร์สถานะว่าง และรายการอาหารทั้งหมดย้ายมารวมที่ โต๊ะ {{mergeTargetTable}}
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:10px">
+          <button type="button" onclick="{{closeMergeTablesModal}}" style="min-height:48px;border:1px solid #CBD5E1;border-radius:10px;background:#fff;color:#334155;font:inherit;font-weight:850;cursor:pointer">ยกเลิก</button>
+          <button type="button" disabled="{{mergeConfirmDisabled}}" onclick="{{confirmMergeTables}}" style="{{mergeConfirmBtnStyle}}">
+            {{mergeConfirmLabel}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{modalOpen}}" hint-placeholder-val="{{false}}">
     <div class="pos-modal-overlay" style="{{modalOverlayStyle}}" onclick="{{closeModalIfBackdrop}}">
       <div class="pos-modal-card" style="{{modalCardStyle}}" onclick="{{stopProp}}">
@@ -1585,6 +1655,10 @@ class Component extends DCLogic {
     pendingTable: null,
     guestCountInput: '2',
     guestModalMode: 'open',
+    mergeModalOpen: false,
+    mergeTargetTable: '',
+    selectedMergeSourceTables: [],
+    mergedTableNos: [],
     tableCount: 12,
     tableCountInput: '12',
     tableDisplayMode: 'auto',
@@ -2264,7 +2338,7 @@ class Component extends DCLogic {
     if(totals.couponTotal>0)receiptItems.push({name:'คูปองส่วนลด ฿100 × '+totals.couponCount,qty:1,detail:'คูปองแทนเงินสด',price:-totals.couponTotal});
     if(totals.rounding!==0)receiptItems.push({name:'ปัดเศษสตางค์',qty:1,detail:(totals.rounding>0?'+':'-')+'ตามหลักสากล',price:totals.rounding});
     const receiptNote='ยอดรวม ฿'+Number(totals.netTotal).toFixed(2)+(totals.rounding!==0?'\nปัดเศษ: '+(totals.rounding>0?'+':'')+Number(totals.rounding).toFixed(2):'')+'\nรวมทั้งสิ้น ฿'+Number(total).toFixed(2)+'\nชำระโดย '+(PAY_TH[payment]||payment||'');
-    nativePrinter.printOrder('receipt',JSON.stringify({header:this.receiptHeader('ใบเสร็จรับเงิน'),table:'โต๊ะ '+s.activeTable,guests:s.activeGuestCount||0,items:receiptItems,note:receiptNote}),'receipt-'+Date.now());
+    nativePrinter.printOrder('receipt',JSON.stringify({header:this.receiptHeader('ใบเสร็จรับเงิน'),table:((s.mergedTableNos&&s.mergedTableNos.length)?('โต๊ะ '+s.activeTable+' (รวมโต๊ะ '+s.mergedTableNos.join(', ')+')'):('โต๊ะ '+s.activeTable)),guests:s.activeGuestCount||0,items:receiptItems,note:receiptNote}),'receipt-'+Date.now());
   }
   printTableBill(){
     const s=this.state;if(!s.activeTable||!s.cart.length){this.setState({orderError:'ยังไม่มีรายการอาหารสำหรับพิมพ์บิล'});return}
@@ -2274,7 +2348,7 @@ class Component extends DCLogic {
     if(totals.discount>0)billItems.push({name:s.discountLabel||'ส่วนลด',qty:1,detail:'ส่วนลด',price:-totals.discount});
     if(totals.couponTotal>0)billItems.push({name:'คูปองส่วนลด ฿100 × '+totals.couponCount,qty:1,detail:'คูปองแทนเงินสด',price:-totals.couponTotal});
     if(totals.rounding!==0)billItems.push({name:'ปัดเศษสตางค์',qty:1,detail:(totals.rounding>0?'+':'-')+'ตามหลักสากล',price:totals.rounding});
-    nativePrinter.printOrder('receipt',JSON.stringify({header:this.receiptHeader('ใบแจ้งยอด'),table:'โต๊ะ '+s.activeTable,guests:s.activeGuestCount||1,items:billItems,note:(s.note?'หมายเหตุ: '+s.note+'\n':'')+'ยอดรวม ฿'+Number(totals.netTotal).toFixed(2)+(totals.rounding!==0?'\nปัดเศษ: '+(totals.rounding>0?'+':'')+Number(totals.rounding).toFixed(2):'')+'\nรวมทั้งสิ้น ฿'+Number(totals.total).toFixed(2)+'\nยังไม่ชำระเงิน'}),'table-bill-'+Date.now());
+    nativePrinter.printOrder('receipt',JSON.stringify({header:this.receiptHeader('ใบแจ้งยอด'),table:((s.mergedTableNos&&s.mergedTableNos.length)?('โต๊ะ '+s.activeTable+' (รวมโต๊ะ '+s.mergedTableNos.join(', ')+')'):('โต๊ะ '+s.activeTable)),guests:s.activeGuestCount||1,items:billItems,note:(s.note?'หมายเหตุ: '+s.note+'\n':'')+'ยอดรวม ฿'+Number(totals.netTotal).toFixed(2)+(totals.rounding!==0?'\nปัดเศษ: '+(totals.rounding>0?'+':'')+Number(totals.rounding).toFixed(2):'')+'\nรวมทั้งสิ้น ฿'+Number(totals.total).toFixed(2)+'\nยังไม่ชำระเงิน'}),'table-bill-'+Date.now());
     this.setState({orderError:null});
   }
   retryKitchenPrint(){
@@ -2301,6 +2375,122 @@ class Component extends DCLogic {
     const saved=this.state.tableOrders[String(tableNo)];if(!saved||!saved.cart||!saved.cart.length)return;
     this.setState({activeTable:tableNo,activeGuestCount:saved.guestCount||1,cart:saved.cart,note:saved.note||'',coName:'โต๊ะ '+tableNo,coPhone:saved.coPhone||'',paymentMethod:null,cashReceived:'',paymentVerified:false,screen:'checkout',orderError:null});
   }
+  openMergeTablesModal(targetTable = '') {
+    const s = this.state;
+    const occupied = Object.keys(s.tableOrders).filter(k => (s.tableOrders[k]?.cart || []).length > 0 && !String(k).startsWith('TA-'));
+    if (occupied.length < 2) {
+      this.setState({ orderError: 'ต้องมีโต๊ะที่มีรายการอาหารอย่างน้อย 2 โต๊ะขึ้นไปจึงจะสามารถรวมโต๊ะได้' });
+      return;
+    }
+    const defaultTarget = (targetTable && occupied.includes(String(targetTable)))
+      ? String(targetTable)
+      : ((s.activeTable && occupied.includes(String(s.activeTable))) ? String(s.activeTable) : occupied[0]);
+    this.setState({
+      mergeModalOpen: true,
+      mergeTargetTable: defaultTarget,
+      selectedMergeSourceTables: [],
+      orderError: null
+    });
+  }
+  closeMergeTablesModal() {
+    this.setState({ mergeModalOpen: false, selectedMergeSourceTables: [] });
+  }
+  toggleMergeSourceTable(tableNo) {
+    const key = String(tableNo);
+    this.setState(s => {
+      const list = s.selectedMergeSourceTables || [];
+      const next = list.includes(key) ? list.filter(x => x !== key) : [...list, key];
+      return { selectedMergeSourceTables: next };
+    });
+  }
+  setMergeTargetTable(tableNo) {
+    const key = String(tableNo);
+    this.setState(s => ({
+      mergeTargetTable: key,
+      selectedMergeSourceTables: (s.selectedMergeSourceTables || []).filter(x => x !== key)
+    }));
+  }
+  async confirmMergeTables() {
+    const s = this.state;
+    const target = String(s.mergeTargetTable || '');
+    const sources = (s.selectedMergeSourceTables || []).map(String).filter(t => t !== target);
+    if (!target || !sources.length) return;
+
+    let targetOrder = s.tableOrders[target] || { tableNo: target, guestCount: 1, cart: [], note: '' };
+    // If target table is currently active in editor, use current cart
+    const currentCart = (s.activeTable === target && s.cart.length) ? s.cart : (targetOrder.cart || []);
+    let combinedCart = [...currentCart];
+    let totalGuests = Number(targetOrder.guestCount) || 1;
+    let combinedNotes = [targetOrder.note || ''];
+    let mergedList = [...(targetOrder.mergedTables || []), ...sources];
+
+    for (const src of sources) {
+      const srcOrder = s.tableOrders[src];
+      if (!srcOrder) continue;
+      totalGuests += Number(srcOrder.guestCount) || 1;
+      if (srcOrder.note) combinedNotes.push('โต๊ะ ' + src + ': ' + srcOrder.note);
+      (srcOrder.cart || []).forEach((line, idx) => {
+        combinedCart.push({
+          ...line,
+          cartId: 'merged-' + src + '-' + Date.now() + '-' + idx + '-' + Math.random().toString(36).substr(2, 4),
+          modText: [line.modText, '[จากโต๊ะ ' + src + ']'].filter(Boolean).join(' · ')
+        });
+      });
+    }
+
+    const finalNote = combinedNotes.filter(Boolean).join(' · ');
+    const updatedTableOrders = { ...s.tableOrders };
+    for (const src of sources) {
+      delete updatedTableOrders[src];
+      if (this.session() && this.session() !== DEMO_SESSION) {
+        this.api('POST', 'rpc/delete_pos_table_order', { p_table_no: String(src) }).catch(() => {});
+      }
+    }
+
+    const now = new Date().toISOString();
+    const updatedTargetOrder = {
+      ...targetOrder,
+      cart: combinedCart,
+      guestCount: totalGuests,
+      note: finalNote,
+      mergedTables: Array.from(new Set(mergedList)),
+      updatedAt: now,
+      version: (targetOrder.version || 0) + 1
+    };
+    updatedTableOrders[target] = updatedTargetOrder;
+    this.persistTableOrders(updatedTableOrders);
+
+    if (this.session() && this.session() !== DEMO_SESSION) {
+      this.api('POST', 'rpc/upsert_pos_table_order', {
+        p_table_no: target,
+        p_guest_count: totalGuests,
+        p_cart: combinedCart,
+        p_note: finalNote,
+        p_co_phone: targetOrder.coPhone || '',
+        p_expected_version: targetOrder.version || 0,
+        p_kitchen_pending: false
+      }).catch(() => {});
+    }
+
+    const uniqueMerged = Array.from(new Set(mergedList));
+    this.setState({
+      tableOrders: updatedTableOrders,
+      activeTable: target,
+      activeTableVersion: updatedTargetOrder.version,
+      activeGuestCount: totalGuests,
+      cart: combinedCart,
+      note: finalNote,
+      coName: 'โต๊ะ ' + target + ' (รวมโต๊ะ ' + uniqueMerged.join(', ') + ')',
+      mergedTableNos: uniqueMerged,
+      mergeModalOpen: false,
+      selectedMergeSourceTables: [],
+      screen: 'checkout',
+      orderError: null
+    }, () => {
+      this.showSaveNotice('รวมโต๊ะ ' + sources.join(', ') + ' เข้ากับ โต๊ะ ' + target + ' สำเร็จแล้ว');
+    });
+  }
+
   closePaidTable(tableNo){
     if(!tableNo)return;const tableOrders={...this.state.tableOrders};delete tableOrders[String(tableNo)];this.persistTableOrders(tableOrders);if(this.session()&&this.session()!==DEMO_SESSION)this.api('POST','rpc/delete_pos_table_order',{p_table_no:String(tableNo)}).catch(()=>{});return tableOrders;
   }
@@ -2367,7 +2557,7 @@ class Component extends DCLogic {
       if(selectedPayment.kind==='cash'&&s.activeTable&&!String(s.activeTable).startsWith('TA-'))this.openNativeCashDrawer();
       const shift=s.currentShift,expected=shift&&demoOrder.pay_method==='cash'?Number(shift.expected_cash||0)+total:Number(shift?.expected_cash||0);
       const tableOrders=this.closePaidTable(s.activeTable)||s.tableOrders;
-      this.setState({lastOrder:{queue:SEQ,total},lastPaidOrder:{uid:demoOrder.id,queue_no:SEQ,isDone:true,items:s.cart.map(x=>({name:x.name,qty:x.qty,price:this.grossUnitPrice(x),desc:x.modText||''})),total},history:[{id:s.coName&&s.coName!=='หน้าร้าน'?s.coName:'หน้าร้าน',uid:demoOrder.id,time:new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}),items:items.map(x=>({name:x.name,qty:x.qty,modText:x.desc||''})),total,paymentLabel:selectedPayment.label,status:STATUS_TH.done,isDone:true,source:'pos',pay_method:demoOrder.pay_method,queue_no:SEQ},...s.history],tableOrders,activeTable:null,currentShift:shift?{...shift,expected_cash:expected}:shift,cart:[],screen:'confirmed',note:'',paymentMethod:null,cashReceived:'',paymentVerified:false,promoCode:'',promoMsg:null,discountAmount:0,discountLabel:'',manualDiscount:'',couponCount:0,orderError:null,coName:'หน้าร้าน',coPhone:'',activeMember:null});
+      this.setState({lastOrder:{queue:SEQ,total},lastPaidOrder:{uid:demoOrder.id,queue_no:SEQ,isDone:true,items:s.cart.map(x=>({name:x.name,qty:x.qty,price:this.grossUnitPrice(x),desc:x.modText||''})),total},history:[{id:s.coName&&s.coName!=='หน้าร้าน'?s.coName:'หน้าร้าน',uid:demoOrder.id,time:new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}),items:items.map(x=>({name:x.name,qty:x.qty,modText:x.desc||''})),total,paymentLabel:selectedPayment.label,status:STATUS_TH.done,isDone:true,source:'pos',pay_method:demoOrder.pay_method,queue_no:SEQ},...s.history],tableOrders,activeTable:null,currentShift:shift?{...shift,expected_cash:expected}:shift,cart:[],screen:'confirmed',note:'',paymentMethod:null,cashReceived:'',paymentVerified:false,promoCode:'',promoMsg:null,discountAmount:0,discountLabel:'',manualDiscount:'',couponCount:0,orderError:null,coName:'หน้าร้าน',coPhone:'',activeMember:null,mergedTableNos:[]});
       return;
     }
     this.setState({ sending: true, orderError: null });
@@ -2391,7 +2581,7 @@ class Component extends DCLogic {
       if(selectedPayment.kind==='cash'&&s.activeTable&&!String(s.activeTable).startsWith('TA-'))this.openNativeCashDrawer();
       const tableOrders=this.closePaidTable(s.activeTable)||s.tableOrders;
       const paidOrder={uid:o.id,queue_no:o.queue_no,isDone:true,items:s.cart.map(x=>({name:x.name,qty:x.qty,price:this.grossUnitPrice(x),desc:x.modText||''})),total};
-      this.setState({ sending: false, lastOrder: { queue: o.queue_no, total },lastPaidOrder:paidOrder, tableOrders,activeTable:null,cart: [], screen: 'confirmed', note: '', paymentMethod: null, cashReceived:'', paymentVerified:false, promoCode:'', promoMsg:null, discountAmount:0, discountLabel:'', manualDiscount:'', couponCount:0, coName: 'หน้าร้าน', coPhone: '', activeMember: null });
+      this.setState({ sending: false, lastOrder: { queue: o.queue_no, total },lastPaidOrder:paidOrder, tableOrders,activeTable:null,cart: [], screen: 'confirmed', note: '', paymentMethod: null, cashReceived:'', paymentVerified:false, promoCode:'', promoMsg:null, discountAmount:0, discountLabel:'', manualDiscount:'', couponCount:0, coName: 'หน้าร้าน', coPhone: '', activeMember: null, mergedTableNos:[] });
       this.loadQueue();
     }).catch((error) => {
       this.setState({ sending: false, orderError: 'ส่งออเดอร์ไม่สำเร็จ — '+(error&&error.message?error.message:'กรุณาเข้าสู่ระบบใหม่หรือติดต่อผู้ดูแล') });
@@ -2873,6 +3063,50 @@ class Component extends DCLogic {
     const canvasEditorTables=s.tableCanvasDraft.map((item,index)=>{const selected=s.selectedCanvasTables.includes(index);return{label:item.label,style:`position:absolute;left:${item.x/10}%;top:${item.y/6.5}%;width:${item.w/10}%;height:${item.h/6.5}%;min-width:70px;min-height:60px;padding:8px;border:${selected?'3px solid #1D4ED8':'2px solid #60A5FA'};border-radius:${item.shape==='circle'?'50%':item.shape==='square'?'4px':'14px'};background:${selected?'#DBEAFE':'#EFF6FF'};box-shadow:0 5px 14px rgba(37,99,235,.14);box-sizing:border-box;cursor:grab;touch-action:none;user-select:none;overflow:hidden`,move:e=>this.beginCanvasPointer(e,index,'move'),resize:e=>this.beginCanvasPointer(e,index,'resize'),rename:e=>this.updateCanvasTable(index,{label:e.target.value}),remove:e=>{if(e){e.preventDefault();e.stopPropagation()}this.removeCanvasTable(index)},stop:e=>e&&e.stopPropagation(),shapes:[['square','□'],['rounded','▢'],['circle','○']].map(([value,label])=>({label,active:item.shape===value,select:e=>{if(e){e.preventDefault();e.stopPropagation()}this.updateCanvasTable(index,{shape:value})},style:`width:30px;height:28px;border:1px solid ${item.shape===value?'#2563EB':'#CBD5E1'};border-radius:${value==='circle'?'50%':value==='square'?'3px':'8px'};background:${item.shape===value?'#2563EB':'#fff'};color:${item.shape===value?'#fff':'#475569'};font-size:15px`}))}});
     const canvasSelectionButtons=s.tableCanvasDraft.map((item,index)=>{const selected=s.selectedCanvasTables.includes(index);return{label:item.label,selected,select:()=>this.toggleCanvasTableSelection(index),style:`min-height:44px;padding:8px 12px;border:2px solid ${selected?'#2563EB':'#CBD5E1'};border-radius:9px;background:${selected?'#DBEAFE':'#fff'};color:${selected?'#1D4ED8':'#475569'};font:inherit;font-size:12px;font-weight:900`}});
     const occupiedTableCount=restaurantTables.filter(t=>t.occupied).length;
+    const occupiedOrderKeys=Object.keys(s.tableOrders).filter(k=>(s.tableOrders[k]?.cart||[]).length>0&&!String(k).startsWith('TA-'));
+    const canMergeTables=occupiedOrderKeys.length>=2;
+    const canMergeIntoCurrentTable=!!s.activeTable&&!String(s.activeTable).startsWith('TA-')&&occupiedOrderKeys.length>=2;
+    const currentMergeTarget=s.mergeTargetTable||s.activeTable||occupiedOrderKeys[0]||'';
+    const mergeTargetChoices=occupiedOrderKeys.map(t=>{
+      const ord=s.tableOrders[t];
+      const tot=(ord&&ord.cart)?this.cartTotals(ord.cart).total:0;
+      const isSel=String(currentMergeTarget)===String(t);
+      return {
+        label:t,
+        total:this.fmt(tot),
+        selected:isSel,
+        select:()=>this.setMergeTargetTable(t),
+        style:`min-height:36px;padding:6px 12px;border:2px solid ${isSel?'#2563EB':'#CBD5E1'};border-radius:8px;background:${isSel?'#2563EB':'#fff'};color:${isSel?'#fff':'#1E293B'};font:inherit;font-size:12.5px;font-weight:900;cursor:pointer`
+      };
+    });
+    const mergeSourceTables=occupiedOrderKeys.filter(t=>String(t)!==String(currentMergeTarget));
+    const mergeSourceRows=mergeSourceTables.map(t=>{
+      const ord=s.tableOrders[t]||{cart:[]};
+      const tot=this.cartTotals(ord.cart||[]).total;
+      const isChecked=(s.selectedMergeSourceTables||[]).includes(String(t));
+      const itemCount=(ord.cart||[]).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
+      const previewItems=(ord.cart||[]).map(l=>(l.qty>1?(l.qty+'x '):'')+l.name).slice(0,3).join(', ');
+      return {
+        label:t,
+        total:this.fmt(tot),
+        itemCount,
+        guestCount:ord.guestCount||1,
+        previewItems:previewItems+(ord.cart&&ord.cart.length>3?'…':''),
+        checked:isChecked,
+        toggle:()=>this.toggleMergeSourceTable(t),
+        rowStyle:`display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;border:2px solid ${isChecked?'#2563EB':'#E2E8F0'};background:${isChecked?'#EFF6FF':'#FFFFFF'};cursor:pointer;box-sizing:border-box`
+      };
+    });
+    const targetOrderData=s.tableOrders[currentMergeTarget];
+    const targetTotal=(targetOrderData&&targetOrderData.cart)?this.cartTotals(targetOrderData.cart).total:0;
+    const sourceTotal=(s.selectedMergeSourceTables||[]).reduce((sum,t)=>{const o=s.tableOrders[t];return sum+((o&&o.cart)?this.cartTotals(o.cart).total:0)},0);
+    const mergeGrandTotal=targetTotal+sourceTotal;
+    const mergeSelectedCount=(s.selectedMergeSourceTables||[]).length;
+    const hasMergeSourcesSelected=mergeSelectedCount>0;
+    const mergeConfirmDisabled=!hasMergeSourcesSelected;
+    const mergeConfirmBtnStyle=`min-height:48px;border:0;border-radius:10px;background:${mergeConfirmDisabled?'#CBD5E1':'#2563EB'};color:${mergeConfirmDisabled?'#64748B':'#fff'};font:inherit;font-size:14px;font-weight:900;cursor:${mergeConfirmDisabled?'not-allowed':'pointer'}`;
+    const mergeConfirmLabel=mergeConfirmDisabled?'เลือกโต๊ะที่จะนำมารวมก่อน':(`ยืนยันรวม ${mergeSelectedCount} โต๊ะและไปชำระเงิน`);
+
 
     return {
       txt,receiptCompanyName:(s.receiptBusiness||DEFAULT_RECEIPT_BUSINESS).company_name,receiptCompanyAddress:(s.receiptBusiness||DEFAULT_RECEIPT_BUSINESS).address,receiptTaxId:(s.receiptBusiness||DEFAULT_RECEIPT_BUSINESS).tax_id,languageThaiStyle, languageEnglishStyle, languageThaiActive: !english, languageEnglishActive: english,
@@ -2881,7 +3115,8 @@ class Component extends DCLogic {
       cartButtonStyle, openCart: () => this.setState({ screen: 'checkout',orderError:null }),
       cartCount: s.cart.reduce((n, l) => n + l.qty, 0), cartSubtotalFmt: this.fmt(subtotal),
       isB, isC,isWaiterMode:WAITER_MODE,showTablePayment:!WAITER_MODE,tableActionGridStyle:`display:grid;grid-template-columns:${WAITER_MODE?'1fr':'1fr 1fr'};gap:8px`, tabBarStyle, bodyRowStyle, railStyle, contentStyle, navItems, showRailLabel, orderWorkspaceStyle, productPaneStyle, quickCartStyle, quickNoteStyle, quickPayStyle,quickSaveStyle,orderMoreItemStyle,backToTablesFromOrder:()=>this.backToTablesFromOrder(),
-      screenIsTables:s.screen==='tables',restaurantTables,restaurantTableRows,tableRowGap:compactTables?'7px':'10px',occupiedTableCount,totalTableCount:restaurantTables.length,vacantTableCount:restaurantTables.length-occupiedTableCount,activeTableLabel:s.activeTable||'—',activeOrderLabel:String(s.activeTable||'').startsWith('TA-')?'Takeaway '+s.activeTable:'โต๊ะ '+(s.activeTable||'—'),activeGuestCount:s.activeGuestCount||1,editGuestCount:()=>this.requestEditGuestCount(),isRestaurantTable:!!s.activeTable&&!String(s.activeTable).startsWith('TA-'),isTakeawayOrder:String(s.activeTable||'').startsWith('TA-'),orderMoreOpen:s.orderMoreOpen,toggleOrderMore:()=>this.setState({orderMoreOpen:!s.orderMoreOpen}),openTakeaway:()=>this.openTakeaway(),completeOrderSelection:()=>this.completeOrderSelection(),saveTableOrder:()=>this.sendTableToKitchen(),payTableOrder:()=>this.payTableOrder(),printTableBill:()=>this.setState({orderMoreOpen:false},()=>this.printTableBill()),retryKitchenPrint:()=>this.setState({orderMoreOpen:false},()=>this.retryKitchenPrint()),sendTableToKitchen:()=>this.sendTableToKitchen(),
+      screenIsTables:s.screen==='tables',
+      canMergeTables,canMergeIntoCurrentTable,openMergeTablesModal:()=>this.openMergeTablesModal(),openMergeIntoCurrentModal:()=>this.openMergeTablesModal(s.activeTable),closeMergeTablesModal:()=>this.closeMergeTablesModal(),toggleMergeSourceTable:t=>this.toggleMergeSourceTable(t),confirmMergeTables:()=>this.confirmMergeTables(),mergeModalOpen:!!s.mergeModalOpen,mergeTargetTable:currentMergeTarget,mergeTargetChoices,mergeSourceRows,hasMergeSourcesSelected,mergeSelectedCount,mergeTargetTotalFmt:this.fmt(targetTotal),mergeSourceTotalFmt:this.fmt(sourceTotal),mergeGrandTotalFmt:this.fmt(mergeGrandTotal),mergeConfirmDisabled,mergeConfirmBtnStyle,mergeConfirmLabel,restaurantTables,restaurantTableRows,tableRowGap:compactTables?'7px':'10px',occupiedTableCount,totalTableCount:restaurantTables.length,vacantTableCount:restaurantTables.length-occupiedTableCount,activeTableLabel:s.activeTable||'—',activeOrderLabel:String(s.activeTable||'').startsWith('TA-')?'Takeaway '+s.activeTable:'โต๊ะ '+(s.activeTable||'—'),activeGuestCount:s.activeGuestCount||1,editGuestCount:()=>this.requestEditGuestCount(),isRestaurantTable:!!s.activeTable&&!String(s.activeTable).startsWith('TA-'),isTakeawayOrder:String(s.activeTable||'').startsWith('TA-'),orderMoreOpen:s.orderMoreOpen,toggleOrderMore:()=>this.setState({orderMoreOpen:!s.orderMoreOpen}),openTakeaway:()=>this.openTakeaway(),completeOrderSelection:()=>this.completeOrderSelection(),saveTableOrder:()=>this.sendTableToKitchen(),payTableOrder:()=>this.payTableOrder(),printTableBill:()=>this.setState({orderMoreOpen:false},()=>this.printTableBill()),retryKitchenPrint:()=>this.setState({orderMoreOpen:false},()=>this.retryKitchenPrint()),sendTableToKitchen:()=>this.sendTableToKitchen(),
       screenIsOrder: s.screen === 'order', screenIsCart: s.screen === 'cart', screenIsCheckout: s.screen === 'checkout',
       screenIsConfirmed: s.screen === 'confirmed', screenIsHistory: s.screen === 'history',screenIsTaxInvoiceList:s.screen==='taxInvoiceList', screenIsManage: s.screen === 'manage',manageMainOpen:s.manageSection==='main',manageCategoryOrderOpen:s.manageSection==='categories',openCategoryOrder:()=>this.setState({manageSection:'categories'},()=>{const main=document.getElementById('pos-main-content');if(main)main.scrollTop=0}),closeCategoryOrder:()=>this.setState({manageSection:'main'},()=>{const main=document.getElementById('pos-main-content');if(main)main.scrollTop=0}),
       screenIsQueue: s.screen === 'queue', screenIsSettings: s.screen === 'settings', screenIsMembers: s.screen === 'members',settingsMainOpen:s.settingsSection==='main',settingsTableLayoutOpen:s.settingsSection==='tables',openTableLayoutSettings:()=>{const draft=this.normalizeTableCanvas(s.tableCanvas,s.tableRows).map(x=>({...x}));this.setState({settingsSection:'tables',tableEditorRows:s.tableRows.map(row=>[...row]),tableCanvasDraft:draft,selectedCanvasTables:draft.map((_,i)=>i)},()=>{const el=document.querySelector('.pos-settings-page');if(el)el.scrollTop=0})},closeTableLayoutSettings:()=>this.setState({settingsSection:'main'},()=>{const el=document.querySelector('.pos-settings-page');if(el)el.scrollTop=0}),
