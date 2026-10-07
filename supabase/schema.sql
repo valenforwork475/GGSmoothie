@@ -69,6 +69,22 @@ begin
   return new;
 end $$;
 
+-- Shared open table bills used by the Sunmi POS and waiter iPads.
+-- See supabase/migrations/20260928090000_pos_shared_table_orders.sql for RPCs and grants.
+create table if not exists public.pos_table_orders (
+  table_no text primary key,
+  guest_count int not null default 1 check (guest_count between 0 and 99),
+  cart jsonb not null default '[]'::jsonb,
+  note text not null default '',
+  co_phone text not null default '',
+  status text not null default 'occupied' check (status in ('occupied')),
+  version bigint not null default 1,
+  kitchen_pending boolean not null default true,
+  opened_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  updated_by uuid default auth.uid()
+);
+
 drop trigger if exists orders_touch on public.orders;
 create trigger orders_touch before update on public.orders
   for each row execute function public.tg_touch_updated_at();
@@ -122,6 +138,9 @@ begin
   if p_source not in ('web','pos') then
     raise exception 'bad source';
   end if;
+  if lower(trim(coalesce(p_pay_method, 'promptpay'))) not in ('promptpay','cash','card','wechat','alipay') then
+    raise exception 'bad payment method';
+  end if;
 
   -- กันเลขคิวชนกันเมื่อมีออเดอร์เข้าพร้อมกัน
   perform pg_advisory_xact_lock(920316);
@@ -133,7 +152,7 @@ begin
     nullif(trim(coalesce(p_phone, '')), ''),
     p_items,
     p_total,
-    coalesce(p_pay_method, 'promptpay'),
+    lower(trim(coalesce(p_pay_method, 'promptpay'))),
     p_source
   )
   returning * into v_order;
