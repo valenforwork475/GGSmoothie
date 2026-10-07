@@ -912,7 +912,7 @@ button { -webkit-tap-highlight-color:transparent; }
         <div class="pos-checkout-screen">
           <div style="font-weight:800;font-size:18px;margin-bottom:14px">{{txt.checkout}}</div>
           <div class="checkout-order-panel" style="{{checkoutSummaryStyle}}">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px"><b style="font-size:13px;color:#0F172A">รายการออเดอร์</b><sc-if value="{{canMergeIntoCurrentTable}}"><button type="button" onclick="{{openMergeIntoCurrentModal}}" style="padding:4px 9px;border:1px solid #93C5FD;border-radius:7px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-size:11.5px;font-weight:850;cursor:pointer">🔗 รวมบิลกับโต๊ะอื่น</button></sc-if></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px"><b style="font-size:13px;color:#0F172A">รายการออเดอร์</b><sc-if value="{{canMergeIntoCurrentTable}}"><button type="button" onclick="{{openMergeIntoCurrentModal}}" style="padding:4px 9px;border:1px solid #93C5FD;border-radius:7px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-size:11.5px;font-weight:850;cursor:pointer">🔗 รวมบิลกับโต๊ะอื่น</button></sc-if><sc-if value="{{canMoveCurrentTable}}"><button type="button" onclick="{{openMoveTableModal}}" style="padding:4px 9px;border:1px solid #CBD5E1;border-radius:7px;background:#FFFFFF;color:#334155;font:inherit;font-size:11.5px;font-weight:850;cursor:pointer">🔀 ย้ายโต๊ะ</button></sc-if></div>
             <sc-for list="{{cartLines}}" as="line" hint-placeholder-count="2">
               <div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid #E2E8F0">
                 <div style="min-width:0"><b style="display:block;font-size:12.5px;color:#0F172A">{{line.name}}</b><span style="display:block;margin-top:2px;font-size:11px;color:#64748B">{{line.modText}}</span></div>
@@ -1345,6 +1345,46 @@ button { -webkit-tap-highlight-color:transparent; }
     </div>
   </sc-if>
 
+  <!-- ===================== MOVE TABLE MODAL ===================== -->
+  <sc-if value="{{moveTableModalOpen}}" hint-placeholder-val="{{false}}">
+    <div class="pos-modal-overlay" style="{{modalOverlayStyle}}" onclick="{{closeMoveTableModal}}">
+      <div class="pos-modal-card" role="dialog" aria-modal="true" data-move-modal="true" style="{{modalCardStyle}};max-width:480px" onclick="{{stopProp}}">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px">
+          <div>
+            <div style="font-size:20px;font-weight:950;color:#0F172A">🔀 ย้ายโต๊ะ</div>
+            <div style="font-size:13px;color:#64748B;margin-top:3px">ย้ายรายการอาหารทั้งหมดจาก <strong>โต๊ะ {{moveSourceTable}}</strong> ไปยังโต๊ะใหม่</div>
+          </div>
+          <button type="button" aria-label="ปิด" onclick="{{closeMoveTableModal}}" style="width:40px;height:40px;border:0;border-radius:10px;background:#F1F5F9;font:inherit;font-size:20px;cursor:pointer">×</button>
+        </div>
+
+        <div style="margin-bottom:14px;padding:11px 13px;border-radius:10px;background:#F8FAFC;border:1px solid #E2E8F0">
+          <div style="font-size:12.5px;color:#475569">
+            โต๊ะปัจจุบัน: <strong style="color:#0F172A">โต๊ะ {{moveSourceTable}}</strong> · {{moveSourceItemCount}} รายการ · ยอดรวม ฿{{moveSourceTotalFmt}}
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:13px;font-weight:850;color:#334155;margin-bottom:8px">เลือกโต๊ะปลายทางที่ต้องการย้ายไป (เฉพาะโต๊ะว่าง):</label>
+          <div style="max-height:240px;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;padding:2px">
+            <sc-for list="{{moveDestChoices}}" as="dc">
+              <button type="button" disabled="{{dc.disabled}}" onclick="{{dc.select}}" style="{{dc.style}}">
+                <span style="font-size:14px;font-weight:950">โต๊ะ {{dc.label}}</span>
+                <span style="font-size:10px;font-weight:750;opacity:0.85">{{dc.statusText}}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:10px">
+          <button type="button" onclick="{{closeMoveTableModal}}" style="min-height:48px;border:1px solid #CBD5E1;border-radius:10px;background:#fff;color:#334155;font:inherit;font-weight:850;cursor:pointer">ยกเลิก</button>
+          <button type="button" disabled="{{moveConfirmDisabled}}" onclick="{{confirmMoveTable}}" style="{{moveConfirmBtnStyle}}">
+            {{moveConfirmLabel}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{modalOpen}}" hint-placeholder-val="{{false}}">
     <div class="pos-modal-overlay" style="{{modalOverlayStyle}}" onclick="{{closeModalIfBackdrop}}">
       <div class="pos-modal-card" style="{{modalCardStyle}}" onclick="{{stopProp}}">
@@ -1656,6 +1696,9 @@ class Component extends DCLogic {
     guestCountInput: '2',
     guestModalMode: 'open',
     mergeModalOpen: false,
+    moveTableModalOpen: false,
+    moveSourceTable: '',
+    moveDestTable: '',
     mergeTargetTable: '',
     selectedMergeSourceTables: [],
     mergedTableNos: [],
@@ -2491,6 +2534,90 @@ class Component extends DCLogic {
     });
   }
 
+  openMoveTableModal(tableNo = '') {
+    const s = this.state;
+    const src = String(tableNo || s.activeTable || '');
+    if (!src) return;
+    this.setState({
+      moveTableModalOpen: true,
+      moveSourceTable: src,
+      moveDestTable: '',
+      orderError: null
+    });
+  }
+  closeMoveTableModal() {
+    this.setState({ moveTableModalOpen: false, moveDestTable: '' });
+  }
+  setMoveDestTable(dest) {
+    this.setState({ moveDestTable: String(dest) });
+  }
+  async confirmMoveTable() {
+    const s = this.state;
+    const src = String(s.moveSourceTable || '');
+    const dest = String(s.moveDestTable || '');
+    if (!src || !dest || src === dest) return;
+
+    let srcOrder = s.tableOrders[src] || { tableNo: src, guestCount: s.activeGuestCount || 1, cart: s.cart, note: s.note };
+    const orderCart = (s.activeTable === src && s.cart.length) ? s.cart : (srcOrder.cart || []);
+    const orderGuests = (s.activeTable === src && s.activeGuestCount) ? s.activeGuestCount : (srcOrder.guestCount || 1);
+    const orderNote = (s.activeTable === src) ? s.note : (srcOrder.note || '');
+
+    const now = new Date().toISOString();
+    const updatedDestOrder = {
+      ...srcOrder,
+      tableNo: dest,
+      cart: orderCart,
+      guestCount: orderGuests,
+      note: orderNote,
+      openedAt: srcOrder.openedAt || now,
+      updatedAt: now,
+      version: (srcOrder.version || 0) + 1
+    };
+
+    const updatedTableOrders = { ...s.tableOrders };
+    delete updatedTableOrders[src];
+    updatedTableOrders[dest] = updatedDestOrder;
+    this.persistTableOrders(updatedTableOrders);
+
+    if (this.session() && this.session() !== DEMO_SESSION) {
+      this.api('POST', 'rpc/delete_pos_table_order', { p_table_no: src }).catch(() => {});
+      this.api('POST', 'rpc/upsert_pos_table_order', {
+        p_table_no: dest,
+        p_guest_count: orderGuests,
+        p_cart: orderCart,
+        p_note: orderNote || '',
+        p_co_phone: srcOrder.coPhone || '',
+        p_expected_version: 0,
+        p_kitchen_pending: false
+      }).catch(() => {});
+    }
+
+    const nativePrinter = window.GGPrinter;
+    if (nativePrinter && typeof nativePrinter.printOrder === 'function') {
+      try {
+        nativePrinter.printOrder('kitchen', JSON.stringify({
+          header: 'แจ้งย้ายโต๊ะ',
+          table: 'โต๊ะ ' + src + ' ➜ โต๊ะ ' + dest,
+          guests: orderGuests,
+          items: orderCart.map(l => ({ name: l.name, qty: l.qty, detail: l.modText || '' })),
+          note: 'ย้ายโต๊ะ'
+        }), 'move-' + Date.now());
+      } catch (_e) {}
+    }
+
+    const isActive = s.activeTable === src;
+    this.setState({
+      tableOrders: updatedTableOrders,
+      activeTable: isActive ? dest : s.activeTable,
+      coName: isActive ? ('โต๊ะ ' + dest) : s.coName,
+      moveTableModalOpen: false,
+      moveDestTable: '',
+      orderError: null
+    }, () => {
+      this.showSaveNotice('ย้ายจาก โต๊ะ ' + src + ' ไป โต๊ะ ' + dest + ' สำเร็จแล้ว');
+    });
+  }
+
   closePaidTable(tableNo){
     if(!tableNo)return;const tableOrders={...this.state.tableOrders};delete tableOrders[String(tableNo)];this.persistTableOrders(tableOrders);if(this.session()&&this.session()!==DEMO_SESSION)this.api('POST','rpc/delete_pos_table_order',{p_table_no:String(tableNo)}).catch(()=>{});return tableOrders;
   }
@@ -3063,6 +3190,29 @@ class Component extends DCLogic {
     const canvasEditorTables=s.tableCanvasDraft.map((item,index)=>{const selected=s.selectedCanvasTables.includes(index);return{label:item.label,style:`position:absolute;left:${item.x/10}%;top:${item.y/6.5}%;width:${item.w/10}%;height:${item.h/6.5}%;min-width:70px;min-height:60px;padding:8px;border:${selected?'3px solid #1D4ED8':'2px solid #60A5FA'};border-radius:${item.shape==='circle'?'50%':item.shape==='square'?'4px':'14px'};background:${selected?'#DBEAFE':'#EFF6FF'};box-shadow:0 5px 14px rgba(37,99,235,.14);box-sizing:border-box;cursor:grab;touch-action:none;user-select:none;overflow:hidden`,move:e=>this.beginCanvasPointer(e,index,'move'),resize:e=>this.beginCanvasPointer(e,index,'resize'),rename:e=>this.updateCanvasTable(index,{label:e.target.value}),remove:e=>{if(e){e.preventDefault();e.stopPropagation()}this.removeCanvasTable(index)},stop:e=>e&&e.stopPropagation(),shapes:[['square','□'],['rounded','▢'],['circle','○']].map(([value,label])=>({label,active:item.shape===value,select:e=>{if(e){e.preventDefault();e.stopPropagation()}this.updateCanvasTable(index,{shape:value})},style:`width:30px;height:28px;border:1px solid ${item.shape===value?'#2563EB':'#CBD5E1'};border-radius:${value==='circle'?'50%':value==='square'?'3px':'8px'};background:${item.shape===value?'#2563EB':'#fff'};color:${item.shape===value?'#fff':'#475569'};font-size:15px`}))}});
     const canvasSelectionButtons=s.tableCanvasDraft.map((item,index)=>{const selected=s.selectedCanvasTables.includes(index);return{label:item.label,selected,select:()=>this.toggleCanvasTableSelection(index),style:`min-height:44px;padding:8px 12px;border:2px solid ${selected?'#2563EB':'#CBD5E1'};border-radius:9px;background:${selected?'#DBEAFE':'#fff'};color:${selected?'#1D4ED8':'#475569'};font:inherit;font-size:12px;font-weight:900`}});
     const occupiedTableCount=restaurantTables.filter(t=>t.occupied).length;
+    const allTableLabels=Array.from(new Set(s.tableRows.flat().map(String))).filter(Boolean);
+    const moveSourceKey=String(s.moveSourceTable||s.activeTable||'');
+    const moveSourceOrder=s.tableOrders[moveSourceKey]||{cart:[]};
+    const moveSourceTotalFmt=this.fmt((moveSourceOrder.cart)?this.cartTotals(moveSourceOrder.cart).total:0);
+    const moveSourceItemCount=(moveSourceOrder.cart||[]).reduce((sum,l)=>sum+(Number(l.qty)||0),0);
+    const moveDestChoices=allTableLabels.filter(t=>t!==moveSourceKey).map(t=>{
+      const ord=s.tableOrders[t];
+      const isOcc=!!(ord&&ord.cart&&ord.cart.length);
+      const isSel=String(s.moveDestTable)===String(t);
+      return {
+        label:t,
+        isOccupied:isOcc,
+        statusText:isOcc?'มีลูกค้า':'ว่าง',
+        selected:isSel,
+        disabled:isOcc,
+        select:()=>!isOcc&&this.setMoveDestTable(t),
+        style:`min-height:50px;padding:8px 10px;border:${isSel?'2px solid #2563EB':'1px solid '+(isOcc?'#CBD5E1':'#93C5FD')};border-radius:10px;background:${isSel?'#2563EB':(isOcc?'#F1F5F9':'#EFF6FF')};color:${isSel?'#fff':(isOcc?'#94A3B8':'#1E293B')};font:inherit;cursor:${isOcc?'not-allowed':'pointer'};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px`
+      };
+    });
+    const moveConfirmDisabled=!s.moveDestTable||s.moveDestTable===moveSourceKey;
+    const moveConfirmBtnStyle=`min-height:48px;border:0;border-radius:10px;background:${moveConfirmDisabled?'#CBD5E1':'#2563EB'};color:${moveConfirmDisabled?'#64748B':'#fff'};font:inherit;font-size:14px;font-weight:900;cursor:${moveConfirmDisabled?'not-allowed':'pointer'}`;
+    const moveConfirmLabel=moveConfirmDisabled?'เลือกโต๊ะปลายทางก่อน':(`ยืนยันย้ายไป โต๊ะ ${s.moveDestTable}`);
+
     const occupiedOrderKeys=Object.keys(s.tableOrders).filter(k=>(s.tableOrders[k]?.cart||[]).length>0&&!String(k).startsWith('TA-'));
     const canMergeTables=occupiedOrderKeys.length>=2;
     const canMergeIntoCurrentTable=!!s.activeTable&&!String(s.activeTable).startsWith('TA-')&&occupiedOrderKeys.length>=2;
@@ -3116,7 +3266,20 @@ class Component extends DCLogic {
       cartCount: s.cart.reduce((n, l) => n + l.qty, 0), cartSubtotalFmt: this.fmt(subtotal),
       isB, isC,isWaiterMode:WAITER_MODE,showTablePayment:!WAITER_MODE,tableActionGridStyle:`display:grid;grid-template-columns:${WAITER_MODE?'1fr':'1fr 1fr'};gap:8px`, tabBarStyle, bodyRowStyle, railStyle, contentStyle, navItems, showRailLabel, orderWorkspaceStyle, productPaneStyle, quickCartStyle, quickNoteStyle, quickPayStyle,quickSaveStyle,orderMoreItemStyle,backToTablesFromOrder:()=>this.backToTablesFromOrder(),
       screenIsTables:s.screen==='tables',
-      canMergeTables,canMergeIntoCurrentTable,openMergeTablesModal:()=>this.openMergeTablesModal(),openMergeIntoCurrentModal:()=>this.openMergeTablesModal(s.activeTable),closeMergeTablesModal:()=>this.closeMergeTablesModal(),toggleMergeSourceTable:t=>this.toggleMergeSourceTable(t),confirmMergeTables:()=>this.confirmMergeTables(),mergeModalOpen:!!s.mergeModalOpen,mergeTargetTable:currentMergeTarget,mergeTargetChoices,mergeSourceRows,hasMergeSourcesSelected,mergeSelectedCount,mergeTargetTotalFmt:this.fmt(targetTotal),mergeSourceTotalFmt:this.fmt(sourceTotal),mergeGrandTotalFmt:this.fmt(mergeGrandTotal),mergeConfirmDisabled,mergeConfirmBtnStyle,mergeConfirmLabel,restaurantTables,restaurantTableRows,tableRowGap:compactTables?'7px':'10px',occupiedTableCount,totalTableCount:restaurantTables.length,vacantTableCount:restaurantTables.length-occupiedTableCount,activeTableLabel:s.activeTable||'—',activeOrderLabel:String(s.activeTable||'').startsWith('TA-')?'Takeaway '+s.activeTable:'โต๊ะ '+(s.activeTable||'—'),activeGuestCount:s.activeGuestCount||1,editGuestCount:()=>this.requestEditGuestCount(),isRestaurantTable:!!s.activeTable&&!String(s.activeTable).startsWith('TA-'),isTakeawayOrder:String(s.activeTable||'').startsWith('TA-'),orderMoreOpen:s.orderMoreOpen,toggleOrderMore:()=>this.setState({orderMoreOpen:!s.orderMoreOpen}),openTakeaway:()=>this.openTakeaway(),completeOrderSelection:()=>this.completeOrderSelection(),saveTableOrder:()=>this.sendTableToKitchen(),payTableOrder:()=>this.payTableOrder(),printTableBill:()=>this.setState({orderMoreOpen:false},()=>this.printTableBill()),retryKitchenPrint:()=>this.setState({orderMoreOpen:false},()=>this.retryKitchenPrint()),sendTableToKitchen:()=>this.sendTableToKitchen(),
+      canMergeTables,
+      canMoveCurrentTable:!!s.activeTable&&!String(s.activeTable).startsWith('TA-'),
+      openMoveTableModal:()=>this.openMoveTableModal(),
+      closeMoveTableModal:()=>this.closeMoveTableModal(),
+      confirmMoveTable:()=>this.confirmMoveTable(),
+      moveTableModalOpen:!!s.moveTableModalOpen,
+      moveSourceTable:moveSourceKey,
+      moveSourceTotalFmt,
+      moveSourceItemCount,
+      moveDestTable:s.moveDestTable||'',
+      moveDestChoices,
+      moveConfirmDisabled,
+      moveConfirmBtnStyle,
+      moveConfirmLabel,canMergeIntoCurrentTable,openMergeTablesModal:()=>this.openMergeTablesModal(),openMergeIntoCurrentModal:()=>this.openMergeTablesModal(s.activeTable),closeMergeTablesModal:()=>this.closeMergeTablesModal(),toggleMergeSourceTable:t=>this.toggleMergeSourceTable(t),confirmMergeTables:()=>this.confirmMergeTables(),mergeModalOpen:!!s.mergeModalOpen,mergeTargetTable:currentMergeTarget,mergeTargetChoices,mergeSourceRows,hasMergeSourcesSelected,mergeSelectedCount,mergeTargetTotalFmt:this.fmt(targetTotal),mergeSourceTotalFmt:this.fmt(sourceTotal),mergeGrandTotalFmt:this.fmt(mergeGrandTotal),mergeConfirmDisabled,mergeConfirmBtnStyle,mergeConfirmLabel,restaurantTables,restaurantTableRows,tableRowGap:compactTables?'7px':'10px',occupiedTableCount,totalTableCount:restaurantTables.length,vacantTableCount:restaurantTables.length-occupiedTableCount,activeTableLabel:s.activeTable||'—',activeOrderLabel:String(s.activeTable||'').startsWith('TA-')?'Takeaway '+s.activeTable:'โต๊ะ '+(s.activeTable||'—'),activeGuestCount:s.activeGuestCount||1,editGuestCount:()=>this.requestEditGuestCount(),isRestaurantTable:!!s.activeTable&&!String(s.activeTable).startsWith('TA-'),isTakeawayOrder:String(s.activeTable||'').startsWith('TA-'),orderMoreOpen:s.orderMoreOpen,toggleOrderMore:()=>this.setState({orderMoreOpen:!s.orderMoreOpen}),openTakeaway:()=>this.openTakeaway(),completeOrderSelection:()=>this.completeOrderSelection(),saveTableOrder:()=>this.sendTableToKitchen(),payTableOrder:()=>this.payTableOrder(),printTableBill:()=>this.setState({orderMoreOpen:false},()=>this.printTableBill()),retryKitchenPrint:()=>this.setState({orderMoreOpen:false},()=>this.retryKitchenPrint()),sendTableToKitchen:()=>this.sendTableToKitchen(),
       screenIsOrder: s.screen === 'order', screenIsCart: s.screen === 'cart', screenIsCheckout: s.screen === 'checkout',
       screenIsConfirmed: s.screen === 'confirmed', screenIsHistory: s.screen === 'history',screenIsTaxInvoiceList:s.screen==='taxInvoiceList', screenIsManage: s.screen === 'manage',manageMainOpen:s.manageSection==='main',manageCategoryOrderOpen:s.manageSection==='categories',openCategoryOrder:()=>this.setState({manageSection:'categories'},()=>{const main=document.getElementById('pos-main-content');if(main)main.scrollTop=0}),closeCategoryOrder:()=>this.setState({manageSection:'main'},()=>{const main=document.getElementById('pos-main-content');if(main)main.scrollTop=0}),
       screenIsQueue: s.screen === 'queue', screenIsSettings: s.screen === 'settings', screenIsMembers: s.screen === 'members',settingsMainOpen:s.settingsSection==='main',settingsTableLayoutOpen:s.settingsSection==='tables',openTableLayoutSettings:()=>{const draft=this.normalizeTableCanvas(s.tableCanvas,s.tableRows).map(x=>({...x}));this.setState({settingsSection:'tables',tableEditorRows:s.tableRows.map(row=>[...row]),tableCanvasDraft:draft,selectedCanvasTables:draft.map((_,i)=>i)},()=>{const el=document.querySelector('.pos-settings-page');if(el)el.scrollTop=0})},closeTableLayoutSettings:()=>this.setState({settingsSection:'main'},()=>{const el=document.querySelector('.pos-settings-page');if(el)el.scrollTop=0}),
