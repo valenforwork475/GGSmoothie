@@ -858,7 +858,7 @@ button { -webkit-tap-highlight-color:transparent; }
               </div>
               <sc-if value="{{hasDiscount}}"><div style="display:flex;justify-content:space-between;font-size:11.5px;color:#166534;font-weight:800;margin-bottom:3px"><span>ส่วนลด</span><span>−฿{{discountFmt}}</span></div></sc-if>
               <sc-if value="{{hasCoupon}}"><div style="display:flex;justify-content:space-between;font-size:11.5px;color:#166534;font-weight:800;margin-bottom:3px"><span>คูปอง ({{couponCount}} ใบ)</span><span>−฿{{couponFmt}}</span></div></sc-if>
-              <sc-if value="{{hasRounding}}"><div style="display:flex;justify-content:space-between;font-size:11px;color:#64748B;font-weight:750;margin-bottom:3px"><span>ปัดเศษ ({{roundingNote}})</span><span>{{roundingSign}}฿{{roundingFmt}}</span></div></sc-if>
+              
               <div style="display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px;">
                 <span style="font-size:12px;color:#6B7280;font-weight:700;">{{txt.total}}</span>
                 <span style="font-size:28px;line-height:1;font-weight:950;letter-spacing:-.03em;">฿{{totalFmt}}</span>
@@ -2311,8 +2311,9 @@ class Component extends DCLogic {
     const couponCount = Math.max(0, Number(this.state.couponCount)||0);
     const couponTotal = Math.min(Math.max(0, subtotal - discount), couponCount * 100);
     const netTotal = Math.max(0, subtotal - discount - couponTotal);
-    const total = Math.round(netTotal);
-    const rounding = Math.round((total - netTotal) * 100) / 100;
+    const total = netTotal;
+    const roundedInt = Math.round(netTotal);
+    const rounding = Math.round((roundedInt - netTotal) * 100) / 100;
     const vatAmount = subtotal > 0 ? vatBeforeDiscount * (total / subtotal) : 0;
     return { subtotal, discount, couponCount, couponTotal, netTotal, rounding, total, vatAmount };
   }
@@ -2362,7 +2363,18 @@ class Component extends DCLogic {
   normalizeTableOrder(row){return{tableNo:row.table_no??row.tableNo,guestCount:Number(row.guest_count??row.guestCount)||1,status:'occupied',cart:Array.isArray(row.cart)?row.cart:[],note:row.note||'',coPhone:row.co_phone??row.coPhone??'',openedAt:row.opened_at??row.openedAt??new Date().toISOString(),updatedAt:row.updated_at??row.updatedAt??new Date().toISOString(),version:Number(row.version)||0,kitchenPending:!!(row.kitchen_pending??row.kitchenPending)}}
   hasNativePrinter(){const printer=window.GGPrinter;return !!(printer&&typeof printer.printOrder==='function')}
   openNativeCashDrawer(){const printer=window.GGPrinter;if(!printer||typeof printer.openCashDrawer!=='function')return false;try{printer.openCashDrawer('cash-drawer-'+Date.now());return true}catch(_e){return false}}
-  manualOpenCashDrawer(){const opened=this.openNativeCashDrawer();this.setState({menuDrawerOpen:false},()=>this.showSaveNotice(opened?'กำลังตรวจสอบการเปิดลิ้นชัก...':'เปิดลิ้นชักไม่ได้ กรุณาใช้แอป SkyPOS รุ่นล่าสุด'))}
+  manualOpenCashDrawer(){
+    const opened=this.openNativeCashDrawer();
+    this.setState({menuDrawerOpen:false},()=>{
+      if(opened){
+        this.showSaveNotice('ส่งคำสั่งเปิดลิ้นชักเก็บเงินแล้ว');
+      }else if(!window.GGPrinter){
+        this.showSaveNotice('เปิดผ่านเว็บบราวเซอร์ (ฟังก์ชันเปิดลิ้นชักทำงานบนเครื่อง POS Sunmi หน้าร้าน)');
+      }else{
+        this.showSaveNotice('เปิดลิ้นชักไม่ได้ กรุณาตรวจสายเชื่อมต่อลิ้นชักหรือเครื่องพิมพ์');
+      }
+    });
+  }
   hasNativeBackgroundPrinter(){const printer=window.GGPrinter;if(!printer||typeof printer.backgroundPrintEnabled!=='function')return false;try{return !!printer.backgroundPrintEnabled()}catch(_e){return false}}
   syncNativePrintSession(){const printer=window.GGPrinter,session=this.session();if(!printer||typeof printer.syncBackgroundSession!=='function'||!session||session===DEMO_SESSION)return;try{printer.syncBackgroundSession(SB_URL,this.key(),session)}catch(_e){}}
   loadTableOrders(){
@@ -2461,8 +2473,8 @@ class Component extends DCLogic {
     });
     if(totals.discount>0)receiptItems.push({name:s.discountLabel||'ส่วนลด',qty:1,detail:'ส่วนลด',price:-totals.discount});
     if(totals.couponTotal>0)receiptItems.push({name:'คูปองส่วนลด ฿100 × '+totals.couponCount,qty:1,detail:'คูปองแทนเงินสด',price:-totals.couponTotal});
-    if(totals.rounding!==0)receiptItems.push({name:'ปัดเศษสตางค์',qty:1,detail:(totals.rounding>0?'+':'-')+'ตามหลักสากล',price:totals.rounding});
-    const receiptNote='ยอดรวม ฿'+Number(totals.netTotal).toFixed(2)+(totals.rounding!==0?'\nปัดเศษ: '+(totals.rounding>0?'+':'')+Number(totals.rounding).toFixed(2):'')+'\nรวมทั้งสิ้น ฿'+Number(total).toFixed(2)+'\nชำระโดย '+(PAY_TH[payment]||payment||'');
+    // no rounding food item
+    const receiptNote='ยอดรวม ฿'+Number(totals.netTotal).toFixed(2)+((payment==='cash'&&totals.rounding!==0)?'\nปัดเศษเงินสด: '+(totals.rounding>0?'+':'')+Number(totals.rounding).toFixed(2):'')+'\nรวมทั้งสิ้น ฿'+Number(total).toFixed(2)+'\nชำระโดย '+(PAY_TH[payment]||payment||'');
     nativePrinter.printOrder('receipt',JSON.stringify({header:this.receiptHeader('ใบเสร็จรับเงิน'),table:((s.mergedTableNos&&s.mergedTableNos.length)?('โต๊ะ '+s.activeTable+' (รวมโต๊ะ '+s.mergedTableNos.join(', ')+')'):('โต๊ะ '+s.activeTable)),guests:s.activeGuestCount||0,items:receiptItems,note:receiptNote}),'receipt-'+Date.now());
   }
   printTableBill(){
@@ -2477,8 +2489,8 @@ class Component extends DCLogic {
     });
     if(totals.discount>0)billItems.push({name:s.discountLabel||'ส่วนลด',qty:1,detail:'ส่วนลด',price:-totals.discount});
     if(totals.couponTotal>0)billItems.push({name:'คูปองส่วนลด ฿100 × '+totals.couponCount,qty:1,detail:'คูปองแทนเงินสด',price:-totals.couponTotal});
-    if(totals.rounding!==0)billItems.push({name:'ปัดเศษสตางค์',qty:1,detail:(totals.rounding>0?'+':'-')+'ตามหลักสากล',price:totals.rounding});
-    nativePrinter.printOrder('receipt',JSON.stringify({header:this.receiptHeader('ใบแจ้งยอด'),table:((s.mergedTableNos&&s.mergedTableNos.length)?('โต๊ะ '+s.activeTable+' (รวมโต๊ะ '+s.mergedTableNos.join(', ')+')'):('โต๊ะ '+s.activeTable)),guests:s.activeGuestCount||1,items:billItems,note:(s.note?'หมายเหตุ: '+s.note+'\n':'')+'ยอดรวม ฿'+Number(totals.netTotal).toFixed(2)+(totals.rounding!==0?'\nปัดเศษ: '+(totals.rounding>0?'+':'')+Number(totals.rounding).toFixed(2):'')+'\nรวมทั้งสิ้น ฿'+Number(totals.total).toFixed(2)+'\nยังไม่ชำระเงิน'}),'table-bill-'+Date.now());
+    // no rounding food item
+    nativePrinter.printOrder('receipt',JSON.stringify({header:this.receiptHeader('ใบแจ้งยอด'),table:((s.mergedTableNos&&s.mergedTableNos.length)?('โต๊ะ '+s.activeTable+' (รวมโต๊ะ '+s.mergedTableNos.join(', ')+')'):('โต๊ะ '+s.activeTable)),guests:s.activeGuestCount||1,items:billItems,note:(s.note?'หมายเหตุ: '+s.note+'\n':'')+'รวมทั้งสิ้น ฿'+Number(totals.netTotal).toFixed(2)+'\nยังไม่ชำระเงิน'}),'table-bill-'+Date.now());
     this.setState({orderError:null});
   }
   retryKitchenPrint(){
