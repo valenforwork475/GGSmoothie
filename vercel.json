@@ -1,13 +1,23 @@
 {
   "redirects": [
     {
+      "source": "/ipad",
+      "destination": "/POS-direct.html?mode=waiter&v=ipad3",
+      "permanent": false
+    },
+    {
       "source": "/pos",
       "destination": "/POS-direct.html?v=v6",
       "permanent": false
     },
     {
       "source": "/sunmi",
-      "destination": "/downloads/GG-POS-SUNMI-1.1.0.apk",
+      "destination": "/downloads/SkyPOS-SUNMI-1.3.4.apk",
+      "permanent": false
+    },
+    {
+      "source": "/apk",
+      "destination": "/downloads/SkyPOS-SUNMI-1.3.4.apk",
       "permanent": false
     }
   ],
