@@ -659,7 +659,7 @@ button { -webkit-tap-highlight-color:transparent; }
           <sc-if value="{{loginError}}"><div role="alert" style="margin-top:12px;padding:10px 12px;border-radius:9px;background:#FEF2F2;color:#B91C1C;font-size:12px;font-weight:750;line-height:1.5">{{loginError}}</div></sc-if>
           <button onclick="{{login}}" style="width:100%;min-height:50px;margin-top:20px;border:0;border-radius:10px;background:#2563EB;color:#FFFFFF;font:inherit;font-size:15px;font-weight:900;box-shadow:0 8px 18px rgba(37,99,235,.20);cursor:pointer">{{loginLabel}}</button>
           <div style="display:flex;align-items:center;justify-content:center;gap:7px;margin-top:16px;color:#94A3B8;font-size:10.5px"><span aria-hidden="true" style="width:7px;height:7px;border-radius:50%;background:#22C55E"></span>{{txt.secureSession}}</div>
-          <div style="margin-top:8px;color:#94A3B8;font-size:10.5px;text-align:center">SkyPOS Web v2.5 · Sunmi {{sunmiAppVersionText}}</div>
+          
         </section>
       </div>
     </div>
@@ -1137,6 +1137,9 @@ button { -webkit-tap-highlight-color:transparent; }
       <sc-if value="{{screenIsTaxInvoiceList}}">
         <div style="max-width:900px;margin:0 auto"><div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px"><div><div style="font-weight:900;font-size:21px;color:#0F172A">ใบกำกับภาษี</div><div style="font-size:12px;color:#64748B;margin-top:4px">ค้นหาบิลที่ชำระแล้วและออกใบกำกับภาษีย้อนหลัง</div></div><button type="button" onclick="{{refreshTaxInvoiceBills}}" style="min-height:42px;padding:8px 14px;border:1px solid #CBD5E1;border-radius:9px;background:#fff;color:#334155;font:inherit;font-weight:850">รีเฟรชรายการ</button></div><input value="{{taxHistorySearch}}" oninput="{{onTaxHistorySearch}}" placeholder="ค้นหาเลขบิล ชื่อลูกค้า หรือยอดเงิน" style="width:100%;min-height:46px;padding:10px 13px;border:1px solid #CBD5E1;border-radius:9px;background:#fff;color:#0F172A;font:inherit;box-sizing:border-box"><div style="display:flex;flex-direction:column;gap:8px;margin-top:12px"><sc-for list="{{taxInvoiceRows}}" as="bill"><div style="min-height:64px;padding:10px 12px;border:1px solid #E2E8F0;border-radius:10px;background:#fff;display:flex;align-items:center;gap:12px"><div style="flex:1;min-width:0"><b style="display:block;font-size:14px;color:#0F172A">บิล #{{bill.receiptNo}}</b><span style="display:block;font-size:11px;color:#64748B;margin-top:3px">{{bill.customer}} · {{bill.time}} · ฿{{bill.total}}</span></div><button type="button" onclick="{{bill.issue}}" style="min-height:42px;padding:8px 13px;border:1px solid #93C5FD;border-radius:8px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-size:12px;font-weight:900">ออกใบกำกับภาษี</button></div></sc-for><sc-if value="{{taxInvoiceRowsEmpty}}"><div style="padding:36px 16px;text-align:center;color:#64748B;font-size:13px">ไม่พบบิลที่ชำระแล้ว</div></sc-if></div></div>
       </sc-if>
+
+      <sc-if value="{{screenIsQueue}}" hint-placeholder-val="{{false}}">
+        <div class="pos-queue-page">
           <div style="display:flex;flex-direction:column;gap:10px">
             <sc-for list="{{queueCards}}" as="q" hint-placeholder-count="2">
               <div style="{{queueCardStyle}}">
