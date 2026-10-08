@@ -1003,6 +1003,7 @@ button { -webkit-tap-highlight-color:transparent; }
               <button type="button" style="{{secondaryButtonNative}}" onclick="{{goHistory}}">{{txt.viewHistory}}</button>
               <button type="button" style="{{primaryBtnStyle}};border:0;font:inherit" onclick="{{newOrder}}">{{txt.nextTransaction}}</button>
             </div>
+            <button type="button" style="width:100%;min-height:46px;margin-top:10px;border:1px solid #CBD5E1;border-radius:9px;background:#FFFFFF;color:#0F172A;font:inherit;font-weight:800;cursor:pointer" onclick="{{printLastCheckoutReceipt}}">พิมพ์ใบเสร็จรับเงิน</button>
             <div style="margin-top:14px;padding-top:14px;border-top:1px solid #E2E8F0"><div style="font-size:13px;font-weight:900;color:#0F172A">ใบกำกับภาษี</div><div style="font-size:11px;color:#64748B;margin-top:3px">ออกเอกสารหลังรับชำระเงินเรียบร้อยแล้ว</div><button type="button" onclick="{{openPaidTaxInvoice}}" style="width:100%;min-height:46px;margin-top:9px;border:1px solid #93C5FD;border-radius:9px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-weight:900">ออกใบกำกับภาษีสำหรับบิลนี้</button></div>
           </section>
         </div>
@@ -1274,7 +1275,39 @@ button { -webkit-tap-highlight-color:transparent; }
                   <button onclick="{{setLanguageEnglish}}" aria-pressed="{{languageEnglishActive}}" style="{{languageEnglishStyle}}">English</button>
                 </div>
               </div>
-              <button type="button" aria-pressed="{{autoPrintOrderSummary}}" onclick="{{toggleAutoPrintOrderSummary}}" style="width:100%;min-height:76px;padding:14px 16px;margin-bottom:16px;border:1px solid {{autoPrintOrderSummary?'#86EFAC':'#CBD5E1'}};border-radius:12px;background:{{autoPrintOrderSummary?'#F0FDF4':'#FFFFFF'}};color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer"><span><b style="display:block;font-size:15px">พิมพ์บิลสรุปอัตโนมัติ</b><span style="display:block;margin-top:4px;font-size:12px;line-height:1.5;color:#64748B">พิมพ์รายการให้ลูกค้าตรวจสอบทุกครั้ง หลังบันทึกและยิงออเดอร์เข้าครัวสำเร็จ</span></span><span aria-hidden="true" style="width:48px;height:28px;padding:3px;box-sizing:border-box;border-radius:16px;background:{{autoPrintOrderSummary?'#16A34A':'#CBD5E1'}};display:flex;align-items:center;justify-content:{{autoPrintOrderSummary?'flex-end':'flex-start'}};flex:none"><span style="width:22px;height:22px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(15,23,42,.25)"></span></span></button>
+              <div style="margin-bottom:16px;padding:14px;border:1px solid #E2E8F0;border-radius:12px;background:#F8FAFC;">
+                <div style="font-size:14px;font-weight:900;color:#0F172A;margin-bottom:4px;">การพิมพ์บิลอัตโนมัติ</div>
+                <div style="font-size:11.5px;color:#64748B;line-height:1.5;margin-bottom:12px;">ตั้งค่าเปิด-ปิดการสั่งพิมพ์บิลอัตโนมัติในแต่ละขั้นตอน</div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <button type="button" aria-pressed="{{autoPrintCheckoutReceipt}}" onclick="{{toggleAutoPrintCheckoutReceipt}}" style="width:100%;min-height:68px;padding:12px 14px;border:1px solid {{autoPrintCheckoutReceipt?'#86EFAC':'#CBD5E1'}};border-radius:10px;background:{{autoPrintCheckoutReceipt?'#F0FDF4':'#FFFFFF'}};color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer">
+                    <span>
+                      <b style="display:block;font-size:14px">พิมพ์ใบเสร็จอัตโนมัติ (หลังเช็คบิล)</b>
+                      <span style="display:block;margin-top:3px;font-size:11.5px;line-height:1.45;color:#64748B">พิมพ์ใบเสร็จรับเงินทันทีเมื่อชำระเงินเสร็จสิ้น</span>
+                    </span>
+                    <span aria-hidden="true" style="width:44px;height:26px;padding:3px;box-sizing:border-box;border-radius:16px;background:{{autoPrintCheckoutReceipt?'#16A34A':'#CBD5E1'}};display:flex;align-items:center;justify-content:{{autoPrintCheckoutReceipt?'flex-end':'flex-start'}};flex:none">
+                      <span style="width:20px;height:20px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(15,23,42,.25)"></span>
+                    </span>
+                  </button>
+                  <button type="button" aria-pressed="{{autoPrintOrderSummary}}" onclick="{{toggleAutoPrintOrderSummary}}" style="width:100%;min-height:68px;padding:12px 14px;border:1px solid {{autoPrintOrderSummary?'#86EFAC':'#CBD5E1'}};border-radius:10px;background:{{autoPrintOrderSummary?'#F0FDF4':'#FFFFFF'}};color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer">
+                    <span>
+                      <b style="display:block;font-size:14px">พิมพ์บิลสรุปอัตโนมัติ (หลังคีย์ออเดอร์)</b>
+                      <span style="display:block;margin-top:3px;font-size:11.5px;line-height:1.45;color:#64748B">พิมพ์ใบแจ้งยอด/รายการอาหารให้ลูกค้าทันที เมื่อบันทึกและส่งเข้าครัว</span>
+                    </span>
+                    <span aria-hidden="true" style="width:44px;height:26px;padding:3px;box-sizing:border-box;border-radius:16px;background:{{autoPrintOrderSummary?'#16A34A':'#CBD5E1'}};display:flex;align-items:center;justify-content:{{autoPrintOrderSummary?'flex-end':'flex-start'}};flex:none">
+                      <span style="width:20px;height:20px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(15,23,42,.25)"></span>
+                    </span>
+                  </button>
+                  <button type="button" aria-pressed="{{autoPrintKitchenOrder}}" onclick="{{toggleAutoPrintKitchenOrder}}" style="width:100%;min-height:68px;padding:12px 14px;border:1px solid {{autoPrintKitchenOrder?'#86EFAC':'#CBD5E1'}};border-radius:10px;background:{{autoPrintKitchenOrder?'#F0FDF4':'#FFFFFF'}};color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer">
+                    <span>
+                      <b style="display:block;font-size:14px">พิมพ์ใบส่งครัวอัตโนมัติ (หลังคีย์ออเดอร์)</b>
+                      <span style="display:block;margin-top:3px;font-size:11.5px;line-height:1.45;color:#64748B">พิมพ์รายการอาหารแยกตามครัว (Main / Appetizer) ทันทีเมื่อส่งออเดอร์</span>
+                    </span>
+                    <span aria-hidden="true" style="width:44px;height:26px;padding:3px;box-sizing:border-box;border-radius:16px;background:{{autoPrintKitchenOrder?'#16A34A':'#CBD5E1'}};display:flex;align-items:center;justify-content:{{autoPrintKitchenOrder?'flex-end':'flex-start'}};flex:none">
+                      <span style="width:20px;height:20px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(15,23,42,.25)"></span>
+                    </span>
+                  </button>
+                </div>
+              </div>
               <div id="gg-native-printer-settings" style="display:block;margin-bottom:16px;">
                 <div style="font-size:15px;font-weight:900;color:#0F172A;margin-bottom:10px;">เส้นทางเครื่องพิมพ์</div>
                 <div class="pos-printer-note" style="margin-bottom:10px;padding:10px 12px;border:1px solid #BFDBFE;border-radius:9px;background:#EFF6FF;color:#1E40AF;font-size:11.5px;line-height:1.55">ดูค่า IP และ Port ได้ทุกอุปกรณ์ · การบันทึกและทดสอบพิมพ์ต้องเปิดหน้านี้ผ่านแอป SkyPOS บนเครื่อง SUNMI</div>
@@ -1774,7 +1807,7 @@ class Component extends DCLogic {
     tableCountInput: '12',
     tableDisplayMode: 'auto',
     tableLayoutText:'1-12',tableRows:[],tableEditorRows:[],tableShape:'rounded',tableCanvas:[],tableCanvasDraft:[],selectedCanvasTables:[],canvasWidthInput:'120',canvasHeightInput:'90',tableLayoutSaving:false,
-    settingsSection:'main',manageSection:'main',autoPrintOrderSummary:false,
+    settingsSection:'main',manageSection:'main',autoPrintCheckoutReceipt:true,autoPrintOrderSummary:false,autoPrintKitchenOrder:true,
     paymentMethodsConfig: normalizePaymentMethods([]),
     receiptBusiness: {...DEFAULT_RECEIPT_BUSINESS},
     newPaymentName: '',
@@ -2158,14 +2191,16 @@ class Component extends DCLogic {
     tableCount=tableRows.flat().length;tableCanvas=this.normalizeTableCanvas(tableCanvas,tableRows);
     try{const saved=JSON.parse(localStorage.getItem('gg_pos_payment_methods')||'null');if(Array.isArray(saved)&&saved.length)paymentMethodsConfig=normalizePaymentMethods(saved)}catch(e){}
     try{const saved=JSON.parse(localStorage.getItem('gg_pos_menu_options')||'[]');if(Array.isArray(saved))menuOptionGroups=saved}catch(e){}
-    try{const saved=localStorage.getItem('gg_pos_auto_print_order_summary');autoPrintOrderSummary=saved===null?true:saved==='1'}catch(e){}
+    let autoPrintCheckoutReceipt=true;try{const saved=localStorage.getItem('gg_pos_auto_print_checkout_receipt');if(saved!==null)autoPrintCheckoutReceipt=saved==='1'}catch(e){}
+    try{const saved=localStorage.getItem('gg_pos_auto_print_order_summary');autoPrintOrderSummary=saved==='1'}catch(e){}
+    let autoPrintKitchenOrder=true;try{const saved=localStorage.getItem('gg_pos_auto_print_kitchen_order');if(saved!==null)autoPrintKitchenOrder=saved==='1'}catch(e){}
     try{const saved=JSON.parse(localStorage.getItem('gg_pos_category_order')||'[]');if(Array.isArray(saved))menuCategoryOrder=saved}catch(e){}
     let savedSession=null;
     try{savedSession=JSON.parse(localStorage.getItem('gg_pos_session')||'null')}catch(e){}
     const savedValid=!!(savedSession&&savedSession.token&&Number(savedSession.expiresAt||0)>Math.floor(Date.now()/1000)+30);
     this._sessionToken=savedValid?savedSession.token:'';
     if(!savedValid)this.clearPosSession();
-    this.setState({ sessionToken: savedValid?savedSession.token:'', currentShift: null, screen: 'tables', heldBills, tableOrders, tableCount,tableCountInput:String(tableCount),tableDisplayMode,tableRows,tableEditorRows:tableRows.map(row=>[...row]),tableCanvas,tableCanvasDraft:tableCanvas.map(x=>({...x})),tableLayoutText,tableShape,paymentMethodsConfig,menuOptionGroups,menuCategoryOrder,autoPrintOrderSummary },()=>{
+    this.setState({ sessionToken: savedValid?savedSession.token:'', currentShift: null, screen: 'tables', heldBills, tableOrders, tableCount,tableCountInput:String(tableCount),tableDisplayMode,tableRows,tableEditorRows:tableRows.map(row=>[...row]),tableCanvas,tableCanvasDraft:tableCanvas.map(x=>({...x})),tableLayoutText,tableShape,paymentMethodsConfig,menuOptionGroups,menuCategoryOrder,autoPrintCheckoutReceipt,autoPrintOrderSummary,autoPrintKitchenOrder },()=>{
       if(!savedValid)return;
       if(savedSession.token===DEMO_SESSION){this.setState({canCreateMenu:true,canDiscount:true});return}
       Promise.all([
@@ -2623,7 +2658,10 @@ class Component extends DCLogic {
     nativePrinter.printOrder('receipt',JSON.stringify({header:this.receiptHeader('ใบแจ้งยอด'),table:((s.mergedTableNos&&s.mergedTableNos.length)?('โต๊ะ '+s.activeTable+' (รวมโต๊ะ '+s.mergedTableNos.join(', ')+')'):('โต๊ะ '+s.activeTable)),guests:s.activeGuestCount||1,items:billItems,note:(s.note?'หมายเหตุ: '+s.note+'\n':'')+'รวมทั้งสิ้น ฿'+Number(totals.netTotal).toFixed(2)+'\nยังไม่ชำระเงิน'}),'table-bill-'+Date.now());
     this.setState({orderError:null});
   }
-  toggleAutoPrintOrderSummary(){this.setState(s=>{const enabled=!s.autoPrintOrderSummary;try{localStorage.setItem('gg_pos_auto_print_order_summary',enabled?'1':'0')}catch(_e){}return{autoPrintOrderSummary:enabled}},()=>this.showSaveNotice(this.state.autoPrintOrderSummary?'เปิดพิมพ์บิลสรุปอัตโนมัติแล้ว':'ปิดพิมพ์บิลสรุปอัตโนมัติแล้ว'))}
+  toggleAutoPrintCheckoutReceipt(){this.setState(s=>{const enabled=!s.autoPrintCheckoutReceipt;try{localStorage.setItem('gg_pos_auto_print_checkout_receipt',enabled?'1':'0')}catch(_e){}return{autoPrintCheckoutReceipt:enabled}},()=>this.showSaveNotice(this.state.autoPrintCheckoutReceipt?'เปิดพิมพ์ใบเสร็จอัตโนมัติหลังเช็คบิลแล้ว':'ปิดพิมพ์ใบเสร็จอัตโนมัติหลังเช็คบิลแล้ว'))}
+  toggleAutoPrintOrderSummary(){this.setState(s=>{const enabled=!s.autoPrintOrderSummary;try{localStorage.setItem('gg_pos_auto_print_order_summary',enabled?'1':'0')}catch(_e){}return{autoPrintOrderSummary:enabled}},()=>this.showSaveNotice(this.state.autoPrintOrderSummary?'เปิดพิมพ์บิลสรุปหลังคีย์ออเดอร์แล้ว':'ปิดพิมพ์บิลสรุปหลังคีย์ออเดอร์แล้ว'))}
+  toggleAutoPrintKitchenOrder(){this.setState(s=>{const enabled=!s.autoPrintKitchenOrder;try{localStorage.setItem('gg_pos_auto_print_kitchen_order',enabled?'1':'0')}catch(_e){}return{autoPrintKitchenOrder:enabled}},()=>this.showSaveNotice(this.state.autoPrintKitchenOrder?'เปิดพิมพ์ใบส่งครัวอัตโนมัติแล้ว':'ปิดพิมพ์ใบส่งครัวอัตโนมัติแล้ว'))}
+  printLastCheckoutReceipt(){const s=this.state;if(s.lastPaidOrder){this.printHistoryReceipt(s.lastPaidOrder);this.showSaveNotice('ส่งพิมพ์ใบเสร็จรับเงินแล้ว')}else{this.setState({orderError:'ไม่พบบิลล่าสุดสำหรับพิมพ์'})}}
   retryKitchenPrint(){
     if(!this.state.activeTable||!this.state.cart.length){this.setState({orderError:'ยังไม่มีรายการอาหารสำหรับส่งครัว'});return}
     this.printNativeTableOrder();this.setState({orderError:null});
@@ -2632,7 +2670,7 @@ class Component extends DCLogic {
     const s=this.state;if(!s.activeTable){this.setState({orderError:'กรุณาเลือกโต๊ะก่อน'});return}if(!s.cart.length){this.setState({orderError:'กรุณาเพิ่มรายการอาหารก่อนส่งครัว'});return}
     const key=String(s.activeTable),previous=s.tableOrders[key],now=new Date().toISOString(),nativePrint=this.hasNativePrinter(),addedCart=this.addedOrderLines(s.cart,previous&&previous.cart),hasAddedItems=addedCart.length>0;
     this.setState({savingTable:true,orderError:null});
-    if(nativePrint&&!s.skipKitchenPrint&&hasAddedItems)this.printNativeOrderData({tableNo:s.activeTable,guestCount:s.activeGuestCount,cart:addedCart,note:s.note});
+    if(nativePrint&&!s.skipKitchenPrint&&s.autoPrintKitchenOrder&&hasAddedItems)this.printNativeOrderData({tableNo:s.activeTable,guestCount:s.activeGuestCount,cart:addedCart,note:s.note});
     try{
       const savedCartItems=(s.cart||[]).map(line=>({...line,kitchenPrinted:true,printedQty:Number(line.qty)||1}));
       let saved={tableNo:s.activeTable,guestCount:s.activeGuestCount||1,status:'occupied',cart:savedCartItems,note:s.note,coPhone:s.coPhone,openedAt:previous&&previous.openedAt||now,updatedAt:now,version:(previous&&previous.version||0)+1,kitchenPending:(hasAddedItems&&!nativePrint&&!s.skipKitchenPrint)};
@@ -2915,8 +2953,8 @@ class Component extends DCLogic {
       if(couponTotal>0)items.push({kind:'coupon',menu_id:null,name:'คูปองส่วนลด ฿100 × '+couponCount,qty:1,price:-couponTotal,desc:'คูปองแทนเงินสด'});
       if(rounding!==0)items.push({kind:'rounding',menu_id:null,name:'ปัดเศษ',qty:1,price:rounding,desc:'ปัดเศษ'});
       const demoOrder={id:'demo-'+Date.now(),queue_no:SEQ,customer_name:s.coName||'หน้าร้าน',phone:s.coPhone||'',items,total,pay_method:savedPayMethod,paymentLabel:selectedPayment.label,status:'done',source:'pos',note:[s.note||'',discount>0?'ส่วนลด: '+(s.discountLabel||discount):'',couponTotal>0?'คูปอง ฿100: '+couponCount+' ใบ':'',rounding!==0?'ปัดเศษ: '+(rounding>0?'+':'')+rounding:''].filter(Boolean).join(' · ')||null,created_at:new Date().toISOString()};
-      if(!s.skipKitchenPrint && (String(s.activeTable||'').startsWith('TA-')||!Number(s.activeTableVersion||0)))this.printNativeTableOrder();
-      this.printNativeReceipt(total,demoOrder.pay_method);
+      if(!s.skipKitchenPrint && s.autoPrintKitchenOrder && (String(s.activeTable||'').startsWith('TA-')||!Number(s.activeTableVersion||0)))this.printNativeTableOrder();
+      if(s.autoPrintCheckoutReceipt)this.printNativeReceipt(total,demoOrder.pay_method);
       if(selectedPayment.kind==='cash'&&s.activeTable&&!String(s.activeTable).startsWith('TA-'))this.openNativeCashDrawer();
       const shift=s.currentShift,expected=shift&&demoOrder.pay_method==='cash'?Number(shift.expected_cash||0)+total:Number(shift?.expected_cash||0);
       const tableOrders=this.closePaidTable(s.activeTable)||s.tableOrders;
@@ -2939,8 +2977,8 @@ class Component extends DCLogic {
     submitOrder().then((o) => {
       this.api('POST','rpc/set_pos_order_note',{p_order_id:o.id,p_note:[s.note||'',discount>0?'ส่วนลด: '+(s.discountLabel||discount):'',couponTotal>0?'คูปอง ฿100: '+couponCount+' ใบ':'',rounding!==0?'ปัดเศษ: '+(rounding>0?'+':'')+rounding:''].filter(Boolean).join(' · ')||null}).catch(()=>{});
       this.api('POST','rpc/set_pos_order_guest_count',{p_order_id:o.id,p_guest_count:s.activeGuestCount||1}).catch(()=>{});
-      if(String(s.activeTable||'').startsWith('TA-')||!Number(s.activeTableVersion||0))this.printNativeTableOrder();
-      this.printNativeReceipt(total,selectedPayment.label,o.id,o.queue_no);
+      if(!s.skipKitchenPrint && s.autoPrintKitchenOrder && (String(s.activeTable||'').startsWith('TA-')||!Number(s.activeTableVersion||0)))this.printNativeTableOrder();
+      if(s.autoPrintCheckoutReceipt)this.printNativeReceipt(total,selectedPayment.label,o.id,o.queue_no);
       if(selectedPayment.kind==='cash'&&s.activeTable&&!String(s.activeTable).startsWith('TA-'))this.openNativeCashDrawer();
       const tableOrders=this.closePaidTable(s.activeTable)||s.tableOrders;
       const paidOrder={uid:o.id,queue_no:o.queue_no,isDone:true,items:s.cart.map(x=>({name:x.name,qty:x.qty,price:this.grossUnitPrice(x),desc:x.modText||''})),total};
@@ -3629,7 +3667,7 @@ class Component extends DCLogic {
       if (typeof p.openCashDrawer === 'function') return 'padding:5px 10px;border-radius:7px;background:#DCFCE7;color:#166534;font-size:11.5px;font-weight:850';
       return 'padding:5px 10px;border-radius:7px;background:#FEE2E2;color:#991B1B;font-size:11.5px;font-weight:850';
     })(),
-    settingsCardStyle,autoPrintOrderSummary:s.autoPrintOrderSummary,toggleAutoPrintOrderSummary:()=>this.toggleAutoPrintOrderSummary(),testMainPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('main'),testKitchenPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('kitchen'),testReceiptPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('receipt'),canManagePayments:s.canCreateMenu,tableCountInput:s.tableCountInput,onTableCountInput:e=>this.setState({tableCountInput:e.target.value,connMsg:null}),saveTableCount:()=>this.saveTableCount(),tableDisplayChoices:[],tableEditorRows,canvasEditorTables,canvasSelectionButtons,selectedCanvasCount:s.selectedCanvasTables.length,canvasWidthInput:s.canvasWidthInput,canvasHeightInput:s.canvasHeightInput,onCanvasWidthInput:e=>this.setState({canvasWidthInput:e.target.value}),onCanvasHeightInput:e=>this.setState({canvasHeightInput:e.target.value}),selectAllCanvasTables:()=>this.selectAllCanvasTables(),clearCanvasTableSelection:()=>this.clearCanvasTableSelection(),applyCanvasTableSize:()=>this.applyCanvasTableSize(),arrangeCanvasTables:()=>this.arrangeCanvasTables(),addCanvasTable:()=>this.addCanvasTable(),addTableEditorRow:()=>this.addTableEditorRow(),tableLayoutSaving:s.tableLayoutSaving,tableLayoutSaveLabel:s.tableLayoutSaving?'กำลังบันทึก...':'บันทึกผังโต๊ะ',saveTableLayout:()=>this.saveTableLayout(),tableShapeChoices:[],
+    settingsCardStyle,autoPrintCheckoutReceipt:s.autoPrintCheckoutReceipt,toggleAutoPrintCheckoutReceipt:()=>this.toggleAutoPrintCheckoutReceipt(),autoPrintOrderSummary:s.autoPrintOrderSummary,toggleAutoPrintOrderSummary:()=>this.toggleAutoPrintOrderSummary(),autoPrintKitchenOrder:s.autoPrintKitchenOrder,toggleAutoPrintKitchenOrder:()=>this.toggleAutoPrintKitchenOrder(),printLastCheckoutReceipt:()=>this.printLastCheckoutReceipt(),testMainPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('main'),testKitchenPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('kitchen'),testReceiptPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('receipt'),canManagePayments:s.canCreateMenu,tableCountInput:s.tableCountInput,onTableCountInput:e=>this.setState({tableCountInput:e.target.value,connMsg:null}),saveTableCount:()=>this.saveTableCount(),tableDisplayChoices:[],tableEditorRows,canvasEditorTables,canvasSelectionButtons,selectedCanvasCount:s.selectedCanvasTables.length,canvasWidthInput:s.canvasWidthInput,canvasHeightInput:s.canvasHeightInput,onCanvasWidthInput:e=>this.setState({canvasWidthInput:e.target.value}),onCanvasHeightInput:e=>this.setState({canvasHeightInput:e.target.value}),selectAllCanvasTables:()=>this.selectAllCanvasTables(),clearCanvasTableSelection:()=>this.clearCanvasTableSelection(),applyCanvasTableSize:()=>this.applyCanvasTableSize(),arrangeCanvasTables:()=>this.arrangeCanvasTables(),addCanvasTable:()=>this.addCanvasTable(),addTableEditorRow:()=>this.addTableEditorRow(),tableLayoutSaving:s.tableLayoutSaving,tableLayoutSaveLabel:s.tableLayoutSaving?'กำลังบันทึก...':'บันทึกผังโต๊ะ',saveTableLayout:()=>this.saveTableLayout(),tableShapeChoices:[],
       hasOpenShift:!!s.currentShift,hasLastShiftSummary:!!s.lastShiftSummary,noOpenShift:!s.currentShift&&!s.lastShiftSummary,goShiftManagement:()=>this.setState({screen:'shift'}),
       lastShiftTotal:s.lastShiftSummary?this.fmt(s.lastShiftSummary.total):'0',lastShiftBillCount:s.lastShiftSummary?s.lastShiftSummary.billCount:0,lastShiftCancelledCount:s.lastShiftSummary?s.lastShiftSummary.cancelledCount:0,lastShiftCancelledTotal:s.lastShiftSummary?this.fmt(s.lastShiftSummary.cancelledTotal):'0',lastShiftPayments:s.lastShiftSummary?(s.lastShiftSummary.payments||[]).map(x=>({label:x.label,amount:this.fmt(x.amount)})):[],lastShiftPrintMessage:s.lastShiftSummary&&s.lastShiftSummary.printed?'พิมพ์รายงานฉบับเต็มและใบสรุปยอดแล้ว':'ไม่พบเครื่องพิมพ์ กรุณาตรวจการเชื่อมต่อ',finishClosedShift:()=>this.logout(),
       shiftStartRequired: !!s.sessionToken && !s.currentShift && s.screen !== 'shift' && !WAITER_MODE,
