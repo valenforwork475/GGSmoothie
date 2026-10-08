@@ -9,6 +9,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.common.BitMatrix;
 import android.os.Bundle;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -59,7 +62,7 @@ public class MainActivity extends Activity {
     private void startPrintService(){Intent i=new Intent(this,KitchenPrintService.class);if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O)startForegroundService(i);else startService(i);}
 
     public class PrinterBridge {
-        @JavascriptInterface public String getConfig(){try{return new JSONObject().put("host",host("receipt")).put("port",port("receipt")).put("paperMm",80).put("native",true).put("backgroundPrint",true).put("printVersion",8).put("appVersion","1.3.4").put("sunmiDrawer",sunmiPrinterService!=null).toString();}catch(Exception e){return "{}";}}
+        @JavascriptInterface public String getConfig(){try{return new JSONObject().put("host",host("receipt")).put("port",port("receipt")).put("paperMm",80).put("native",true).put("backgroundPrint",true).put("printVersion",9).put("appVersion","1.3.5").put("sunmiDrawer",sunmiPrinterService!=null).toString();}catch(Exception e){return "{}";}}
         @JavascriptInterface public boolean backgroundPrintEnabled(){return true;}
         @JavascriptInterface public void syncBackgroundSession(String url,String key,String token){getSharedPreferences("background_print",0).edit().putString("url",url==null?"":url.trim()).putString("key",key==null?"":key.trim()).putString("token",token==null?"":token.trim()).apply();startPrintService();}
         @JavascriptInterface public String getPrinters(){try{JSONObject o=new JSONObject();for(String r:new String[]{"main","kitchen","receipt"})o.put(r,new JSONObject().put("host",host(r)).put("port",port(r)));return o.put("native",true).put("printVersion",2).toString();}catch(Exception e){return "{}";}}
@@ -71,34 +74,34 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void openCashDrawer(String id){executor.execute(()->openCashDrawerAll(id));}
     }
 
-    // ลิ้นชักเสียบอยู่กับเครื่องพิมพ์ใบเสร็จ (LAN) — ส่งพัลส์ ESC p แบบเดียวกับรุ่น 1.3.1 ก่อน แล้วลองลิ้นชักในตัว SUNMI เสริม
+    // สั่งเปิดลิ้นชักทุกช่องทาง: ทั้งทางเครื่องพิมพ์ใบเสร็จ (RJ11 Pin 2 และ Pin 5) และพอร์ตลิ้นชักของเครื่อง SUNMI
     private void openCashDrawerAll(String id){
-        String lanError=null;
-        try{sendCashDrawerPulse();}catch(Exception e){lanError=e.getMessage()==null?e.getClass().getSimpleName():e.getMessage();}
-        if(lanError==null){callback(id,true,"ส่งคำสั่งเปิดลิ้นชักแล้ว");try{openSunmiCashDrawer(null);}catch(Exception ignored){}return;}
-        openSunmiCashDrawer(id);
+        boolean lanOk=false;
+        try{sendCashDrawerPulse();lanOk=true;}catch(Exception ignored){}
+        boolean sunmiOk=false;
+        try{sunmiOk=openSunmiCashDrawerSync();}catch(Exception ignored){}
+        if(lanOk||sunmiOk){
+            callback(id,true,"ส่งคำสั่งเปิดลิ้นชักแล้ว (ตรวจเครื่องพิมพ์ใบเสร็จ/เครื่อง SUNMI)");
+        }else{
+            callback(id,false,"เปิดลิ้นชักไม่ได้ กรุณาตรวจสายลิ้นชัก (เสียบช่อง DK หลังเครื่องพิมพ์ใบเสร็จ หรือช่องลิ้นชัก SUNMI)");
+        }
     }
 
-    private void openSunmiCashDrawer(String id){
+    private boolean openSunmiCashDrawerSync(){
         SunmiPrinterService service=sunmiPrinterService;
-        if(service==null){if(id!=null)callback(id,false,"เปิดลิ้นชักไม่ได้ กรุณาตรวจเครื่องพิมพ์ใบเสร็จ ("+host("receipt")+")");bindSunmiPrinterService();return;}
+        if(service==null){bindSunmiPrinterService();return false;}
         try{
-            final int before=service.getOpenDrawerTimes();
-            final CountDownLatch done=new CountDownLatch(1);
-            final AtomicBoolean accepted=new AtomicBoolean(false);
-            final String[] error={""};
             service.openDrawer(new InnerResultCallback(){
-                @Override public void onRunResult(boolean success){accepted.set(success);done.countDown();}
-                @Override public void onReturnString(String value){done.countDown();}
-                @Override public void onRaiseException(int code,String message){error[0]="SUNMI "+code+": "+(message==null?"ไม่สามารถเปิดลิ้นชักได้":message);done.countDown();}
-                @Override public void onPrintResult(int code,String message){if(code==0)accepted.set(true);else error[0]="SUNMI "+code+": "+(message==null?"ไม่สามารถเปิดลิ้นชักได้":message);done.countDown();}
+                @Override public void onRunResult(boolean success){}
+                @Override public void onReturnString(String value){}
+                @Override public void onRaiseException(int code,String message){}
+                @Override public void onPrintResult(int code,String message){}
             });
-            done.await(1800,TimeUnit.MILLISECONDS);
-            int after=service.getOpenDrawerTimes();
-            if(id==null)return;
-            if(after>before||accepted.get()){callback(id,true,"ลิ้นชักได้รับคำสั่งเปิดจาก SUNMI แล้ว");return;}
-            callback(id,false,error[0].isEmpty()?"เปิดลิ้นชักไม่ได้ กรุณาตรวจเครื่องพิมพ์ใบเสร็จ ("+host("receipt")+")":error[0]);
-        }catch(Exception e){if(id!=null)callback(id,false,"เปิดลิ้นชักไม่ได้: "+(e.getMessage()==null?e.getClass().getSimpleName():e.getMessage()));}
+            service.sendRAWData(new byte[]{0x10,0x14,0x01,0x00,0x05},null);
+            service.sendRAWData(new byte[]{0x1b,0x70,0x00,0x19,(byte)0xfa},null);
+            service.sendRAWData(new byte[]{0x1b,0x70,0x01,0x19,(byte)0xfa},null);
+            return true;
+        }catch(Exception e){return false;}
     }
 
     private void callback(String id,boolean ok,String message){runOnUiThread(()->webView.evaluateJavascript("window.dispatchEvent(new CustomEvent('gg-printer-result',{detail:"+JSONObject.quote("{\"id\":"+JSONObject.quote(id)+",\"ok\":"+ok+",\"message\":"+JSONObject.quote(message==null?"":message)+"}")+"}));",null));}
@@ -119,10 +122,14 @@ public class MainActivity extends Activity {
         lines.add(new Line("────────────────────────",20,false,Paint.Align.CENTER));
         JSONArray items=data.optJSONArray("items");if(items!=null)for(int i=0;i<items.length();i++){JSONObject item=items.getJSONObject(i);int qty=item.optInt("qty",1);String name=item.optString("name","");addWrapped(lines,qty+" × "+name,34,true,Paint.Align.LEFT,content);String detail=item.optString("detail","");if(!detail.isEmpty())for(String option:detail.split(" · "))addWrapped(lines,"• "+option,36,true,Paint.Align.LEFT,content-28);if(item.has("price"))addWrapped(lines,"฿"+String.format(Locale.US,"%.2f",item.optDouble("price",0)*qty),28,true,Paint.Align.RIGHT,content);lines.add(new Line("────────────────────────",18,false,Paint.Align.CENTER));}
         String note=data.optString("note","");if(!note.isEmpty())addWrapped(lines,note,27,true,Paint.Align.LEFT,content);
-        int logoSpace="receipt".equals(route)?320:0,height=44+logoSpace;for(Line l:lines)height+=(int)(l.size*1.42f);height+=48;height=Math.max(height,280);
+        String barcode=data.optString("barcode","");String barcodeLabel=data.optString("barcodeLabel","");int barcodeSpace=barcode.isEmpty()?0:180;
+        int logoSpace="receipt".equals(route)?320:0,height=44+logoSpace;for(Line l:lines)height+=(int)(l.size*1.42f);height+=barcodeSpace+48;height=Math.max(height,280);
         Bitmap bmp=Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(bmp);c.drawColor(Color.WHITE);Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);p.setColor(Color.BLACK);float y=34;if(logoSpace>0){Bitmap logo=getReceiptLogo();if(logo!=null)c.drawBitmap(logo,null,new Rect(148,10,428,290),p);y=330;}
-        for(Line l:lines){p.setTextSize(l.size);p.setFakeBoldText(l.bold);p.setTextAlign(l.align);float x=l.align==Paint.Align.CENTER?width/2f:l.align==Paint.Align.RIGHT?width-24:24;c.drawText(l.text,x,y,p);y+=l.size*1.42f;}return bmp;
+        for(Line l:lines){p.setTextSize(l.size);p.setFakeBoldText(l.bold);p.setTextAlign(l.align);float x=l.align==Paint.Align.CENTER?width/2f:l.align==Paint.Align.RIGHT?width-24:24;c.drawText(l.text,x,y,p);y+=l.size*1.42f;}
+        if(!barcode.isEmpty()){Bitmap bars=code128(barcode,500,105);c.drawBitmap(bars,null,new Rect(38,(int)y,538,(int)y+105),p);bars.recycle();y+=125;p.setTextAlign(Paint.Align.CENTER);p.setTextSize(21);p.setFakeBoldText(true);c.drawText(barcodeLabel,width/2f,y,p);}
+        return bmp;
     }
+    private Bitmap code128(String value,int width,int height)throws Exception{BitMatrix matrix=new MultiFormatWriter().encode(value,BarcodeFormat.CODE_128,width,height);Bitmap bitmap=Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);for(int y=0;y<height;y++)for(int x=0;x<width;x++)bitmap.setPixel(x,y,matrix.get(x,y)?Color.BLACK:Color.WHITE);return bitmap;}
     private void send(String route,Bitmap bitmap)throws Exception{try(Socket socket=new Socket()){socket.connect(new InetSocketAddress(host(route),port(route)),5000);socket.setSoTimeout(5000);OutputStream out=socket.getOutputStream();out.write(new byte[]{0x1b,0x40});out.write(raster(bitmap));out.write(new byte[]{0x0a,0x0a,0x0a,0x1d,0x56,0x00});out.flush();}}
     private void sendCashDrawerPulse()throws Exception{try(Socket socket=new Socket()){socket.connect(new InetSocketAddress(host("receipt"),port("receipt")),5000);socket.setSoTimeout(5000);OutputStream out=socket.getOutputStream();out.write(new byte[]{0x1b,0x40,0x1b,0x70,0x00,0x19,(byte)0xFA});out.flush();}}
     private synchronized Bitmap getReceiptLogo(){if(receiptLogo!=null&&!receiptLogo.isRecycled())return receiptLogo;Bitmap source=BitmapFactory.decodeResource(getResources(),R.drawable.receipt_logo);if(source==null)return null;Bitmap scaled=Bitmap.createScaledBitmap(source,280,280,true);source.recycle();receiptLogo=outlineLogo(scaled);scaled.recycle();return receiptLogo;}

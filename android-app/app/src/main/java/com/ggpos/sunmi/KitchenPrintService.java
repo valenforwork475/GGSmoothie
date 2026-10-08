@@ -60,7 +60,16 @@ public class KitchenPrintService extends Service {
 
     private boolean printOrder(JSONObject order) throws Exception{
         JSONObject groups=new JSONObject().put("main",new JSONArray()).put("kitchen",new JSONArray());JSONArray cart=order.optJSONArray("cart");if(cart==null)return false;
-        for(int i=0;i<cart.length();i++){JSONObject line=cart.getJSONObject(i);String route=line.optString("printerRoute",line.optString("printer_route","main"));if(!"kitchen".equals(route))route="main";groups.getJSONArray(route).put(new JSONObject().put("name",line.optString("name")).put("qty",line.optInt("qty",1)).put("detail",line.optString("modText",line.optString("desc",""))));}
+        for(int i=0;i<cart.length();i++){
+            JSONObject line=cart.getJSONObject(i);
+            int printedQty = line.has("printedQty") ? line.optInt("printedQty", 0) : (line.optBoolean("kitchenPrinted", false) ? line.optInt("qty", 1) : 0);
+            int newQty = line.optInt("qty", 1) - printedQty;
+            if (newQty <= 0) continue;
+            String route=line.optString("printerRoute",line.optString("printer_route","main"));
+            if("none".equals(route)||"skip".equals(route)||"no_print".equals(route)) continue;
+            if(!"kitchen".equals(route))route="main";
+            groups.getJSONArray(route).put(new JSONObject().put("name",line.optString("name")).put("qty",newQty).put("detail",line.optString("modText",line.optString("desc",""))));
+        }
         boolean printed=false;for(String route:new String[]{"main","kitchen"}){JSONArray items=groups.getJSONArray(route);for(int i=0;i<items.length();i++){JSONObject payload=new JSONObject().put("table",order.optString("table_no")).put("guests",order.optInt("guest_count",1)).put("items",new JSONArray().put(items.getJSONObject(i))).put("note",order.optString("note",""));send(route,render(route,payload));printed=true;}}return printed;
     }
 
