@@ -12,7 +12,7 @@
 <link rel="icon" href="/assets/gg-pos-logo.png" type="image/png">
 <link rel="apple-touch-icon" href="/assets/gg-pos-logo.png">
 <title>SkyPOS</title>
-<script src="05d739e8-da8e-42ee-82a1-603ba3532e38"></script>
+<script src="05d739e8-da8e-42ee-82a1-603ba3532e38.js"></script>
 </head>
 <body>
 <x-dc>
@@ -1275,36 +1275,51 @@ button { -webkit-tap-highlight-color:transparent; }
                   <button onclick="{{setLanguageEnglish}}" aria-pressed="{{languageEnglishActive}}" style="{{languageEnglishStyle}}">English</button>
                 </div>
               </div>
-              <div style="margin-bottom:16px;padding:14px;border:1px solid #E2E8F0;border-radius:12px;background:#F8FAFC;">
-                <div style="font-size:14px;font-weight:900;color:#0F172A;margin-bottom:4px;">การพิมพ์บิลอัตโนมัติ</div>
-                <div style="font-size:11.5px;color:#64748B;line-height:1.5;margin-bottom:12px;">ตั้งค่าเปิด-ปิดการสั่งพิมพ์บิลอัตโนมัติในแต่ละขั้นตอน</div>
+              <div style="margin-bottom:16px;padding:16px;border:1px solid #E2E8F0;border-radius:14px;background:#F8FAFC;">
+                <div style="font-size:15px;font-weight:900;color:#0F172A;margin-bottom:4px;">การพิมพ์บิลอัตโนมัติ</div>
+                <div style="font-size:12px;color:#64748B;line-height:1.5;margin-bottom:14px;">แตะสวิตช์เพื่อเปิดหรือปิดการสั่งพิมพ์บิลในแต่ละขั้นตอน</div>
                 <div style="display:flex;flex-direction:column;gap:10px;">
-                  <button type="button" aria-pressed="{{autoPrintCheckoutReceipt}}" onclick="{{toggleAutoPrintCheckoutReceipt}}" style="width:100%;min-height:68px;padding:12px 14px;border:1px solid {{autoPrintCheckoutReceipt?'#86EFAC':'#CBD5E1'}};border-radius:10px;background:{{autoPrintCheckoutReceipt?'#F0FDF4':'#FFFFFF'}};color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer">
-                    <span>
-                      <b style="display:block;font-size:14px">พิมพ์ใบเสร็จอัตโนมัติ (หลังเช็คบิล)</b>
-                      <span style="display:block;margin-top:3px;font-size:11.5px;line-height:1.45;color:#64748B">พิมพ์ใบเสร็จรับเงินทันทีเมื่อชำระเงินเสร็จสิ้น</span>
-                    </span>
-                    <span aria-hidden="true" style="width:44px;height:26px;padding:3px;box-sizing:border-box;border-radius:16px;background:{{autoPrintCheckoutReceipt?'#16A34A':'#CBD5E1'}};display:flex;align-items:center;justify-content:{{autoPrintCheckoutReceipt?'flex-end':'flex-start'}};flex:none">
-                      <span style="width:20px;height:20px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(15,23,42,.25)"></span>
-                    </span>
+                  <button type="button" role="switch" aria-checked="{{autoPrintCheckoutReceipt}}" onclick="{{toggleAutoPrintCheckoutReceipt}}" style="width:100%;min-height:72px;padding:12px 16px;border:1.5px solid {{autoPrintCheckoutReceipt?'#86EFAC':'#CBD5E1'}};border-radius:12px;background:{{autoPrintCheckoutReceipt?'#F0FDF4':'#FFFFFF'}};color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;gap:14px;cursor:pointer;box-sizing:border-box;transition:all .15s ease">
+                    <div style="display:flex;align-items:center;gap:8px;flex:none">
+                      <div style="width:52px;height:30px;border-radius:16px;background:{{autoPrintCheckoutReceipt?'#16A34A':'#CBD5E1'}};position:relative;flex:none;box-shadow:inset 0 1px 3px rgba(0,0,0,0.15)">
+                        <div style="width:24px;height:24px;border-radius:50%;background:#FFFFFF;position:absolute;top:3px;left:{{autoPrintCheckoutReceipt?'25px':'3px'}};box-shadow:0 2px 5px rgba(0,0,0,0.25)"></div>
+                      </div>
+                      <span style="font-size:12.5px;font-weight:900;padding:3px 8px;border-radius:6px;background:{{autoPrintCheckoutReceipt?'#DCFCE7':'#F1F5F9'}};color:{{autoPrintCheckoutReceipt?'#15803D':'#64748B'}};flex:none">
+                        {{autoPrintCheckoutReceipt?'เปิด':'ปิด'}}
+                      </span>
+                    </div>
+                    <div style="flex:1;min-width:0">
+                      <b style="display:block;font-size:14.5px;color:#0F172A">พิมพ์ใบเสร็จอัตโนมัติ (หลังเช็คบิล)</b>
+                      <span style="display:block;margin-top:3px;font-size:12px;line-height:1.45;color:#64748B">พิมพ์ใบเสร็จรับเงินทันทีเมื่อชำระเงินเสร็จสิ้น</span>
+                    </div>
                   </button>
-                  <button type="button" aria-pressed="{{autoPrintOrderSummary}}" onclick="{{toggleAutoPrintOrderSummary}}" style="width:100%;min-height:68px;padding:12px 14px;border:1px solid {{autoPrintOrderSummary?'#86EFAC':'#CBD5E1'}};border-radius:10px;background:{{autoPrintOrderSummary?'#F0FDF4':'#FFFFFF'}};color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer">
-                    <span>
-                      <b style="display:block;font-size:14px">พิมพ์บิลสรุปอัตโนมัติ (หลังคีย์ออเดอร์)</b>
-                      <span style="display:block;margin-top:3px;font-size:11.5px;line-height:1.45;color:#64748B">พิมพ์ใบแจ้งยอด/รายการอาหารให้ลูกค้าทันที เมื่อบันทึกและส่งเข้าครัว</span>
-                    </span>
-                    <span aria-hidden="true" style="width:44px;height:26px;padding:3px;box-sizing:border-box;border-radius:16px;background:{{autoPrintOrderSummary?'#16A34A':'#CBD5E1'}};display:flex;align-items:center;justify-content:{{autoPrintOrderSummary?'flex-end':'flex-start'}};flex:none">
-                      <span style="width:20px;height:20px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(15,23,42,.25)"></span>
-                    </span>
+                  <button type="button" role="switch" aria-checked="{{autoPrintOrderSummary}}" onclick="{{toggleAutoPrintOrderSummary}}" style="width:100%;min-height:72px;padding:12px 16px;border:1.5px solid {{autoPrintOrderSummary?'#86EFAC':'#CBD5E1'}};border-radius:12px;background:{{autoPrintOrderSummary?'#F0FDF4':'#FFFFFF'}};color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;gap:14px;cursor:pointer;box-sizing:border-box;transition:all .15s ease">
+                    <div style="display:flex;align-items:center;gap:8px;flex:none">
+                      <div style="width:52px;height:30px;border-radius:16px;background:{{autoPrintOrderSummary?'#16A34A':'#CBD5E1'}};position:relative;flex:none;box-shadow:inset 0 1px 3px rgba(0,0,0,0.15)">
+                        <div style="width:24px;height:24px;border-radius:50%;background:#FFFFFF;position:absolute;top:3px;left:{{autoPrintOrderSummary?'25px':'3px'}};box-shadow:0 2px 5px rgba(0,0,0,0.25)"></div>
+                      </div>
+                      <span style="font-size:12.5px;font-weight:900;padding:3px 8px;border-radius:6px;background:{{autoPrintOrderSummary?'#DCFCE7':'#F1F5F9'}};color:{{autoPrintOrderSummary?'#15803D':'#64748B'}};flex:none">
+                        {{autoPrintOrderSummary?'เปิด':'ปิด'}}
+                      </span>
+                    </div>
+                    <div style="flex:1;min-width:0">
+                      <b style="display:block;font-size:14.5px;color:#0F172A">พิมพ์บิลสรุปอัตโนมัติ (หลังคีย์ออเดอร์)</b>
+                      <span style="display:block;margin-top:3px;font-size:12px;line-height:1.45;color:#64748B">พิมพ์ใบแจ้งยอด/รายการอาหารให้ลูกค้าทันที เมื่อบันทึกและส่งเข้าครัว</span>
+                    </div>
                   </button>
-                  <button type="button" aria-pressed="{{autoPrintKitchenOrder}}" onclick="{{toggleAutoPrintKitchenOrder}}" style="width:100%;min-height:68px;padding:12px 14px;border:1px solid {{autoPrintKitchenOrder?'#86EFAC':'#CBD5E1'}};border-radius:10px;background:{{autoPrintKitchenOrder?'#F0FDF4':'#FFFFFF'}};color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer">
-                    <span>
-                      <b style="display:block;font-size:14px">พิมพ์ใบส่งครัวอัตโนมัติ (หลังคีย์ออเดอร์)</b>
-                      <span style="display:block;margin-top:3px;font-size:11.5px;line-height:1.45;color:#64748B">พิมพ์รายการอาหารแยกตามครัว (Main / Appetizer) ทันทีเมื่อส่งออเดอร์</span>
-                    </span>
-                    <span aria-hidden="true" style="width:44px;height:26px;padding:3px;box-sizing:border-box;border-radius:16px;background:{{autoPrintKitchenOrder?'#16A34A':'#CBD5E1'}};display:flex;align-items:center;justify-content:{{autoPrintKitchenOrder?'flex-end':'flex-start'}};flex:none">
-                      <span style="width:20px;height:20px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(15,23,42,.25)"></span>
-                    </span>
+                  <button type="button" role="switch" aria-checked="{{autoPrintKitchenOrder}}" onclick="{{toggleAutoPrintKitchenOrder}}" style="width:100%;min-height:72px;padding:12px 16px;border:1.5px solid {{autoPrintKitchenOrder?'#86EFAC':'#CBD5E1'}};border-radius:12px;background:{{autoPrintKitchenOrder?'#F0FDF4':'#FFFFFF'}};color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;gap:14px;cursor:pointer;box-sizing:border-box;transition:all .15s ease">
+                    <div style="display:flex;align-items:center;gap:8px;flex:none">
+                      <div style="width:52px;height:30px;border-radius:16px;background:{{autoPrintKitchenOrder?'#16A34A':'#CBD5E1'}};position:relative;flex:none;box-shadow:inset 0 1px 3px rgba(0,0,0,0.15)">
+                        <div style="width:24px;height:24px;border-radius:50%;background:#FFFFFF;position:absolute;top:3px;left:{{autoPrintKitchenOrder?'25px':'3px'}};box-shadow:0 2px 5px rgba(0,0,0,0.25)"></div>
+                      </div>
+                      <span style="font-size:12.5px;font-weight:900;padding:3px 8px;border-radius:6px;background:{{autoPrintKitchenOrder?'#DCFCE7':'#F1F5F9'}};color:{{autoPrintKitchenOrder?'#15803D':'#64748B'}};flex:none">
+                        {{autoPrintKitchenOrder?'เปิด':'ปิด'}}
+                      </span>
+                    </div>
+                    <div style="flex:1;min-width:0">
+                      <b style="display:block;font-size:14.5px;color:#0F172A">พิมพ์ใบส่งครัวอัตโนมัติ (หลังคีย์ออเดอร์)</b>
+                      <span style="display:block;margin-top:3px;font-size:12px;line-height:1.45;color:#64748B">พิมพ์รายการอาหารแยกตามครัว (Main / Appetizer) ทันทีเมื่อส่งออเดอร์</span>
+                    </div>
                   </button>
                 </div>
               </div>
