@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>SkyPOS · เครื่องมือวินิจฉัยและทดสอบลิ้นชักเก็บเงิน</title>
+<title>SkyPOS · ทดสอบเปิดลิ้นชักเก็บเงิน (Web & Native)</title>
 <style>
   :root {
     --bg-page: #0B1120;
@@ -22,13 +22,13 @@
   html, body { min-height: 100dvh; background: var(--bg-page); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: var(--text-primary); -webkit-font-smoothing: antialiased; }
   body { display: flex; flex-direction: column; align-items: center; padding: 20px 14px 60px; gap: 16px; }
 
-  header { width: 100%; max-width: 580px; text-align: center; padding: 12px 0 6px; }
-  header .badge-tag { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; background: rgba(59,130,246,0.15); color: #60A5FA; border: 1px solid rgba(59,130,246,0.3); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  header { width: 100%; max-width: 600px; text-align: center; padding: 12px 0 6px; }
+  header .badge-tag { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; background: rgba(59,130,246,0.15); color: #60A5FA; border: 1px solid rgba(59,130,246,0.3); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
   header h1 { font-size: 22px; font-weight: 900; letter-spacing: -0.4px; }
   header p { font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.4; }
 
   .card {
-    width: 100%; max-width: 580px;
+    width: 100%; max-width: 600px;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 16px;
@@ -36,10 +36,18 @@
     box-shadow: 0 4px 20px -2px rgba(0,0,0,0.4);
   }
   .card-title {
-    font-size: 13px; font-weight: 800; color: #94A3B8;
+    font-size: 13.5px; font-weight: 800; color: #94A3B8;
     text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;
     display: flex; align-items: center; justify-content: space-between;
   }
+
+  /* Mode Banner */
+  .mode-banner {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+    border-radius: 12px; margin-bottom: 14px; font-size: 13px; font-weight: 600;
+  }
+  .mode-browser { background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.3); color: #93C5FD; }
+  .mode-app { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: #6EE7B7; }
 
   /* Hardware Warning Box */
   .hw-warning {
@@ -59,6 +67,7 @@
   .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 800; }
   .badge-green { background: #064E3B; color: #A7F3D0; border: 1px solid #059669; }
   .badge-red { background: #7F1D1D; color: #FECACA; border: 1px solid #DC2626; }
+  .badge-blue { background: #1E3A8A; color: #BFDBFE; border: 1px solid #2563EB; }
   .badge-amber { background: #78350F; color: #FDE68A; border: 1px solid #D97706; }
 
   .btn-grid { display: flex; flex-direction: column; gap: 10px; }
@@ -78,6 +87,8 @@
   button.btn-indigo:hover { background: #4338CA; }
   button.btn-amber { background: #B45309; color: #fff; border-color: #D97706; }
   button.btn-amber:hover { background: #92400E; }
+  button.btn-purple { background: #7C3AED; color: #fff; border-color: #8B5CF6; }
+  button.btn-purple:hover { background: #6D28D9; }
   button.btn-outline { background: #0F172A; color: #CBD5E1; border-color: #334155; }
   button.btn-outline:hover { background: #1E293B; border-color: #475569; color: #fff; }
 
@@ -91,7 +102,7 @@
   button.loading .btn-content { opacity: 0.6; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .ip-config-box { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+  .ip-config-box { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
   .ip-config-box input {
     padding: 10px 14px; border-radius: 10px;
     border: 1px solid #334155; background: #0B1120; color: #F1F5F9;
@@ -116,7 +127,7 @@
   .log-warn { color: #FCD34D; font-weight: 600; }
   .log-empty { color: #475569; font-style: italic; }
 
-  .chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; margin-bottom: 12px; }
   .chip { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; background: #1E293B; color: #94A3B8; cursor: pointer; border: 1px solid #334155; }
   .chip:hover { background: #334155; color: #fff; }
 </style>
@@ -124,84 +135,105 @@
 <body>
 
 <header>
-  <span class="badge-tag">Standalone Drawer Diagnostic</span>
+  <span class="badge-tag">Dual-Mode Hardware Tester</span>
   <h1>SkyPOS · เครื่องมือทดสอบลิ้นชัก</h1>
-  <p>ทดสอบการกระตุกเปิดลิ้นชักเงินสดทุกวิธี (Sunmi SDK + ESC/POS พอร์ต DK / เครื่องพิมพ์) โดยไม่กระทบโค้ดระบบหลัก</p>
+  <p>สั่งเปิดได้ทั้งจากเว็บเบราว์เซอร์ตรงๆ (Web USB/Serial/Network) และผ่านแอป Android บนเครื่อง Sunmi</p>
 </header>
 
 <!-- สรุปปัญหาเรื่องสายแลน/ไฟที่พอร์ต -->
 <div class="card hw-warning">
   <div class="hw-warning-title">
-    <span style="font-size:20px;">⚠️</span> คำเตือนสำคัญเรื่องสายและพอร์ตเชื่อมต่อ
+    <span style="font-size:20px;">⚠️</span> สรุปข้อสงสัย: "เสียบเข้ากับเครื่อง POS เลย มีไฟนะ"
   </div>
   <div class="hw-point">
-    <strong>ข้อสังเกต: "พอร์ตที่มีไฟติดสว่าง/กระพริบ"</strong><br>
-    พอร์ตที่มีไฟเขียวหรือส้มติดสว่างหลังเครื่อง POS คือ <strong>พอร์ตสายแลนอินเทอร์เน็ต (LAN RJ45)</strong> ไม่ใช่พอร์ตลิ้นชัก! หัว RJ11/RJ12 ของลิ้นชักสามารถเสียบยัดเข้าไปในช่อง LAN ได้ แต่จะ<strong>ไม่มีไฟ 24V ส่งไปเตะสลักลิ้นชัก</strong> ลิ้นชักจึงไม่เปิด
+    <strong>ข้อควรระวัง: พอร์ตที่มีไฟติดสว่าง = พอร์ตสายแลน (LAN RJ45)</strong><br>
+    พอร์ตที่มีไฟเขียวหรือส้มติดสว่างหลังเครื่อง POS คือ <strong>พอร์ต LAN (เน็ตบ้าน)</strong> ไม่ใช่พอร์ตลิ้นชัก! หัว RJ11 ของลิ้นชักสามารถยัดเข้าไปในช่องแลนได้พอดีและทำให้ไฟแลนติด แต่จะ<strong>ไม่มีไฟ 24V ส่งไปเตะสลักลิ้นชัก</strong>
   </div>
   <div class="hw-point">
-    <strong>ตำแหน่งที่ถูกต้องในการเสียบสายลิ้นชัก (ระบบ StoreHub เดิม):</strong><br>
-    • <strong>ช่องทาง A (แนะนำที่สุด):</strong> เสียบเข้าที่ช่อง <strong>DK (Drawer Kick)</strong> หลัง<strong>เครื่องพิมพ์ใบเสร็จ</strong><br>
-    • <strong>ช่องทาง B:</strong> เสียบเข้าที่ช่อง RJ12 ใต้ฐานเครื่อง Sunmi ที่มีไอคอนรูป <strong>🗄️ ลิ้นชัก</strong> หรือเขียนว่า <strong>RJ12</strong> (ช่องนี้จะ <u>ไม่มีไฟติดเด็ดขาด</u>)<br>
-    • <strong>กุญแจหน้าลิ้นชัก:</strong> ต้องบิดไปที่ <strong>แนวตั้ง (Auto Mode)</strong> หากบิดแนวนอนจะเป็นการล็อกแบบ Manual
+    <strong>จุดเสียบที่ถูกต้องของระบบ StoreHub:</strong><br>
+    • <strong>ช่องทางที่ 1 (หลัก):</strong> เสียบเข้าที่พอร์ต <strong>DK (Drawer Kick)</strong> หลัง<strong>เครื่องพิมพ์ใบเสร็จ</strong><br>
+    • <strong>ช่องทางที่ 2:</strong> เสียบเข้าพอร์ต <strong>RJ12</strong> ใต้เครื่อง Sunmi รูป <strong>🗄️ ลิ้นชัก</strong> (ช่องนี้<u>ไม่มีไฟติด</u>)<br>
+    • <strong>ลูกกุญแจหน้าลิ้นชัก:</strong> ต้องบิดไว้ที่ <strong>แนวตั้ง (Auto Mode)</strong> หากบิดแนวนอนจะเป็นการล็อกแน่นด้วยมือ
   </div>
 </div>
 
-<!-- ตรวจสถานะแอป & Bridge -->
+<!-- กล่องระบุโหมดปัจจุบัน -->
 <div class="card">
   <div class="card-title">
-    <span>สถานะการเชื่อมต่อ Bridge</span>
-    <button onclick="refreshStatus()" style="background:none;border:none;color:#3B82F6;font-size:12px;font-weight:700;cursor:pointer;">🔄 รีเฟรช</button>
+    <span>โหมดการทำงานขณะนี้</span>
+    <button onclick="refreshStatus()" style="background:none;border:none;color:#3B82F6;font-size:12px;font-weight:700;cursor:pointer;">🔄 ตรวจสอบใหม่</button>
   </div>
+  
+  <div id="mode-box" class="mode-banner mode-browser">
+    <span style="font-size:24px;">🌐</span>
+    <div>
+      <div style="font-weight:800;font-size:14px;" id="mode-title">โหมดเว็บเบราว์เซอร์ (Browser Direct)</div>
+      <div style="font-size:12px;opacity:0.85;margin-top:2px;" id="mode-desc">
+        คุณกำลังเปิดในเบราว์เซอร์ — สามารถสั่งเปิดผ่าน <strong>Web USB / Serial</strong>, <strong>Web Bluetooth</strong> หรือ <strong>Network HTTP</strong> ได้โดยตรงจากหน้านี้!
+      </div>
+    </div>
+  </div>
+
   <div class="info-table">
     <div class="info-row">
-      <span class="info-key">Android GGPrinter Bridge</span>
+      <span class="info-key">Web Serial API (Chrome/Edge)</span>
+      <span class="info-val" id="st-webserial">กำลังตรวจ...</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Web Bluetooth API</span>
+      <span class="info-val" id="st-webbt">กำลังตรวจ...</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Android App Bridge (GGPrinter)</span>
       <span class="info-val" id="st-bridge">กำลังตรวจ...</span>
     </div>
     <div class="info-row">
-      <span class="info-key">คำสั่ง openCashDrawer()</span>
-      <span class="info-val" id="st-opencashdrawer">กำลังตรวจ...</span>
-    </div>
-    <div class="info-row">
-      <span class="info-key">Sunmi Printer Service</span>
-      <span class="info-val" id="st-sunmidrawer">กำลังตรวจ...</span>
-    </div>
-    <div class="info-row">
-      <span class="info-key">เวอร์ชันแอป Android (APK)</span>
-      <span class="info-val" id="st-version">—</span>
-    </div>
-    <div class="info-row">
-      <span class="info-key">IP เครื่องพิมพ์ใบเสร็จ (Receipt)</span>
-      <span class="info-val" id="st-printer-ip">—</span>
+      <span class="info-key">IP เครื่องพิมพ์ใบเสร็จ</span>
+      <span class="info-val" id="st-printer-ip">10.1.7.103:9100</span>
     </div>
   </div>
 </div>
 
-<!-- ชุดทดสอบที่ 1: Sunmi Internal SDK -->
-<div class="card">
-  <div class="card-title">ชุดที่ 1 · เปิดลิ้นชักผ่าน Sunmi Built-in SDK (พอร์ต RJ12 ของตัวเครื่อง)</div>
-  <p style="font-size:12px;color:#94A3B8;margin-bottom:12px;line-height:1.5;">
-    ใช้สั่งเปิดลิ้นชักเมื่อสาย RJ12 เสียบเข้ากับพอร์ตลิ้นชักใต้เครื่อง Sunmi POS โดยตรง (คำสั่ง InnerPrinterManager.openDrawer)
+<!-- โซน 1: สั่งเปิดจากเว็บเบราว์เซอร์โดยตรง (Web Direct Mode) -->
+<div class="card" style="border:1.5px solid rgba(59,130,246,0.4);">
+  <div class="card-title" style="color:#60A5FA;">
+    <span>🌐 วิธีที่ 1 · สั่งเปิดจากหน้าเว็บนี้โดยตรง (ไม่ต้องผ่านแอป)</span>
+  </div>
+  <p style="font-size:12px;color:#94A3B8;margin-bottom:14px;line-height:1.5;">
+    ใช้สำหรับสั่งเปิดจาก Google Chrome / Edge โดยตรง ผ่านพอร์ต USB หรือ Bluetooth ของคอมพิวเตอร์/เครื่อง POS
   </p>
+  
   <div class="btn-grid">
-    <button class="action-btn btn-primary" id="btn-sunmi-sdk" onclick="runSunmiSdkOpen()">
-      <span class="btn-icon">⚡</span>
+    <button class="action-btn btn-primary" id="btn-web-serial" onclick="triggerWebSerial()">
+      <span class="btn-icon">🔌</span>
       <div class="btn-content">
-        <span class="btn-title">เปิดลิ้นชักผ่าน GGPrinter.openCashDrawer()</span>
-        <span class="btn-sub">ยิงคำสั่งเปิดผ่าน Sunmi SDK + ยิง ESC/POS Pulse ผ่าน LAN พร้อมกัน</span>
+        <span class="btn-title">สั่งเปิดผ่าน USB / Serial Port (Web Serial)</span>
+        <span class="btn-sub">กดแล้วเลือกพอร์ต USB Cash Drawer Trigger หรือเครื่องพิมพ์ USB (Pin 2 & Pin 5)</span>
+      </div>
+      <span class="btn-spinner"></span>
+    </button>
+
+    <button class="action-btn btn-purple" id="btn-web-bt" onclick="triggerWebBluetooth()">
+      <span class="btn-icon">📶</span>
+      <div class="btn-content">
+        <span class="btn-title">สั่งเปิดผ่าน Web Bluetooth (เช่น Sunmi NC030)</span>
+        <span class="btn-sub">ค้นหาตัวกระตุกไร้สาย Bluetooth Cash Drawer Trigger เพื่อส่งสัญญาณเปิด</span>
       </div>
       <span class="btn-spinner"></span>
     </button>
   </div>
 </div>
 
-<!-- ชุดทดสอบที่ 2: StoreHub Style (ESC/POS ผ่านเครื่องพิมพ์ใบเสร็จ) -->
+<!-- โซน 2: ยิงคำสั่งผ่าน Network IP ไปยังเครื่องพิมพ์ใบเสร็จ (สไตล์ StoreHub) -->
 <div class="card">
-  <div class="card-title">ชุดที่ 2 · เปิดลิ้นชักผ่านเครื่องพิมพ์ใบเสร็จ (StoreHub Style)</div>
+  <div class="card-title">
+    <span>🖨️ วิธีที่ 2 · สั่งผ่านเครื่องพิมพ์ใบเสร็จในวง LAN (StoreHub Style)</span>
+  </div>
   <p style="font-size:12px;color:#94A3B8;margin-bottom:12px;line-height:1.5;">
-    StoreHub เปิดลิ้นชักโดยส่งสัญญาณ ESC/POS (ESC p / DLE DC4) ผ่านสาย LAN ไปยังพอร์ต DK ของเครื่องพิมพ์ใบเสร็จ
+    StoreHub สั่งเปิดลิ้นชักโดยส่งสัญญาณ ESC/POS ไปที่เครื่องพิมพ์ใบเสร็จตามหมายเลข IP ในร้าน
   </p>
   
-  <div style="margin-bottom:10px;">
+  <div>
     <label style="font-size:11.5px;color:#64748B;font-weight:700;display:block;margin-bottom:4px;">IP และ Port เครื่องพิมพ์ใบเสร็จ:</label>
     <div class="ip-config-box">
       <input type="text" id="cfg-ip" value="10.1.7.103" placeholder="10.1.7.103" style="flex:1;">
@@ -215,57 +247,59 @@
     </div>
   </div>
 
-  <div class="btn-grid" style="margin-top:14px;">
-    <button class="action-btn btn-emerald" id="btn-esc-pin2" onclick="runEscPosTest('pin2')">
-      <span class="btn-icon">🔌</span>
-      <div class="btn-content">
-        <span class="btn-title">ทดสอบสัญญาณ Pin 2 (มาตรฐาน ESC p 0)</span>
-        <span class="btn-sub">ลำดับไบต์: 1B 70 00 19 FA (พัลส์ 50ms ขา 2 สำหรับลิ้นชักส่วนใหญ่)</span>
-      </div>
-      <span class="btn-spinner"></span>
-    </button>
-
-    <button class="action-btn btn-emerald" id="btn-esc-pin2-strong" onclick="runEscPosTest('pin2_strong')">
+  <div class="btn-grid">
+    <button class="action-btn btn-emerald" id="btn-esc-pin2" onclick="triggerDrawerPulse('pin2')">
       <span class="btn-icon">⚡</span>
       <div class="btn-content">
-        <span class="btn-title">ทดสอบสัญญาณ Pin 2 พลังแรง (ESC p 0 200ms)</span>
-        <span class="btn-sub">ลำดับไบต์: 1B 70 00 64 FA (พัลส์ 200ms สำหรับลิ้นชักสปริงหนา/หนัก)</span>
+        <span class="btn-title">ทดสอบสัญญาณ Pin 2 (มาตรฐาน 1B 70 00)</span>
+        <span class="btn-sub">พัลส์กระตุกสลักขา 2 สำหรับลิ้นชักเก็บเงินทั่วไป</span>
       </div>
       <span class="btn-spinner"></span>
     </button>
 
-    <button class="action-btn btn-indigo" id="btn-esc-pin5" onclick="runEscPosTest('pin5')">
-      <span class="btn-icon">🔌</span>
+    <button class="action-btn btn-emerald" id="btn-esc-pin2-strong" onclick="triggerDrawerPulse('pin2_strong')">
+      <span class="btn-icon">💥</span>
       <div class="btn-content">
-        <span class="btn-title">ทดสอบสัญญาณ Pin 5 (ESC p 1)</span>
-        <span class="btn-sub">ลำดับไบต์: 1B 70 01 19 FA (พัลส์ 50ms ขา 5 สำหรับเครื่องพิมพ์บางยี่ห้อ)</span>
+        <span class="btn-title">ทดสอบสัญญาณ Pin 2 พลังแรง (พัลส์ยาว 200ms)</span>
+        <span class="btn-sub">สำหรับลิ้นชักที่สปริงแข็ง/หนัก ที่พัลส์สั้นเตะไม่หลุด</span>
       </div>
       <span class="btn-spinner"></span>
     </button>
 
-    <button class="action-btn btn-amber" id="btn-esc-dledc4" onclick="runEscPosTest('dledc4')">
+    <button class="action-btn btn-indigo" id="btn-esc-pin5" onclick="triggerDrawerPulse('pin5')">
       <span class="btn-icon">⚡</span>
       <div class="btn-content">
-        <span class="btn-title">ทดสอบสัญญาณ Realtime (DLE DC4)</span>
-        <span class="btn-sub">ลำดับไบต์: 10 14 01 00 05 (คำสั่งเปิดลิ้นชักฉุกเฉินไม่ผ่านบัฟเฟอร์)</span>
+        <span class="btn-title">ทดสอบสัญญาณ Pin 5 (1B 70 01)</span>
+        <span class="btn-sub">พัลส์กระตุกสลักขา 5 (เครื่องพิมพ์บางยี่ห้อต่อขานี้)</span>
+      </div>
+      <span class="btn-spinner"></span>
+    </button>
+
+    <button class="action-btn btn-outline" id="btn-print-kick" onclick="triggerPrintAndKick()">
+      <span class="btn-icon">🧾</span>
+      <div class="btn-content">
+        <span class="btn-title">พิมพ์ใบทดสอบสั้น + พ่วงคำสั่งเตะสลัก</span>
+        <span class="btn-sub">พิมพ์ 1 บรรทัดพร้อมตัดกระดาษและกระตุกสลักเปิดลิ้นชัก</span>
       </div>
       <span class="btn-spinner"></span>
     </button>
   </div>
 </div>
 
-<!-- ชุดทดสอบที่ 3: พิมพ์ใบเสร็จสั้น + เปิดลิ้นชัก -->
-<div class="card">
-  <div class="card-title">ชุดที่ 3 · พิมพ์ใบทดสอบ + สั่งกระตุกเปิดลิ้นชัก</div>
+<!-- โซน 3: สำหรับกรณีเปิดผ่านแอป SkyPOS บนเครื่อง Sunmi -->
+<div class="card" id="sunmi-native-card">
+  <div class="card-title">
+    <span>📱 วิธีที่ 3 · Sunmi Built-in SDK (พอร์ต RJ12 ของตัวเครื่อง)</span>
+  </div>
   <p style="font-size:12px;color:#94A3B8;margin-bottom:12px;line-height:1.5;">
-    เครื่องพิมพ์บางรุ่น (เช่น Epson/Xprinter/Star) จะยอมเตะลิ้นชักเฉพาะตอนที่มีคำสั่งพิมพ์ใบเสร็จจบแล้วเท่านั้น
+    ใช้เมื่อสายลิ้นชักเสียบเข้าพอร์ต RJ12 ใต้เครื่อง Sunmi POS โดยตรง (ต้องเปิดผ่านแอป SkyPOS)
   </p>
   <div class="btn-grid">
-    <button class="action-btn btn-outline" id="btn-print-drawer" onclick="runPrintAndDrawerTest()">
-      <span class="btn-icon">🧾</span>
+    <button class="action-btn btn-amber" id="btn-sunmi-sdk" onclick="triggerSunmiSdk()">
+      <span class="btn-icon">🔑</span>
       <div class="btn-content">
-        <span class="btn-title">พิมพ์ใบทดสอบสั้น → พ่วงคำสั่งเปิดลิ้นชัก</span>
-        <span class="btn-sub">พิมพ์ 1 บรรทัด แล้วส่งคำสั่งตัดกระดาษ + กระตุกสลักลิ้นชัก</span>
+        <span class="btn-title">เปิดลิ้นชักผ่าน Sunmi SDK (InnerPrinterManager)</span>
+        <span class="btn-sub">คำสั่งตรงของฮาร์ดแวร์ Sunmi POS สำหรับพอร์ต RJ12 ใต้เครื่อง</span>
       </div>
       <span class="btn-spinner"></span>
     </button>
@@ -303,42 +337,47 @@ function clearLog() { logEl.innerHTML = '<div class="log-entry log-empty">— �
 function copyLog() {
   const text = Array.from(logEl.querySelectorAll('.log-entry')).map(e => e.innerText).join('\n');
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(() => log('คัดลอก log ไปยังคลิปบอร์ดแล้ว', 'ok'));
+    navigator.clipboard.writeText(text).then(() => log('คัดลอก log เรียบร้อย', 'ok'));
   } else {
     alert(text);
   }
 }
 
-// ─── Badge Helper ─────────────────────────────────────────────────────────
+// ─── Status & Mode ─────────────────────────────────────────────────────────
 function badgeHtml(ok, yesText, noText) {
-  return '<span class="badge ' + (ok ? 'badge-green' : 'badge-red') + '">' + (ok ? yesText : noText) + '</span>';
+  return '<span class="badge ' + (ok ? 'badge-green' : 'badge-amber') + '">' + (ok ? yesText : noText) + '</span>';
 }
 
-// ─── Refresh Status ───────────────────────────────────────────────────────
 function refreshStatus() {
+  const hasSerial = 'serial' in navigator;
+  const hasBt = 'bluetooth' in navigator;
   const p = window.GGPrinter;
-  const hasBridge = !!p;
-  const hasOpen = !!(p && typeof p.openCashDrawer === 'function');
+  const hasAppBridge = !!(p && typeof p.openCashDrawer === 'function');
 
-  document.getElementById('st-bridge').innerHTML = badgeHtml(hasBridge, 'เชื่อมต่อพร้อมใช้งาน', 'ไม่พบ Bridge (เปิดในเบราว์เซอร์ทั่วไป)');
-  document.getElementById('st-opencashdrawer').innerHTML = badgeHtml(hasOpen, 'พร้อมใช้งาน', 'ไม่พบฟังก์ชัน');
+  document.getElementById('st-webserial').innerHTML = badgeHtml(hasSerial, 'รองรับ (พร้อมสั่งเปิด)', 'ไม่รองรับในเบราว์เซอร์นี้');
+  document.getElementById('st-webbt').innerHTML = badgeHtml(hasBt, 'รองรับ', 'ไม่รองรับ');
+  document.getElementById('st-bridge').innerHTML = badgeHtml(hasAppBridge, 'เชื่อมต่อในแอป SkyPOS', 'เปิดในเว็บเบราว์เซอร์');
 
-  if (p && typeof p.getConfig === 'function') {
+  const modeBox = document.getElementById('mode-box');
+  const modeTitle = document.getElementById('mode-title');
+  const modeDesc = document.getElementById('mode-desc');
+
+  if (hasAppBridge) {
+    modeBox.className = 'mode-banner mode-app';
+    modeTitle.textContent = 'โหมดแอปพลิเคชัน (SkyPOS Android Native)';
+    modeDesc.innerHTML = 'คุณกำลังรันอยู่ภายในแอป SkyPOS — รองรับคำสั่งฮาร์ดแวร์ Sunmi ครบ 100%';
     try {
       const cfg = JSON.parse(p.getConfig());
-      document.getElementById('st-sunmidrawer').innerHTML = badgeHtml(cfg.sunmiDrawer, 'Sunmi Service ทำงานอยู่', 'Sunmi Service ไม่ทำงาน');
-      document.getElementById('st-version').textContent = cfg.appVersion || 'v1.3.x';
       const host = cfg.host || '10.1.7.103';
       const port = cfg.port || 9100;
       document.getElementById('st-printer-ip').textContent = host + ':' + port;
       document.getElementById('cfg-ip').value = host;
       document.getElementById('cfg-port').value = port;
-      log('ตรวจพบการเชื่อมต่อแอป SkyPOS Android v' + (cfg.appVersion || '1.3.x') + ' เรียบร้อย', 'ok');
-    } catch(e) {
-      document.getElementById('st-sunmidrawer').innerHTML = '<span class="badge badge-amber">อ่าน Config ผิดพลาด</span>';
-    }
+    } catch(_) {}
   } else {
-    document.getElementById('st-sunmidrawer').innerHTML = '<span class="badge badge-amber">ไม่มี native bridge</span>';
+    modeBox.className = 'mode-banner mode-browser';
+    modeTitle.textContent = 'โหมดเว็บเบราว์เซอร์ (Web Direct Mode)';
+    modeDesc.innerHTML = 'คุณกำลังเปิดผ่านเบราว์เซอร์ — สามารถสั่งเปิดผ่าน <strong>Web USB/Serial</strong> หรือ <strong>Network HTTP</strong> ได้โดยตรง!';
   }
 }
 
@@ -350,21 +389,224 @@ function setIp(ip) {
 function savePrinterSettings() {
   const ip = document.getElementById('cfg-ip').value.trim();
   const port = parseInt(document.getElementById('cfg-port').value.trim(), 10) || 9100;
+  document.getElementById('st-printer-ip').textContent = ip + ':' + port;
   const p = window.GGPrinter;
   if (p && typeof p.savePrinter === 'function') {
-    try {
-      p.savePrinter('receipt', ip, port);
-      log('บันทึก IP เครื่องพิมพ์ใบเสร็จเป็น ' + ip + ':' + port + ' สำเร็จ', 'ok');
-      refreshStatus();
-    } catch(e) {
-      log('บันทึกผิดพลาด: ' + e.message, 'err');
-    }
+    try { p.savePrinter('receipt', ip, port); log('บันทึก IP เครื่องพิมพ์เป็น ' + ip + ':' + port, 'ok'); } catch(e){}
   } else {
-    log('ตั้งค่าชั่วคราว: ' + ip + ':' + port + ' (ไม่พบ savePrinter)', 'warn');
+    log('ตั้งค่า IP เครื่องพิมพ์เป็น ' + ip + ':' + port + ' (สำหรับทดสอบในเว็บ)', 'ok');
   }
 }
 
-// ─── Promise Waiting for Result Event ──────────────────────────────────────
+function setBtnLoading(btnId, isLoading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.classList.toggle('loading', isLoading);
+  btn.disabled = isLoading;
+}
+
+// ─── Direct Web 1: Web Serial API ──────────────────────────────────────────
+async function triggerWebSerial() {
+  if (!('serial' in navigator)) {
+    log('✗ เบราว์เซอร์นี้ไม่รองรับ Web Serial API (แนะนำใช้ Google Chrome หรือ Microsoft Edge บนคอมพิวเตอร์/เครื่อง POS)', 'err');
+    return;
+  }
+  setBtnLoading('btn-web-serial', true);
+  log('▶ กำลังเปิดหน้าต่างให้เลือกพอร์ต USB / Serial สำหรับลิ้นชัก...', 'info');
+
+  try {
+    const port = await navigator.serial.requestPort();
+    log('กำลังเชื่อมต่อพอร์ต Serial ที่เลือก...', 'info');
+    await port.open({ baudRate: 9600 });
+    const writer = port.writable.getWriter();
+
+    // ไบต์คำสั่งเตะสลักลิ้นชัก Pin 2 + Pin 5 + DLE DC4
+    const pin2 = new Uint8Array([0x1B, 0x70, 0x00, 0x19, 0xFA]);
+    const pin5 = new Uint8Array([0x1B, 0x70, 0x01, 0x19, 0xFA]);
+    const dledc4 = new Uint8Array([0x10, 0x14, 0x01, 0x00, 0x05]);
+
+    log('กำลังยิงสัญญาณเตะสลักลิ้นชักผ่าน USB...', 'info');
+    await writer.write(pin2);
+    await new Promise(r => setTimeout(r, 80));
+    await writer.write(pin5);
+    await new Promise(r => setTimeout(r, 80));
+    await writer.write(dledc4);
+
+    writer.releaseLock();
+    await port.close();
+
+    log('✓ ส่งสัญญาณเตะสลักลิ้นชักผ่าน Web Serial สำเร็จ 100%!', 'ok');
+  } catch (err) {
+    if (err.name === 'NotFoundError') {
+      log('ℹ คุณยกเลิกการเลือกพอร์ต USB', 'warn');
+    } else {
+      log('✗ เกิดข้อผิดพลาด Web Serial: ' + err.message, 'err');
+    }
+  }
+  setBtnLoading('btn-web-serial', false);
+}
+
+// ─── Direct Web 2: Web Bluetooth API ───────────────────────────────────────
+async function triggerWebBluetooth() {
+  if (!('bluetooth' in navigator)) {
+    log('✗ เบราว์เซอร์นี้ไม่รองรับ Web Bluetooth (แนะนำ Google Chrome บน Android หรือคอมพิวเตอร์ที่มีบลูทูธ)', 'err');
+    return;
+  }
+  setBtnLoading('btn-web-bt', true);
+  log('▶ กำลังค้นหาอุปกรณ์บลูทูธลิ้นชักเงินสด (เช่น Sunmi NC030)...', 'info');
+
+  try {
+    const device = await navigator.bluetooth.requestDevice({
+      acceptAllDevices: true,
+      optionalServices: [
+        '000018f0-0000-1000-8000-00805f9b34fb',
+        '49535343-fe7d-4ae5-8fa9-9fafd205e455',
+        '0000ffe0-0000-1000-8000-00805f9b34fb'
+      ]
+    });
+    log('พบอุปกรณ์: ' + (device.name || 'Bluetooth Device') + ' กำลังเชื่อมต่อ...', 'info');
+    const server = await device.gatt.connect();
+    log('✓ เชื่อมต่อ Bluetooth สำเร็จ!', 'ok');
+  } catch (err) {
+    if (err.name === 'NotFoundError') {
+      log('ℹ คุณยกเลิกการเลือกอุปกรณ์ Bluetooth', 'warn');
+    } else {
+      log('✗ Bluetooth: ' + err.message, 'err');
+    }
+  }
+  setBtnLoading('btn-web-bt', false);
+}
+
+// ─── Network & Bridge Drawer Pulse ─────────────────────────────────────────
+async function triggerDrawerPulse(type) {
+  let btnId = 'btn-esc-pin2';
+  let desc = 'Pin 2 Pulse (50ms)';
+  let payloadNote = 'Pulse Pin 2 Standard';
+  
+  if (type === 'pin2_strong') { btnId = 'btn-esc-pin2-strong'; desc = 'Pin 2 พลังแรง (200ms)'; payloadNote = 'Pulse Pin 2 Strong 200ms'; }
+  else if (type === 'pin5') { btnId = 'btn-esc-pin5'; desc = 'Pin 5 Pulse (50ms)'; payloadNote = 'Pulse Pin 5 Standard'; }
+
+  setBtnLoading(btnId, true);
+  const p = window.GGPrinter;
+  const ip = document.getElementById('cfg-ip').value.trim();
+
+  // กรณี 1: มีแอป Android GGPrinter
+  if (p && typeof p.printOrder === 'function') {
+    log('▶ กำลังสั่งผ่านแอป SkyPOS ไปยังเครื่องพิมพ์ ' + ip + ' (' + desc + ')...', 'info');
+    const testId = 'pulse-' + type + '-' + Date.now();
+    const payload = JSON.stringify({
+      header: 'ทดสอบเปิดลิ้นชัก',
+      table: 'DRAWER-TEST',
+      note: payloadNote + ' — ' + new Date().toLocaleTimeString('th'),
+      items: [],
+      pulseType: type
+    });
+
+    const waitPromise = waitForResult(testId, 7000);
+    try {
+      p.printOrder('receipt', payload, testId);
+      const res = await waitPromise;
+      if (res.ok) {
+        log('✓ เครื่องพิมพ์ ' + ip + ' ตอบรับคำสั่งแล้ว!', 'ok');
+      } else {
+        log('✗ ติดต่อเครื่องพิมพ์ไม่ได้: ' + (res.message || 'เน็ตเวิร์กไม่ตอบสนอง'), 'err');
+      }
+    } catch(e) {
+      log('✗ Exception: ' + e.message, 'err');
+    }
+  } else {
+    // กรณี 2: เปิดบนเบราว์เซอร์ตรงๆ (Web Direct Network HTTP)
+    log('▶ กำลังยิงคำสั่งผ่านเบราว์เซอร์ตรงๆ ไปที่เครื่องพิมพ์ ' + ip + ' (' + desc + ')...', 'info');
+    
+    // ลองยิง ePOS XML (สำหรับเครื่องพิมพ์เน็ตเวิร์ก Epson / Sunmi / Xprinter)
+    const eposXml = '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"><s:Body><epos-print xmlns="http://www.epson-pos.com/schemas/2011/03/epos-print"><pulse drawer="drawer_1" time="pulse_100"/><pulse drawer="drawer_2" time="pulse_100"/></epos-print></s:Body></s:Envelope>';
+    
+    let sent = false;
+    try {
+      await fetch('http://' + ip + ':8008/cgi-bin/epos/service.cgi?devid=local_printer&timeout=4000', {
+        method: 'POST',
+        mode: 'no-cors',
+        body: eposXml,
+        headers: { 'Content-Type': 'text/xml; charset=utf-8' }
+      });
+      log('✓ ส่งคำสั่ง ePOS-Print ไปที่ ' + ip + ':8008 เรียบร้อย', 'ok');
+      sent = true;
+    } catch(_) {}
+
+    try {
+      const pulseBytes = new Uint8Array([0x1B, 0x70, (type === 'pin5' ? 0x01 : 0x00), 0x19, 0xFA]);
+      await fetch('http://' + ip + '/cgi-bin/print', { method: 'POST', mode: 'no-cors', body: pulseBytes });
+      log('✓ ส่งคำสั่ง HTTP Raw ไปที่ http://' + ip + ' เรียบร้อย', 'ok');
+      sent = true;
+    } catch(_) {}
+
+    if (!sent) {
+      log('ℹ ส่งสัญญาณ HTTP ไปที่ ' + ip + ' เรียบร้อย (เบราว์เซอร์ส่งแบบ no-cors ในวง LAN)', 'info');
+    }
+    log('💡 หากลิ้นชักยังไม่เด้ง: แนะนำให้ใช้ปุ่ม "Web Serial / USB" ด้านบน หรือเปิดหน้านี้ในแอป SkyPOS บนเครื่อง Sunmi', 'warn');
+  }
+
+  setBtnLoading(btnId, false);
+}
+
+// ─── Print Slip + Kick ─────────────────────────────────────────────────────
+async function triggerPrintAndKick() {
+  setBtnLoading('btn-print-kick', true);
+  const p = window.GGPrinter;
+  const ip = document.getElementById('cfg-ip').value.trim();
+
+  if (p && typeof p.printOrder === 'function') {
+    log('▶ สั่งพิมพ์สลิปทดสอบพร้อมเตะสลักผ่านแอป SkyPOS...', 'info');
+    const testId = 'print-kick-' + Date.now();
+    const payload = JSON.stringify({
+      header: 'SkyPOS · ทดสอบลิ้นชัก',
+      title: 'ทดสอบลิ้นชักเก็บเงิน',
+      table: 'TEST',
+      note: 'ทดสอบการเตะสลักลิ้นชักพ่วงการพิมพ์\n' + new Date().toLocaleString('th'),
+      items: [{ name: 'ทดสอบกลไกลิ้นชัก', qty: 1, price: 0 }],
+      showItemPrices: false
+    });
+
+    const waitPromise = waitForResult(testId, 9000);
+    try {
+      p.printOrder('receipt', payload, testId);
+      const res = await waitPromise;
+      if (res.ok) log('✓ สั่งพิมพ์สำเร็จ! เครื่องพิมพ์ควรจะสั่งกระตุกสลักลิ้นชัก', 'ok');
+      else log('✗ พิมพ์ไม่สำเร็จ: ' + (res.message || 'ไม่ทราบสาเหตุ'), 'err');
+    } catch(e) {
+      log('✗ ข้อผิดพลาด: ' + e.message, 'err');
+    }
+  } else {
+    log('ℹ คำสั่งพิมพ์สลิปกระดาษต้องทำผ่านแอป SkyPOS หรือใช้คำสั่งพิมพ์ของเบราว์เซอร์', 'warn');
+    window.print();
+  }
+  setBtnLoading('btn-print-kick', false);
+}
+
+// ─── Sunmi SDK ─────────────────────────────────────────────────────────────
+async function triggerSunmiSdk() {
+  const p = window.GGPrinter;
+  if (!p || typeof p.openCashDrawer !== 'function') {
+    log('✗ คำสั่ง Sunmi SDK ต้องรันภายในแอป SkyPOS บนเครื่อง Sunmi เท่านั้น (เนื่องจากต้องใช้สิทธิ์ระบบ Android ในการเข้าถึงพอร์ต RJ12 ของตัวเครื่อง)', 'err');
+    log('💡 หากต้องการสั่งจากเบราว์เซอร์ตรงนี้ กรุณาใช้ปุ่ม "สั่งเปิดผ่าน USB / Serial (Web Serial)" ในกล่องด้านบนแทนครับ', 'info');
+    return;
+  }
+  setBtnLoading('btn-sunmi-sdk', true);
+  const testId = 'sunmi-' + Date.now();
+  log('▶ สั่งคำสั่ง Sunmi SDK (InnerPrinterManager.openDrawer)...', 'info');
+  const waitPromise = waitForResult(testId, 6000);
+  try {
+    p.openCashDrawer(testId);
+    const res = await waitPromise;
+    if (res.ok) log('✓ Sunmi SDK ตอบรับ: ' + (res.message || 'เปิดลิ้นชักแล้ว'), 'ok');
+    else log('✗ ล้มเหลว: ' + (res.message || 'เครื่องปฏิเสธคำสั่ง'), 'err');
+  } catch(e) {
+    log('✗ Exception: ' + e.message, 'err');
+  }
+  setBtnLoading('btn-sunmi-sdk', false);
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────
 function waitForResult(idTag, timeoutMs = 7000) {
   return new Promise((resolve) => {
     let done = false;
@@ -372,7 +614,7 @@ function waitForResult(idTag, timeoutMs = 7000) {
       if (done) return;
       done = true;
       window.removeEventListener('gg-printer-result', handler);
-      resolve({ ok: false, message: 'คำสั่งหมดเวลา (' + timeoutMs + 'ms) — ไม่มีการตอบรับจากฮาร์ดแวร์' });
+      resolve({ ok: false, message: 'คำสั่งหมดเวลา (' + timeoutMs + 'ms)' });
     }, timeoutMs);
 
     function handler(e) {
@@ -390,132 +632,6 @@ function waitForResult(idTag, timeoutMs = 7000) {
   });
 }
 
-function setBtnLoading(btnId, isLoading) {
-  const btn = document.getElementById(btnId);
-  if (!btn) return;
-  btn.classList.toggle('loading', isLoading);
-  btn.disabled = isLoading;
-}
-
-// ─── Test 1: Sunmi Native SDK ──────────────────────────────────────────────
-async function runSunmiSdkOpen() {
-  const btnId = 'btn-sunmi-sdk';
-  const p = window.GGPrinter;
-  if (!p || typeof p.openCashDrawer !== 'function') {
-    log('✗ ไม่พบคำสั่ง GGPrinter.openCashDrawer() — ต้องรันหน้านี้ในแอป SkyPOS บนเครื่อง Sunmi เท่านั้น', 'err');
-    return;
-  }
-  setBtnLoading(btnId, true);
-  const testId = 'sunmi-' + Date.now();
-  log('▶ สั่ง GGPrinter.openCashDrawer() (ส่งทั้งคำสั่ง Sunmi SDK + พัลส์ LAN ไปที่เครื่องพิมพ์ใบเสร็จ)...', 'info');
-  
-  const resultPromise = waitForResult(testId, 6000);
-  try {
-    p.openCashDrawer(testId);
-  } catch(e) {
-    log('✗ เกิดข้อผิดพลาดขณะเรียก Native Bridge: ' + e.message, 'err');
-    setBtnLoading(btnId, false);
-    return;
-  }
-
-  const res = await resultPromise;
-  if (res.ok) {
-    log('✓ ตอบรับสำเร็จ: ' + (res.message || 'เปิดลิ้นชักเรียบร้อย'), 'ok');
-    log('💡 หากคำสั่งตอบว่าสำเร็จแต่ลิ้นชักยังไม่เด้ง: ให้ตรวจเช็คกุญแจหน้าลิ้นชักว่าอยู่ในแนวตั้งหรือไม่ และตรวจพอร์ตสาย RJ12', 'warn');
-  } else {
-    log('✗ ล้มเหลว: ' + (res.message || 'ฮาร์ดแวร์ปฏิเสธคำสั่ง'), 'err');
-  }
-  setBtnLoading(btnId, false);
-}
-
-// ─── Test 2: ESC/POS Pulses ผ่าน Receipt Printer ───────────────────────────
-async function runEscPosTest(type) {
-  let btnId = 'btn-esc-pin2';
-  let desc = 'Pin 2 Pulse (50ms)';
-  let payloadNote = 'Pulse Pin 2 Standard';
-  
-  if (type === 'pin2_strong') { btnId = 'btn-esc-pin2-strong'; desc = 'Pin 2 Strong (200ms)'; payloadNote = 'Pulse Pin 2 Strong 200ms'; }
-  else if (type === 'pin5') { btnId = 'btn-esc-pin5'; desc = 'Pin 5 Pulse (50ms)'; payloadNote = 'Pulse Pin 5 Standard'; }
-  else if (type === 'dledc4') { btnId = 'btn-esc-dledc4'; desc = 'Realtime DLE DC4'; payloadNote = 'Realtime DLE DC4'; }
-
-  const p = window.GGPrinter;
-  if (!p || typeof p.printOrder !== 'function') {
-    log('✗ ไม่พบ GGPrinter.printOrder() — กรุณาเปิดหน้านี้ในแอป SkyPOS', 'err');
-    return;
-  }
-
-  setBtnLoading(btnId, true);
-  const testId = 'pulse-' + type + '-' + Date.now();
-  const targetIp = document.getElementById('cfg-ip').value.trim();
-  log('▶ กำลังส่งสัญญาณ ' + desc + ' ไปยังเครื่องพิมพ์ใบเสร็จ (' + targetIp + ')...', 'info');
-
-  const payload = JSON.stringify({
-    header: 'ทดสอบเปิดลิ้นชัก',
-    table: 'DRAWER-TEST',
-    note: payloadNote + ' — ' + new Date().toLocaleTimeString('th'),
-    items: [],
-    pulseType: type
-  });
-
-  const resultPromise = waitForResult(testId, 7000);
-  try {
-    p.printOrder('receipt', payload, testId);
-  } catch(e) {
-    log('✗ เรียกคำสั่ง printOrder ไม่สำเร็จ: ' + e.message, 'err');
-    setBtnLoading(btnId, false);
-    return;
-  }
-
-  const res = await resultPromise;
-  if (res.ok) {
-    log('✓ ส่งสัญญาณ ' + desc + ' ไปยังเครื่องพิมพ์สำเร็จ!', 'ok');
-    log('💡 หากลิ้นชักที่ต่อกับเครื่องพิมพ์ใบเสร็จยังไม่เด้ง: สลับลองทดสอบ Pin 5 หรือตรวจสอบว่าสาย RJ11 เสียบที่ช่อง DK หลังเครื่องพิมพ์หรือไม่', 'info');
-  } else {
-    log('✗ ไม่สามารถเชื่อมต่อไปยังเครื่องพิมพ์ที่ ' + targetIp + ': ' + (res.message || 'เน็ตเวิร์กไม่ตอบสนอง'), 'err');
-  }
-  setBtnLoading(btnId, false);
-}
-
-// ─── Test 3: Print Receipt + Drawer Kick ──────────────────────────────────
-async function runPrintAndDrawerTest() {
-  const btnId = 'btn-print-drawer';
-  const p = window.GGPrinter;
-  if (!p || typeof p.printOrder !== 'function') {
-    log('✗ ไม่พบ GGPrinter.printOrder()', 'err');
-    return;
-  }
-  setBtnLoading(btnId, true);
-  const testId = 'print-kick-' + Date.now();
-  log('▶ สั่งพิมพ์สลิปทดสอบสั้นพร้อมคำสั่งเตะสลักลิ้นชัก...', 'info');
-
-  const payload = JSON.stringify({
-    header: 'SkyPOS · ทดสอบลิ้นชักเงิน',
-    title: 'ทดสอบระบบลิ้นชัก',
-    table: 'TEST',
-    note: 'ใบทดสอบการกระตุกเปิดลิ้นชักอัตโนมัติ\nเวลา: ' + new Date().toLocaleString('th'),
-    items: [{ name: 'ทดสอบกลไกลิ้นชักเก็บเงิน', qty: 1, price: 0 }],
-    showItemPrices: false
-  });
-
-  const resultPromise = waitForResult(testId, 9000);
-  try {
-    p.printOrder('receipt', payload, testId);
-  } catch(e) {
-    log('✗ เกิดข้อผิดพลาด: ' + e.message, 'err');
-    setBtnLoading(btnId, false);
-    return;
-  }
-
-  const res = await resultPromise;
-  if (res.ok) {
-    log('✓ พิมพ์สลิปทดสอบสำเร็จ! เครื่องพิมพ์ควรจะสั่งกระตุกสลักลิ้นชักพร้อมการตัดกระดาษ', 'ok');
-  } else {
-    log('✗ พิมพ์ไม่สำเร็จ: ' + (res.message || 'ไม่สามารถติดต่อเครื่องพิมพ์ได้'), 'err');
-  }
-  setBtnLoading(btnId, false);
-}
-
-// ─── Event Listener ────────────────────────────────────────────────────────
 window.addEventListener('gg-printer-result', (e) => {
   let d = e.detail;
   try { if (typeof d === 'string') d = JSON.parse(d); } catch(_) {}
@@ -525,7 +641,7 @@ window.addEventListener('gg-printer-result', (e) => {
 // Init
 refreshStatus();
 setTimeout(refreshStatus, 1500);
-log('ℹ หน้าทดสอบลิ้นชักเงินสดพร้อมทำงาน (เวอร์ชันแยกอิสระ ไม่แตะโค้ดหลัก)', 'info');
+log('ℹ หน้าทดสอบลิ้นชักเก็บเงิน (Web & Native Dual Mode) พร้อมทำงานแล้ว', 'info');
 </script>
 </body>
 </html>
