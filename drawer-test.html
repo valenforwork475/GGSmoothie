@@ -2,218 +2,287 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkyPOS — ทดสอบลิ้นชัก</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SkyPOS · เครื่องมือวินิจฉัยและทดสอบลิ้นชักเก็บเงิน</title>
 <style>
+  :root {
+    --bg-page: #0B1120;
+    --card-bg: #151F32;
+    --card-border: #1E293B;
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --accent-blue: #3B82F6;
+    --accent-green: #10B981;
+    --accent-red: #EF4444;
+    --accent-amber: #F59E0B;
+    --accent-purple: #8B5CF6;
+  }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { min-height: 100dvh; background: #0F172A; font-family: -apple-system, 'Segoe UI', sans-serif; color: #F1F5F9; }
-  body { display: flex; flex-direction: column; align-items: center; padding: 24px 16px 40px; gap: 20px; }
+  html, body { min-height: 100dvh; background: var(--bg-page); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+  body { display: flex; flex-direction: column; align-items: center; padding: 20px 14px 60px; gap: 16px; }
 
-  header { width: 100%; max-width: 500px; text-align: center; padding: 20px 0 4px; }
-  header h1 { font-size: 20px; font-weight: 900; letter-spacing: -0.3px; }
-  header p { font-size: 13px; color: #64748B; margin-top: 4px; }
+  header { width: 100%; max-width: 580px; text-align: center; padding: 12px 0 6px; }
+  header .badge-tag { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; background: rgba(59,130,246,0.15); color: #60A5FA; border: 1px solid rgba(59,130,246,0.3); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  header h1 { font-size: 22px; font-weight: 900; letter-spacing: -0.4px; }
+  header p { font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.4; }
 
-  .section {
-    width: 100%; max-width: 500px;
-    background: #1E293B;
-    border: 1px solid #334155;
-    border-radius: 14px;
+  .card {
+    width: 100%; max-width: 580px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
     padding: 18px;
+    box-shadow: 0 4px 20px -2px rgba(0,0,0,0.4);
   }
-  .section-title {
-    font-size: 14px; font-weight: 800; color: #94A3B8;
-    text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px;
+  .card-title {
+    font-size: 13px; font-weight: 800; color: #94A3B8;
+    text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;
+    display: flex; align-items: center; justify-content: space-between;
   }
 
-  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #263040; font-size: 13px; }
-  .info-row:last-child { border-bottom: none; }
-  .info-key { color: #94A3B8; }
-  .info-val { font-weight: 700; color: #E2E8F0; text-align: right; }
-  .badge { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: 800; }
-  .badge-green { background: #166534; color: #BBF7D0; }
-  .badge-red { background: #7F1D1D; color: #FECACA; }
-  .badge-yellow { background: #713F12; color: #FEF08A; }
+  /* Hardware Warning Box */
+  .hw-warning {
+    background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(245,158,11,0.08));
+    border: 1.5px solid rgba(239,68,68,0.4);
+    border-radius: 14px; padding: 16px; margin-bottom: 6px;
+  }
+  .hw-warning-title { font-size: 15px; font-weight: 900; color: #FCA5A5; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .hw-point { font-size: 13px; line-height: 1.55; color: #E2E8F0; margin-bottom: 8px; padding-left: 4px; }
+  .hw-point strong { color: #FEF08A; }
+  .hw-point:last-child { margin-bottom: 0; }
 
-  .btn-group { display: flex; flex-direction: column; gap: 10px; }
+  .info-table { display: flex; flex-direction: column; gap: 6px; }
+  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 8px; background: rgba(15,23,42,0.6); font-size: 13px; }
+  .info-key { color: var(--text-secondary); font-weight: 600; }
+  .info-val { font-weight: 700; color: var(--text-primary); text-align: right; display: flex; align-items: center; gap: 6px; }
+  .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 800; }
+  .badge-green { background: #064E3B; color: #A7F3D0; border: 1px solid #059669; }
+  .badge-red { background: #7F1D1D; color: #FECACA; border: 1px solid #DC2626; }
+  .badge-amber { background: #78350F; color: #FDE68A; border: 1px solid #D97706; }
+
+  .btn-grid { display: flex; flex-direction: column; gap: 10px; }
   button.action-btn {
-    width: 100%; min-height: 52px; padding: 12px 18px;
+    width: 100%; min-height: 54px; padding: 12px 16px;
     border: 1.5px solid transparent; border-radius: 12px;
-    font: inherit; font-size: 15px; font-weight: 800;
+    font: inherit; font-size: 14.5px; font-weight: 800;
     cursor: pointer; display: flex; align-items: center; gap: 12px;
-    transition: all 0.15s ease; position: relative;
+    transition: all 0.15s ease; position: relative; text-align: left;
   }
   button.action-btn:active { transform: scale(0.98); }
-  button.btn-primary { background: #1D4ED8; color: #fff; border-color: #1D4ED8; }
-  button.btn-primary:hover { background: #1E40AF; }
-  button.btn-green { background: #166534; color: #fff; border-color: #166534; }
-  button.btn-green:hover { background: #14532D; }
-  button.btn-outline { background: transparent; color: #94A3B8; border-color: #334155; }
-  button.btn-outline:hover { background: #1E293B; border-color: #475569; color: #E2E8F0; }
-  button.btn-warn { background: #92400E; color: #fff; border-color: #92400E; }
-  button.btn-warn:hover { background: #78350F; }
-  .btn-icon { font-size: 20px; flex: none; width: 28px; text-align: center; }
-  .btn-label { flex: 1; text-align: left; }
-  .btn-sub { font-size: 11px; font-weight: 600; opacity: 0.7; display: block; margin-top: 1px; }
-  .btn-spinner { display: none; width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  button.btn-primary { background: #2563EB; color: #fff; border-color: #3B82F6; }
+  button.btn-primary:hover { background: #1D4ED8; }
+  button.btn-emerald { background: #059669; color: #fff; border-color: #10B981; }
+  button.btn-emerald:hover { background: #047857; }
+  button.btn-indigo { background: #4F46E5; color: #fff; border-color: #6366F1; }
+  button.btn-indigo:hover { background: #4338CA; }
+  button.btn-amber { background: #B45309; color: #fff; border-color: #D97706; }
+  button.btn-amber:hover { background: #92400E; }
+  button.btn-outline { background: #0F172A; color: #CBD5E1; border-color: #334155; }
+  button.btn-outline:hover { background: #1E293B; border-color: #475569; color: #fff; }
+
+  .btn-icon { font-size: 22px; flex: none; width: 32px; text-align: center; }
+  .btn-content { flex: 1; min-width: 0; }
+  .btn-title { display: block; font-weight: 800; line-height: 1.25; }
+  .btn-sub { font-size: 11.5px; font-weight: 500; opacity: 0.75; display: block; margin-top: 2px; line-height: 1.3; }
+  .btn-spinner { display: none; width: 20px; height: 20px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; flex: none; }
   button.loading .btn-spinner { display: block; }
-  button.loading .btn-label { opacity: 0.6; }
+  button.loading .btn-icon { display: none; }
+  button.loading .btn-content { opacity: 0.6; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  .ip-config-box { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+  .ip-config-box input {
+    padding: 10px 14px; border-radius: 10px;
+    border: 1px solid #334155; background: #0B1120; color: #F1F5F9;
+    font: inherit; font-size: 14px; font-weight: 700;
+  }
+  .ip-config-box input:focus { outline: none; border-color: #3B82F6; box-shadow: 0 0 0 2px rgba(59,130,246,0.25); }
+
   #log {
-    width: 100%; max-width: 500px;
-    background: #0B1622; border: 1px solid #1E3A5F;
-    border-radius: 12px; padding: 14px;
-    font-family: ui-monospace, 'SF Mono', Consolas, monospace;
-    font-size: 12px; line-height: 1.6;
-    max-height: 300px; overflow-y: auto;
+    background: #070B14; border: 1px solid #1E293B;
+    border-radius: 12px; padding: 12px 14px;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 11.5px; line-height: 1.6;
+    max-height: 280px; overflow-y: auto;
     display: flex; flex-direction: column; gap: 4px;
   }
-  .log-entry { padding: 3px 0; border-bottom: 1px solid #1E293B; }
+  .log-entry { padding: 3px 0; border-bottom: 1px solid #111827; word-break: break-word; }
   .log-entry:last-child { border-bottom: none; }
-  .log-time { color: #475569; }
-  .log-ok { color: #4ADE80; }
-  .log-err { color: #F87171; }
+  .log-time { color: #475569; font-size: 10.5px; margin-right: 6px; }
+  .log-ok { color: #34D399; font-weight: 600; }
+  .log-err { color: #F87171; font-weight: 600; }
   .log-info { color: #93C5FD; }
-  .log-warn { color: #FDE047; }
+  .log-warn { color: #FCD34D; font-weight: 600; }
   .log-empty { color: #475569; font-style: italic; }
 
-  .printer-host-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
-  .printer-host-row input {
-    flex: 1; padding: 9px 12px; border-radius: 9px;
-    border: 1px solid #334155; background: #0F172A; color: #E2E8F0;
-    font: inherit; font-size: 14px;
-  }
-  .printer-host-row input:focus { outline: none; border-color: #3B82F6; }
-  label.input-label { font-size: 12px; color: #64748B; margin-bottom: 5px; display: block; }
+  .chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .chip { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; background: #1E293B; color: #94A3B8; cursor: pointer; border: 1px solid #334155; }
+  .chip:hover { background: #334155; color: #fff; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>SkyPOS · ทดสอบลิ้นชัก</h1>
-  <p>ทดสอบการเปิดลิ้นชักเงินหลายวิธี — หน้าเทสเท่านั้น ไม่กระทบระบบหลัก</p>
+  <span class="badge-tag">Standalone Drawer Diagnostic</span>
+  <h1>SkyPOS · เครื่องมือทดสอบลิ้นชัก</h1>
+  <p>ทดสอบการกระตุกเปิดลิ้นชักเงินสดทุกวิธี (Sunmi SDK + ESC/POS พอร์ต DK / เครื่องพิมพ์) โดยไม่กระทบโค้ดระบบหลัก</p>
 </header>
 
-<!-- สถานะ Bridge -->
-<div class="section">
-  <div class="section-title">สถานะระบบ</div>
-  <div class="info-row">
-    <span class="info-key">GGPrinter (Android Bridge)</span>
-    <span class="info-val" id="st-bridge">ตรวจสอบ...</span>
+<!-- สรุปปัญหาเรื่องสายแลน/ไฟที่พอร์ต -->
+<div class="card hw-warning">
+  <div class="hw-warning-title">
+    <span style="font-size:20px;">⚠️</span> คำเตือนสำคัญเรื่องสายและพอร์ตเชื่อมต่อ
   </div>
-  <div class="info-row">
-    <span class="info-key">openCashDrawer()</span>
-    <span class="info-val" id="st-opencashdrawer">ตรวจสอบ...</span>
+  <div class="hw-point">
+    <strong>ข้อสังเกต: "พอร์ตที่มีไฟติดสว่าง/กระพริบ"</strong><br>
+    พอร์ตที่มีไฟเขียวหรือส้มติดสว่างหลังเครื่อง POS คือ <strong>พอร์ตสายแลนอินเทอร์เน็ต (LAN RJ45)</strong> ไม่ใช่พอร์ตลิ้นชัก! หัว RJ11/RJ12 ของลิ้นชักสามารถเสียบยัดเข้าไปในช่อง LAN ได้ แต่จะ<strong>ไม่มีไฟ 24V ส่งไปเตะสลักลิ้นชัก</strong> ลิ้นชักจึงไม่เปิด
   </div>
-  <div class="info-row">
-    <span class="info-key">sunmiDrawer</span>
-    <span class="info-val" id="st-sunmidrawer">ตรวจสอบ...</span>
-  </div>
-  <div class="info-row">
-    <span class="info-key">appVersion</span>
-    <span class="info-val" id="st-version">—</span>
-  </div>
-  <div class="info-row">
-    <span class="info-key">receipt printer IP</span>
-    <span class="info-val" id="st-printer-ip">—</span>
+  <div class="hw-point">
+    <strong>ตำแหน่งที่ถูกต้องในการเสียบสายลิ้นชัก (ระบบ StoreHub เดิม):</strong><br>
+    • <strong>ช่องทาง A (แนะนำที่สุด):</strong> เสียบเข้าที่ช่อง <strong>DK (Drawer Kick)</strong> หลัง<strong>เครื่องพิมพ์ใบเสร็จ</strong><br>
+    • <strong>ช่องทาง B:</strong> เสียบเข้าที่ช่อง RJ12 ใต้ฐานเครื่อง Sunmi ที่มีไอคอนรูป <strong>🗄️ ลิ้นชัก</strong> หรือเขียนว่า <strong>RJ12</strong> (ช่องนี้จะ <u>ไม่มีไฟติดเด็ดขาด</u>)<br>
+    • <strong>กุญแจหน้าลิ้นชัก:</strong> ต้องบิดไปที่ <strong>แนวตั้ง (Auto Mode)</strong> หากบิดแนวนอนจะเป็นการล็อกแบบ Manual
   </div>
 </div>
 
-<!-- วิธีที่ 1: GGPrinter.openCashDrawer (ปัจจุบัน) -->
-<div class="section">
-  <div class="section-title">วิธีที่ 1 · GGPrinter Bridge (ปัจจุบัน)</div>
-  <div class="btn-group">
-    <button class="action-btn btn-primary" id="btn-bridge" onclick="testBridgeDrawer()">
-      <span class="btn-icon">🔑</span>
-      <span class="btn-label">
-        เปิดลิ้นชักผ่าน GGPrinter
-        <span class="btn-sub">window.GGPrinter.openCashDrawer() → Sunmi SDK + TCP ESC/POS</span>
-      </span>
-      <span class="btn-spinner"></span>
-    </button>
+<!-- ตรวจสถานะแอป & Bridge -->
+<div class="card">
+  <div class="card-title">
+    <span>สถานะการเชื่อมต่อ Bridge</span>
+    <button onclick="refreshStatus()" style="background:none;border:none;color:#3B82F6;font-size:12px;font-weight:700;cursor:pointer;">🔄 รีเฟรช</button>
   </div>
-</div>
-
-<!-- วิธีที่ 2: ESC/POS ผ่าน fetch (ทดสอบ StoreHub style) -->
-<div class="section">
-  <div class="section-title">วิธีที่ 2 · ESC/POS HTTP (StoreHub style)</div>
-  <p style="font-size:12px;color:#64748B;margin-bottom:12px;line-height:1.5;">
-    StoreHub ส่ง ESC/POS bytes ผ่าน local HTTP server บนเครื่อง Sunmi ที่รับคำสั่งจาก WebView
-    — ทดสอบยิง byte sequence <code style="background:#0F172A;padding:2px 5px;border-radius:4px;font-size:11px">1B 70 00 19 FA</code> ไปที่ native printer bridge
-  </p>
-  <div>
-    <label class="input-label">Printer IP (ใบเสร็จ)</label>
-    <div class="printer-host-row">
-      <input type="text" id="printer-ip" value="10.1.7.103" inputmode="decimal" placeholder="10.1.7.103">
-      <input type="text" id="printer-port" value="9100" inputmode="numeric" placeholder="9100" style="max-width:80px">
+  <div class="info-table">
+    <div class="info-row">
+      <span class="info-key">Android GGPrinter Bridge</span>
+      <span class="info-val" id="st-bridge">กำลังตรวจ...</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">คำสั่ง openCashDrawer()</span>
+      <span class="info-val" id="st-opencashdrawer">กำลังตรวจ...</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Sunmi Printer Service</span>
+      <span class="info-val" id="st-sunmidrawer">กำลังตรวจ...</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">เวอร์ชันแอป Android (APK)</span>
+      <span class="info-val" id="st-version">—</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">IP เครื่องพิมพ์ใบเสร็จ (Receipt)</span>
+      <span class="info-val" id="st-printer-ip">—</span>
     </div>
   </div>
-  <div class="btn-group">
-    <button class="action-btn btn-green" id="btn-escpos-bridge" onclick="testEscPosBridge()">
-      <span class="btn-icon">🖨</span>
-      <span class="btn-label">
-        เปิดลิ้นชักผ่าน printOrder (ESC/POS)
-        <span class="btn-sub">ส่งคำสั่ง ESC p ผ่าน GGPrinter.printOrder เป็น raw bytes</span>
-      </span>
-      <span class="btn-spinner"></span>
-    </button>
-    <button class="action-btn btn-outline" id="btn-sunmi-raw" onclick="testSunmiRawData()">
-      <span class="btn-icon">📡</span>
-      <span class="btn-label">
-        Sunmi sendRAWData (ถ้ามี)
-        <span class="btn-sub">ส่ง 1B 70 00 19 FA ผ่าน Sunmi SDK โดยตรง</span>
-      </span>
+</div>
+
+<!-- ชุดทดสอบที่ 1: Sunmi Internal SDK -->
+<div class="card">
+  <div class="card-title">ชุดที่ 1 · เปิดลิ้นชักผ่าน Sunmi Built-in SDK (พอร์ต RJ12 ของตัวเครื่อง)</div>
+  <p style="font-size:12px;color:#94A3B8;margin-bottom:12px;line-height:1.5;">
+    ใช้สั่งเปิดลิ้นชักเมื่อสาย RJ12 เสียบเข้ากับพอร์ตลิ้นชักใต้เครื่อง Sunmi POS โดยตรง (คำสั่ง InnerPrinterManager.openDrawer)
+  </p>
+  <div class="btn-grid">
+    <button class="action-btn btn-primary" id="btn-sunmi-sdk" onclick="runSunmiSdkOpen()">
+      <span class="btn-icon">⚡</span>
+      <div class="btn-content">
+        <span class="btn-title">เปิดลิ้นชักผ่าน GGPrinter.openCashDrawer()</span>
+        <span class="btn-sub">ยิงคำสั่งเปิดผ่าน Sunmi SDK + ยิง ESC/POS Pulse ผ่าน LAN พร้อมกัน</span>
+      </div>
       <span class="btn-spinner"></span>
     </button>
   </div>
 </div>
 
-<!-- วิธีที่ 3: StoreHub Deep Link -->
-<div class="section">
-  <div class="section-title">วิธีที่ 3 · Deep Link / Intent</div>
-  <div class="btn-group">
-    <button class="action-btn btn-warn" id="btn-storehub-intent" onclick="testStoreHubIntent()">
-      <span class="btn-icon">🔗</span>
-      <span class="btn-label">
-        ทดสอบ StoreHub Intent
-        <span class="btn-sub">android.intent.action.OPEN_CASH_DRAWER (ถ้า StoreHub รับ)</span>
-      </span>
+<!-- ชุดทดสอบที่ 2: StoreHub Style (ESC/POS ผ่านเครื่องพิมพ์ใบเสร็จ) -->
+<div class="card">
+  <div class="card-title">ชุดที่ 2 · เปิดลิ้นชักผ่านเครื่องพิมพ์ใบเสร็จ (StoreHub Style)</div>
+  <p style="font-size:12px;color:#94A3B8;margin-bottom:12px;line-height:1.5;">
+    StoreHub เปิดลิ้นชักโดยส่งสัญญาณ ESC/POS (ESC p / DLE DC4) ผ่านสาย LAN ไปยังพอร์ต DK ของเครื่องพิมพ์ใบเสร็จ
+  </p>
+  
+  <div style="margin-bottom:10px;">
+    <label style="font-size:11.5px;color:#64748B;font-weight:700;display:block;margin-bottom:4px;">IP และ Port เครื่องพิมพ์ใบเสร็จ:</label>
+    <div class="ip-config-box">
+      <input type="text" id="cfg-ip" value="10.1.7.103" placeholder="10.1.7.103" style="flex:1;">
+      <input type="text" id="cfg-port" value="9100" placeholder="9100" style="width:75px;text-align:center;">
+      <button class="action-btn btn-outline" style="min-height:42px;padding:8px 14px;width:auto;" onclick="savePrinterSettings()">บันทึก</button>
+    </div>
+    <div class="chip-row">
+      <span class="chip" onclick="setIp('10.1.7.103')">10.1.7.103 (บิล)</span>
+      <span class="chip" onclick="setIp('10.1.7.102')">10.1.7.102 (หน้าบาร์)</span>
+      <span class="chip" onclick="setIp('10.1.7.205')">10.1.7.205 (ครัว)</span>
+    </div>
+  </div>
+
+  <div class="btn-grid" style="margin-top:14px;">
+    <button class="action-btn btn-emerald" id="btn-esc-pin2" onclick="runEscPosTest('pin2')">
+      <span class="btn-icon">🔌</span>
+      <div class="btn-content">
+        <span class="btn-title">ทดสอบสัญญาณ Pin 2 (มาตรฐาน ESC p 0)</span>
+        <span class="btn-sub">ลำดับไบต์: 1B 70 00 19 FA (พัลส์ 50ms ขา 2 สำหรับลิ้นชักส่วนใหญ่)</span>
+      </div>
       <span class="btn-spinner"></span>
     </button>
-    <button class="action-btn btn-outline" id="btn-storehub-url" onclick="testStoreHubUrl()">
-      <span class="btn-icon">🌐</span>
-      <span class="btn-label">
-        ทดสอบ storehub:// URL scheme
-        <span class="btn-sub">storehub://open-cash-drawer หรือ intent URL</span>
-      </span>
+
+    <button class="action-btn btn-emerald" id="btn-esc-pin2-strong" onclick="runEscPosTest('pin2_strong')">
+      <span class="btn-icon">⚡</span>
+      <div class="btn-content">
+        <span class="btn-title">ทดสอบสัญญาณ Pin 2 พลังแรง (ESC p 0 200ms)</span>
+        <span class="btn-sub">ลำดับไบต์: 1B 70 00 64 FA (พัลส์ 200ms สำหรับลิ้นชักสปริงหนา/หนัก)</span>
+      </div>
+      <span class="btn-spinner"></span>
+    </button>
+
+    <button class="action-btn btn-indigo" id="btn-esc-pin5" onclick="runEscPosTest('pin5')">
+      <span class="btn-icon">🔌</span>
+      <div class="btn-content">
+        <span class="btn-title">ทดสอบสัญญาณ Pin 5 (ESC p 1)</span>
+        <span class="btn-sub">ลำดับไบต์: 1B 70 01 19 FA (พัลส์ 50ms ขา 5 สำหรับเครื่องพิมพ์บางยี่ห้อ)</span>
+      </div>
+      <span class="btn-spinner"></span>
+    </button>
+
+    <button class="action-btn btn-amber" id="btn-esc-dledc4" onclick="runEscPosTest('dledc4')">
+      <span class="btn-icon">⚡</span>
+      <div class="btn-content">
+        <span class="btn-title">ทดสอบสัญญาณ Realtime (DLE DC4)</span>
+        <span class="btn-sub">ลำดับไบต์: 10 14 01 00 05 (คำสั่งเปิดลิ้นชักฉุกเฉินไม่ผ่านบัฟเฟอร์)</span>
+      </div>
       <span class="btn-spinner"></span>
     </button>
   </div>
 </div>
 
-<!-- วิธีที่ 4: ผ่าน GGPrinter.testPrinter (เปิดลิ้นชักพ่วงการพิมพ์) -->
-<div class="section">
-  <div class="section-title">วิธีที่ 4 · พิมพ์ใบเสร็จทดสอบ + เปิดลิ้นชัก</div>
-  <div class="btn-group">
-    <button class="action-btn btn-outline" id="btn-print-and-drawer" onclick="testPrintAndDrawer()">
+<!-- ชุดทดสอบที่ 3: พิมพ์ใบเสร็จสั้น + เปิดลิ้นชัก -->
+<div class="card">
+  <div class="card-title">ชุดที่ 3 · พิมพ์ใบทดสอบ + สั่งกระตุกเปิดลิ้นชัก</div>
+  <p style="font-size:12px;color:#94A3B8;margin-bottom:12px;line-height:1.5;">
+    เครื่องพิมพ์บางรุ่น (เช่น Epson/Xprinter/Star) จะยอมเตะลิ้นชักเฉพาะตอนที่มีคำสั่งพิมพ์ใบเสร็จจบแล้วเท่านั้น
+  </p>
+  <div class="btn-grid">
+    <button class="action-btn btn-outline" id="btn-print-drawer" onclick="runPrintAndDrawerTest()">
       <span class="btn-icon">🧾</span>
-      <span class="btn-label">
-        พิมพ์ใบทดสอบ → เปิดลิ้นชัก
-        <span class="btn-sub">บางเครื่องพิมพ์เปิดลิ้นชักอัตโนมัติเมื่อรับคำสั่งพิมพ์ใบเสร็จ</span>
-      </span>
+      <div class="btn-content">
+        <span class="btn-title">พิมพ์ใบทดสอบสั้น → พ่วงคำสั่งเปิดลิ้นชัก</span>
+        <span class="btn-sub">พิมพ์ 1 บรรทัด แล้วส่งคำสั่งตัดกระดาษ + กระตุกสลักลิ้นชัก</span>
+      </div>
       <span class="btn-spinner"></span>
     </button>
   </div>
 </div>
 
-<!-- Log -->
-<div class="section" style="padding:0;overflow:hidden;">
-  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;">
-    <div class="section-title" style="margin:0">Log ผลการทดสอบ</div>
-    <button onclick="clearLog()" style="background:none;border:none;color:#64748B;cursor:pointer;font-size:12px;">ล้าง</button>
+<!-- คอนโซล Log ผลการทดสอบ -->
+<div class="card" style="padding:0;overflow:hidden;">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #1E293B;">
+    <div style="font-size:13px;font-weight:800;color:#94A3B8;text-transform:uppercase;">บันทึกผลการทดสอบ (Live Log)</div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="copyLog()" style="background:none;border:none;color:#3B82F6;cursor:pointer;font-size:12px;font-weight:700;">คัดลอก</button>
+      <button onclick="clearLog()" style="background:none;border:none;color:#64748B;cursor:pointer;font-size:12px;font-weight:700;">ล้าง</button>
+    </div>
   </div>
   <div id="log">
-    <div class="log-entry log-empty">— ยังไม่มีผลการทดสอบ กดปุ่มด้านบนเพื่อเริ่ม —</div>
+    <div class="log-entry log-empty">— พร้อมเริ่มทดสอบ กรุณากดปุ่มด้านบน —</div>
   </div>
 </div>
 
@@ -230,54 +299,88 @@ function log(msg, type = 'info') {
   logEl.scrollTop = logEl.scrollHeight;
 }
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function clearLog() { logEl.innerHTML = '<div class="log-entry log-empty">— Log ถูกล้างแล้ว —</div>'; }
-
-// ─── Status ────────────────────────────────────────────────────────────────
-function badgeHtml(ok, yes, no) {
-  return '<span class="badge badge-' + (ok ? 'green' : 'red') + '">' + (ok ? yes : no) + '</span>';
+function clearLog() { logEl.innerHTML = '<div class="log-entry log-empty">— บันทึกถูกล้างแล้ว —</div>'; }
+function copyLog() {
+  const text = Array.from(logEl.querySelectorAll('.log-entry')).map(e => e.innerText).join('\n');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => log('คัดลอก log ไปยังคลิปบอร์ดแล้ว', 'ok'));
+  } else {
+    alert(text);
+  }
 }
-function checkStatus() {
+
+// ─── Badge Helper ─────────────────────────────────────────────────────────
+function badgeHtml(ok, yesText, noText) {
+  return '<span class="badge ' + (ok ? 'badge-green' : 'badge-red') + '">' + (ok ? yesText : noText) + '</span>';
+}
+
+// ─── Refresh Status ───────────────────────────────────────────────────────
+function refreshStatus() {
   const p = window.GGPrinter;
   const hasBridge = !!p;
   const hasOpen = !!(p && typeof p.openCashDrawer === 'function');
 
-  document.getElementById('st-bridge').innerHTML = badgeHtml(hasBridge, 'พร้อม', 'ไม่พบ (ไม่ใช่ Android)');
-  document.getElementById('st-opencashdrawer').innerHTML = badgeHtml(hasOpen, 'รองรับ', 'ไม่รองรับ');
+  document.getElementById('st-bridge').innerHTML = badgeHtml(hasBridge, 'เชื่อมต่อพร้อมใช้งาน', 'ไม่พบ Bridge (เปิดในเบราว์เซอร์ทั่วไป)');
+  document.getElementById('st-opencashdrawer').innerHTML = badgeHtml(hasOpen, 'พร้อมใช้งาน', 'ไม่พบฟังก์ชัน');
 
   if (p && typeof p.getConfig === 'function') {
     try {
       const cfg = JSON.parse(p.getConfig());
-      document.getElementById('st-sunmidrawer').innerHTML = badgeHtml(cfg.sunmiDrawer, 'Sunmi เชื่อมต่อแล้ว', 'Sunmi ไม่ได้เชื่อมต่อ');
-      document.getElementById('st-version').textContent = cfg.appVersion || '—';
-      document.getElementById('st-printer-ip').textContent = (cfg.host || '—') + ':' + (cfg.port || '9100');
-      document.getElementById('printer-ip').value = cfg.host || '10.1.7.103';
-      document.getElementById('printer-port').value = cfg.port || 9100;
+      document.getElementById('st-sunmidrawer').innerHTML = badgeHtml(cfg.sunmiDrawer, 'Sunmi Service ทำงานอยู่', 'Sunmi Service ไม่ทำงาน');
+      document.getElementById('st-version').textContent = cfg.appVersion || 'v1.3.x';
+      const host = cfg.host || '10.1.7.103';
+      const port = cfg.port || 9100;
+      document.getElementById('st-printer-ip').textContent = host + ':' + port;
+      document.getElementById('cfg-ip').value = host;
+      document.getElementById('cfg-port').value = port;
+      log('ตรวจพบการเชื่อมต่อแอป SkyPOS Android v' + (cfg.appVersion || '1.3.x') + ' เรียบร้อย', 'ok');
     } catch(e) {
-      document.getElementById('st-sunmidrawer').innerHTML = '<span class="badge badge-yellow">ไม่ทราบ</span>';
+      document.getElementById('st-sunmidrawer').innerHTML = '<span class="badge badge-amber">อ่าน Config ผิดพลาด</span>';
     }
   } else {
-    document.getElementById('st-sunmidrawer').innerHTML = '<span class="badge badge-yellow">ไม่มี bridge</span>';
+    document.getElementById('st-sunmidrawer').innerHTML = '<span class="badge badge-amber">ไม่มี native bridge</span>';
   }
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────
-function setLoading(btnId, loading) {
-  const btn = document.getElementById(btnId);
-  if (!btn) return;
-  btn.classList.toggle('loading', loading);
-  btn.disabled = loading;
+function setIp(ip) {
+  document.getElementById('cfg-ip').value = ip;
+  savePrinterSettings();
 }
 
-function waitForDrawerResult(tag, timeout = 5000) {
+function savePrinterSettings() {
+  const ip = document.getElementById('cfg-ip').value.trim();
+  const port = parseInt(document.getElementById('cfg-port').value.trim(), 10) || 9100;
+  const p = window.GGPrinter;
+  if (p && typeof p.savePrinter === 'function') {
+    try {
+      p.savePrinter('receipt', ip, port);
+      log('บันทึก IP เครื่องพิมพ์ใบเสร็จเป็น ' + ip + ':' + port + ' สำเร็จ', 'ok');
+      refreshStatus();
+    } catch(e) {
+      log('บันทึกผิดพลาด: ' + e.message, 'err');
+    }
+  } else {
+    log('ตั้งค่าชั่วคราว: ' + ip + ':' + port + ' (ไม่พบ savePrinter)', 'warn');
+  }
+}
+
+// ─── Promise Waiting for Result Event ──────────────────────────────────────
+function waitForResult(idTag, timeoutMs = 7000) {
   return new Promise((resolve) => {
+    let done = false;
     const timer = setTimeout(() => {
+      if (done) return;
+      done = true;
       window.removeEventListener('gg-printer-result', handler);
-      resolve({ ok: false, message: 'timeout (' + timeout + 'ms)' });
-    }, timeout);
+      resolve({ ok: false, message: 'คำสั่งหมดเวลา (' + timeoutMs + 'ms) — ไม่มีการตอบรับจากฮาร์ดแวร์' });
+    }, timeoutMs);
+
     function handler(e) {
       let data = e.detail;
       if (typeof data === 'string') { try { data = JSON.parse(data); } catch(_) {} }
-      if (data && (data.id === tag || data.id && String(data.id).startsWith(tag))) {
+      if (data && (data.id === idTag || (data.id && String(data.id).startsWith(idTag)))) {
+        if (done) return;
+        done = true;
         clearTimeout(timer);
         window.removeEventListener('gg-printer-result', handler);
         resolve(data);
@@ -287,194 +390,142 @@ function waitForDrawerResult(tag, timeout = 5000) {
   });
 }
 
-// ─── Test 1: Bridge openCashDrawer ─────────────────────────────────────────
-async function testBridgeDrawer() {
-  const id = 'test-bridge-' + Date.now();
-  setLoading('btn-bridge', true);
-  log('▶ เรียก GGPrinter.openCashDrawer("' + id + '")', 'info');
+function setBtnLoading(btnId, isLoading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.classList.toggle('loading', isLoading);
+  btn.disabled = isLoading;
+}
+
+// ─── Test 1: Sunmi Native SDK ──────────────────────────────────────────────
+async function runSunmiSdkOpen() {
+  const btnId = 'btn-sunmi-sdk';
   const p = window.GGPrinter;
   if (!p || typeof p.openCashDrawer !== 'function') {
-    log('✗ ไม่พบ GGPrinter.openCashDrawer — ต้องเปิดในแอป SkyPOS บน Sunmi', 'err');
-    setLoading('btn-bridge', false);
+    log('✗ ไม่พบคำสั่ง GGPrinter.openCashDrawer() — ต้องรันหน้านี้ในแอป SkyPOS บนเครื่อง Sunmi เท่านั้น', 'err');
     return;
   }
-  const resultPromise = waitForDrawerResult(id, 6000);
-  try { p.openCashDrawer(id); } catch(e) { log('✗ exception: ' + e.message, 'err'); setLoading('btn-bridge', false); return; }
-  log('⌛ รอผลตอบกลับจาก Android...', 'info');
-  const result = await resultPromise;
-  if (result.ok) { log('✓ สำเร็จ: ' + (result.message || 'เปิดลิ้นชักแล้ว'), 'ok'); }
-  else { log('✗ ล้มเหลว: ' + (result.message || 'ไม่ทราบ'), 'err'); }
-  setLoading('btn-bridge', false);
+  setBtnLoading(btnId, true);
+  const testId = 'sunmi-' + Date.now();
+  log('▶ สั่ง GGPrinter.openCashDrawer() (ส่งทั้งคำสั่ง Sunmi SDK + พัลส์ LAN ไปที่เครื่องพิมพ์ใบเสร็จ)...', 'info');
+  
+  const resultPromise = waitForResult(testId, 6000);
+  try {
+    p.openCashDrawer(testId);
+  } catch(e) {
+    log('✗ เกิดข้อผิดพลาดขณะเรียก Native Bridge: ' + e.message, 'err');
+    setBtnLoading(btnId, false);
+    return;
+  }
+
+  const res = await resultPromise;
+  if (res.ok) {
+    log('✓ ตอบรับสำเร็จ: ' + (res.message || 'เปิดลิ้นชักเรียบร้อย'), 'ok');
+    log('💡 หากคำสั่งตอบว่าสำเร็จแต่ลิ้นชักยังไม่เด้ง: ให้ตรวจเช็คกุญแจหน้าลิ้นชักว่าอยู่ในแนวตั้งหรือไม่ และตรวจพอร์ตสาย RJ12', 'warn');
+  } else {
+    log('✗ ล้มเหลว: ' + (res.message || 'ฮาร์ดแวร์ปฏิเสธคำสั่ง'), 'err');
+  }
+  setBtnLoading(btnId, false);
 }
 
-// ─── Test 2a: ESC/POS ผ่าน GGPrinter.printOrder พร้อม drawer pulse payload ─
-async function testEscPosBridge() {
-  const id = 'test-escpos-' + Date.now();
-  setLoading('btn-escpos-bridge', true);
-  log('▶ ส่ง ESC/POS drawer pulse ผ่าน GGPrinter.printOrder()', 'info');
+// ─── Test 2: ESC/POS Pulses ผ่าน Receipt Printer ───────────────────────────
+async function runEscPosTest(type) {
+  let btnId = 'btn-esc-pin2';
+  let desc = 'Pin 2 Pulse (50ms)';
+  let payloadNote = 'Pulse Pin 2 Standard';
+  
+  if (type === 'pin2_strong') { btnId = 'btn-esc-pin2-strong'; desc = 'Pin 2 Strong (200ms)'; payloadNote = 'Pulse Pin 2 Strong 200ms'; }
+  else if (type === 'pin5') { btnId = 'btn-esc-pin5'; desc = 'Pin 5 Pulse (50ms)'; payloadNote = 'Pulse Pin 5 Standard'; }
+  else if (type === 'dledc4') { btnId = 'btn-esc-dledc4'; desc = 'Realtime DLE DC4'; payloadNote = 'Realtime DLE DC4'; }
+
   const p = window.GGPrinter;
   if (!p || typeof p.printOrder !== 'function') {
-    log('✗ ไม่พบ GGPrinter.printOrder — ต้องเปิดในแอป SkyPOS บน Sunmi', 'err');
-    setLoading('btn-escpos-bridge', false);
+    log('✗ ไม่พบ GGPrinter.printOrder() — กรุณาเปิดหน้านี้ในแอป SkyPOS', 'err');
     return;
   }
 
-  // ส่ง payload พิเศษที่ขอให้เปิดลิ้นชักอย่างเดียว (header ว่างเปล่า + drawer flag)
-  // ถ้า Android รองรับ drawer=true ก็จะเปิดลิ้นชักก่อนพิมพ์
+  setBtnLoading(btnId, true);
+  const testId = 'pulse-' + type + '-' + Date.now();
+  const targetIp = document.getElementById('cfg-ip').value.trim();
+  log('▶ กำลังส่งสัญญาณ ' + desc + ' ไปยังเครื่องพิมพ์ใบเสร็จ (' + targetIp + ')...', 'info');
+
   const payload = JSON.stringify({
-    header: 'ทดสอบลิ้นชัก',
-    table: 'TEST',
-    note: 'ESC/POS Drawer Test — ' + new Date().toLocaleTimeString('th'),
+    header: 'ทดสอบเปิดลิ้นชัก',
+    table: 'DRAWER-TEST',
+    note: payloadNote + ' — ' + new Date().toLocaleTimeString('th'),
     items: [],
-    drawer: true  // signal พิเศษถ้า Android จะเพิ่มสนับสนุน
+    pulseType: type
   });
 
-  const resultPromise = waitForDrawerResult(id, 8000);
-  try { p.printOrder('receipt', payload, id); } catch(e) { log('✗ exception: ' + e.message, 'err'); setLoading('btn-escpos-bridge', false); return; }
-  log('⌛ รอผล...', 'info');
-  const result = await resultPromise;
-  if (result.ok) { log('✓ พิมพ์สำเร็จ: ' + (result.message || ''), 'ok'); log('ℹ หากลิ้นชักยังไม่เปิด แสดงว่าเครื่องพิมพ์ใบเสร็จยังไม่เชื่อมสายลิ้นชัก', 'warn'); }
-  else { log('✗ ล้มเหลว: ' + (result.message || 'ไม่ทราบ') + ' — ตรวจ IP:Port เครื่องพิมพ์', 'err'); }
-  setLoading('btn-escpos-bridge', false);
-}
-
-// ─── Test 2b: Sunmi sendRAWData ──────────────────────────────────────────────
-async function testSunmiRawData() {
-  setLoading('btn-sunmi-raw', true);
-  log('▶ ทดสอบ Sunmi sendRAWData (ถ้ามี interface)', 'info');
-  const p = window.GGPrinter;
-
-  // ลอง call method ที่อาจมีหรือไม่มีก็ได้
-  if (!p) {
-    log('✗ ไม่พบ GGPrinter bridge', 'err');
-    setLoading('btn-sunmi-raw', false);
+  const resultPromise = waitForResult(testId, 7000);
+  try {
+    p.printOrder('receipt', payload, testId);
+  } catch(e) {
+    log('✗ เรียกคำสั่ง printOrder ไม่สำเร็จ: ' + e.message, 'err');
+    setBtnLoading(btnId, false);
     return;
   }
 
-  // เช็คว่ามี openCashDrawer ซึ่งใน v1.3.x ใช้ Sunmi SDK
-  if (typeof p.openCashDrawer === 'function') {
-    log('ℹ openCashDrawer มีอยู่แล้ว — เรียกและรอผล', 'info');
-    const id = 'test-raw-' + Date.now();
-    const resultPromise = waitForDrawerResult(id, 6000);
-    p.openCashDrawer(id);
-    const result = await resultPromise;
-    if (result.ok) { log('✓ Sunmi SDK เปิดลิ้นชักสำเร็จ', 'ok'); }
-    else { log('✗ Sunmi SDK: ' + (result.message || 'ล้มเหลว'), 'err'); }
+  const res = await resultPromise;
+  if (res.ok) {
+    log('✓ ส่งสัญญาณ ' + desc + ' ไปยังเครื่องพิมพ์สำเร็จ!', 'ok');
+    log('💡 หากลิ้นชักที่ต่อกับเครื่องพิมพ์ใบเสร็จยังไม่เด้ง: สลับลองทดสอบ Pin 5 หรือตรวจสอบว่าสาย RJ11 เสียบที่ช่อง DK หลังเครื่องพิมพ์หรือไม่', 'info');
   } else {
-    log('✗ openCashDrawer ไม่มีใน bridge (app version เก่า?)', 'err');
-    log('ℹ อัปเดต APK เป็น v1.3.3+ เพื่อให้มี openCashDrawer()', 'warn');
+    log('✗ ไม่สามารถเชื่อมต่อไปยังเครื่องพิมพ์ที่ ' + targetIp + ': ' + (res.message || 'เน็ตเวิร์กไม่ตอบสนอง'), 'err');
   }
-  setLoading('btn-sunmi-raw', false);
+  setBtnLoading(btnId, false);
 }
 
-// ─── Test 3a: Intent URL ──────────────────────────────────────────────────────
-function testStoreHubIntent() {
-  setLoading('btn-storehub-intent', true);
-  log('▶ ทดสอบ Android intent ผ่าน intent URL scheme', 'info');
-  
-  // Intent URL ที่ StoreHub อาจรับ (ไม่มี official doc — นี่คือการทดสอบเท่านั้น)
-  const attempts = [
-    'intent://open-cash-drawer#Intent;scheme=storehub;end',
-    'intent://action.OPEN_CASH_DRAWER#Intent;scheme=android-app;package=com.storehub.pos;end',
-  ];
-
-  let idx = 0;
-  function tryNext() {
-    if (idx >= attempts.length) {
-      log('ℹ ทดสอบครบแล้ว — ถ้าไม่มีอะไรเกิดขึ้น StoreHub ไม่รับ intent นี้', 'warn');
-      setLoading('btn-storehub-intent', false);
-      return;
-    }
-    const url = attempts[idx++];
-    log('  ลอง: ' + url, 'info');
-    try {
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = url;
-      document.body.appendChild(iframe);
-      setTimeout(() => { iframe.remove(); tryNext(); }, 1000);
-    } catch(e) {
-      log('  exception: ' + e.message, 'err');
-      tryNext();
-    }
-  }
-  tryNext();
-}
-
-// ─── Test 3b: URL Scheme ──────────────────────────────────────────────────────
-function testStoreHubUrl() {
-  setLoading('btn-storehub-url', true);
-  log('▶ ทดสอบ custom URL scheme ของ StoreHub', 'info');
-
-  const schemes = [
-    'storehub://open-cash-drawer',
-    'storehub://action/open-cash-drawer',
-    'sunmiservice://openCashDrawer',
-  ];
-
-  let idx = 0;
-  function tryNext() {
-    if (idx >= schemes.length) {
-      log('ℹ ทดสอบครบทุก URL scheme', 'warn');
-      setLoading('btn-storehub-url', false);
-      return;
-    }
-    const url = schemes[idx++];
-    log('  ลอง: ' + url, 'info');
-    try {
-      window.location.href = url;
-    } catch(e) {
-      log('  exception: ' + e.message, 'err');
-    }
-    setTimeout(tryNext, 1200);
-  }
-  tryNext();
-}
-
-// ─── Test 4: พิมพ์ + เปิดลิ้นชัก ─────────────────────────────────────────────
-async function testPrintAndDrawer() {
-  const id = 'test-print-drawer-' + Date.now();
-  setLoading('btn-print-and-drawer', true);
-  log('▶ พิมพ์ใบทดสอบ → รอเปิดลิ้นชัก', 'info');
+// ─── Test 3: Print Receipt + Drawer Kick ──────────────────────────────────
+async function runPrintAndDrawerTest() {
+  const btnId = 'btn-print-drawer';
   const p = window.GGPrinter;
   if (!p || typeof p.printOrder !== 'function') {
-    log('✗ ไม่พบ GGPrinter.printOrder', 'err');
-    setLoading('btn-print-and-drawer', false);
+    log('✗ ไม่พบ GGPrinter.printOrder()', 'err');
     return;
   }
+  setBtnLoading(btnId, true);
+  const testId = 'print-kick-' + Date.now();
+  log('▶ สั่งพิมพ์สลิปทดสอบสั้นพร้อมคำสั่งเตะสลักลิ้นชัก...', 'info');
+
   const payload = JSON.stringify({
-    header: 'SkyPOS · ทดสอบลิ้นชัก',
-    title: 'ทดสอบลิ้นชักเงิน',
+    header: 'SkyPOS · ทดสอบลิ้นชักเงิน',
+    title: 'ทดสอบระบบลิ้นชัก',
     table: 'TEST',
-    note: 'ใบนี้พิมพ์เพื่อทดสอบลิ้นชักเงินเท่านั้น\n' + new Date().toLocaleString('th'),
-    items: [{ name: 'Test item', qty: 1, price: 0 }],
+    note: 'ใบทดสอบการกระตุกเปิดลิ้นชักอัตโนมัติ\nเวลา: ' + new Date().toLocaleString('th'),
+    items: [{ name: 'ทดสอบกลไกลิ้นชักเก็บเงิน', qty: 1, price: 0 }],
     showItemPrices: false
   });
 
-  const resultPromise = waitForDrawerResult(id, 10000);
-  try { p.printOrder('receipt', payload, id); } catch(e) { log('✗ exception: ' + e.message, 'err'); setLoading('btn-print-and-drawer', false); return; }
-  log('⌛ พิมพ์อยู่...', 'info');
-  const result = await resultPromise;
-  if (result.ok) {
-    log('✓ พิมพ์สำเร็จ: ' + (result.message || ''), 'ok');
-    log('ℹ ลิ้นชักควรเปิดเองหากสายเชื่อมต่อ (RJ12) ต่อกับเครื่องพิมพ์ใบเสร็จถูกต้อง', 'info');
-  } else {
-    log('✗ ล้มเหลว: ' + (result.message || ''), 'err');
+  const resultPromise = waitForResult(testId, 9000);
+  try {
+    p.printOrder('receipt', payload, testId);
+  } catch(e) {
+    log('✗ เกิดข้อผิดพลาด: ' + e.message, 'err');
+    setBtnLoading(btnId, false);
+    return;
   }
-  setLoading('btn-print-and-drawer', false);
+
+  const res = await resultPromise;
+  if (res.ok) {
+    log('✓ พิมพ์สลิปทดสอบสำเร็จ! เครื่องพิมพ์ควรจะสั่งกระตุกสลักลิ้นชักพร้อมการตัดกระดาษ', 'ok');
+  } else {
+    log('✗ พิมพ์ไม่สำเร็จ: ' + (res.message || 'ไม่สามารถติดต่อเครื่องพิมพ์ได้'), 'err');
+  }
+  setBtnLoading(btnId, false);
 }
 
-// ─── Init ──────────────────────────────────────────────────────────────────
+// ─── Event Listener ────────────────────────────────────────────────────────
 window.addEventListener('gg-printer-result', (e) => {
   let d = e.detail;
   try { if (typeof d === 'string') d = JSON.parse(d); } catch(_) {}
-  // log unhandled results
-  log('📣 gg-printer-result event: ' + JSON.stringify(d), d && d.ok ? 'ok' : 'warn');
+  log('📡 ได้รับการตอบกลับจากฮาร์ดแวร์: ' + JSON.stringify(d), (d && d.ok) ? 'ok' : 'warn');
 });
 
-checkStatus();
-setTimeout(checkStatus, 2000);  // รอ bridge โหลด
-log('ℹ หน้าเทสเริ่มแล้ว — เปิดในแอป SkyPOS บน Sunmi เพื่อผลที่ดีที่สุด', 'info');
+// Init
+refreshStatus();
+setTimeout(refreshStatus, 1500);
+log('ℹ หน้าทดสอบลิ้นชักเงินสดพร้อมทำงาน (เวอร์ชันแยกอิสระ ไม่แตะโค้ดหลัก)', 'info');
 </script>
 </body>
 </html>
