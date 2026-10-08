@@ -1279,13 +1279,13 @@ button { -webkit-tap-highlight-color:transparent; }
                 <div style="font-size:15px;font-weight:900;color:#0F172A;margin-bottom:4px;">การพิมพ์บิลอัตโนมัติ</div>
                 <div style="font-size:12px;color:#64748B;line-height:1.5;margin-bottom:14px;">แตะสวิตช์เพื่อเปิดหรือปิดการสั่งพิมพ์บิลในแต่ละขั้นตอน</div>
                 <div style="display:flex;flex-direction:column;gap:10px;">
-                  <button type="button" role="switch" aria-checked="{{autoPrintCheckoutReceipt}}" onclick="{{toggleAutoPrintCheckoutReceipt}}" style="width:100%;min-height:72px;padding:12px 16px;border:1.5px solid {{autoPrintCheckoutReceipt?'#86EFAC':'#CBD5E1'}};border-radius:12px;background:{{autoPrintCheckoutReceipt?'#F0FDF4':'#FFFFFF'}};color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;gap:14px;cursor:pointer;box-sizing:border-box;transition:all .15s ease">
+                  <button type="button" onclick="{{toggleAutoPrintCheckoutReceipt}}" style="{{autoPrintCheckoutReceiptCardStyle}}">
                     <div style="display:flex;align-items:center;gap:8px;flex:none">
-                      <div style="width:52px;height:30px;border-radius:16px;background:{{autoPrintCheckoutReceipt?'#16A34A':'#CBD5E1'}};position:relative;flex:none;box-shadow:inset 0 1px 3px rgba(0,0,0,0.15)">
-                        <div style="width:24px;height:24px;border-radius:50%;background:#FFFFFF;position:absolute;top:3px;left:{{autoPrintCheckoutReceipt?'25px':'3px'}};box-shadow:0 2px 5px rgba(0,0,0,0.25)"></div>
+                      <div style="{{autoPrintCheckoutReceiptTrackStyle}}">
+                        <div style="{{autoPrintCheckoutReceiptKnobStyle}}"></div>
                       </div>
-                      <span style="font-size:12.5px;font-weight:900;padding:3px 8px;border-radius:6px;background:{{autoPrintCheckoutReceipt?'#DCFCE7':'#F1F5F9'}};color:{{autoPrintCheckoutReceipt?'#15803D':'#64748B'}};flex:none">
-                        {{autoPrintCheckoutReceipt?'เปิด':'ปิด'}}
+                      <span style="{{autoPrintCheckoutReceiptBadgeStyle}}">
+                        {{autoPrintCheckoutReceiptLabel}}
                       </span>
                     </div>
                     <div style="flex:1;min-width:0">
@@ -1293,13 +1293,13 @@ button { -webkit-tap-highlight-color:transparent; }
                       <span style="display:block;margin-top:3px;font-size:12px;line-height:1.45;color:#64748B">พิมพ์ใบเสร็จรับเงินทันทีเมื่อชำระเงินเสร็จสิ้น</span>
                     </div>
                   </button>
-                  <button type="button" role="switch" aria-checked="{{autoPrintOrderSummary}}" onclick="{{toggleAutoPrintOrderSummary}}" style="width:100%;min-height:72px;padding:12px 16px;border:1.5px solid {{autoPrintOrderSummary?'#86EFAC':'#CBD5E1'}};border-radius:12px;background:{{autoPrintOrderSummary?'#F0FDF4':'#FFFFFF'}};color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;gap:14px;cursor:pointer;box-sizing:border-box;transition:all .15s ease">
+                  <button type="button" onclick="{{toggleAutoPrintOrderSummary}}" style="{{autoPrintOrderSummaryCardStyle}}">
                     <div style="display:flex;align-items:center;gap:8px;flex:none">
-                      <div style="width:52px;height:30px;border-radius:16px;background:{{autoPrintOrderSummary?'#16A34A':'#CBD5E1'}};position:relative;flex:none;box-shadow:inset 0 1px 3px rgba(0,0,0,0.15)">
-                        <div style="width:24px;height:24px;border-radius:50%;background:#FFFFFF;position:absolute;top:3px;left:{{autoPrintOrderSummary?'25px':'3px'}};box-shadow:0 2px 5px rgba(0,0,0,0.25)"></div>
+                      <div style="{{autoPrintOrderSummaryTrackStyle}}">
+                        <div style="{{autoPrintOrderSummaryKnobStyle}}"></div>
                       </div>
-                      <span style="font-size:12.5px;font-weight:900;padding:3px 8px;border-radius:6px;background:{{autoPrintOrderSummary?'#DCFCE7':'#F1F5F9'}};color:{{autoPrintOrderSummary?'#15803D':'#64748B'}};flex:none">
-                        {{autoPrintOrderSummary?'เปิด':'ปิด'}}
+                      <span style="{{autoPrintOrderSummaryBadgeStyle}}">
+                        {{autoPrintOrderSummaryLabel}}
                       </span>
                     </div>
                     <div style="flex:1;min-width:0">
@@ -1307,13 +1307,13 @@ button { -webkit-tap-highlight-color:transparent; }
                       <span style="display:block;margin-top:3px;font-size:12px;line-height:1.45;color:#64748B">พิมพ์ใบแจ้งยอด/รายการอาหารให้ลูกค้าทันที เมื่อบันทึกและส่งเข้าครัว</span>
                     </div>
                   </button>
-                  <button type="button" role="switch" aria-checked="{{autoPrintKitchenOrder}}" onclick="{{toggleAutoPrintKitchenOrder}}" style="width:100%;min-height:72px;padding:12px 16px;border:1.5px solid {{autoPrintKitchenOrder?'#86EFAC':'#CBD5E1'}};border-radius:12px;background:{{autoPrintKitchenOrder?'#F0FDF4':'#FFFFFF'}};color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;gap:14px;cursor:pointer;box-sizing:border-box;transition:all .15s ease">
+                  <button type="button" onclick="{{toggleAutoPrintKitchenOrder}}" style="{{autoPrintKitchenOrderCardStyle}}">
                     <div style="display:flex;align-items:center;gap:8px;flex:none">
-                      <div style="width:52px;height:30px;border-radius:16px;background:{{autoPrintKitchenOrder?'#16A34A':'#CBD5E1'}};position:relative;flex:none;box-shadow:inset 0 1px 3px rgba(0,0,0,0.15)">
-                        <div style="width:24px;height:24px;border-radius:50%;background:#FFFFFF;position:absolute;top:3px;left:{{autoPrintKitchenOrder?'25px':'3px'}};box-shadow:0 2px 5px rgba(0,0,0,0.25)"></div>
+                      <div style="{{autoPrintKitchenOrderTrackStyle}}">
+                        <div style="{{autoPrintKitchenOrderKnobStyle}}"></div>
                       </div>
-                      <span style="font-size:12.5px;font-weight:900;padding:3px 8px;border-radius:6px;background:{{autoPrintKitchenOrder?'#DCFCE7':'#F1F5F9'}};color:{{autoPrintKitchenOrder?'#15803D':'#64748B'}};flex:none">
-                        {{autoPrintKitchenOrder?'เปิด':'ปิด'}}
+                      <span style="{{autoPrintKitchenOrderBadgeStyle}}">
+                        {{autoPrintKitchenOrderLabel}}
                       </span>
                     </div>
                     <div style="flex:1;min-width:0">
@@ -2673,9 +2673,9 @@ class Component extends DCLogic {
     nativePrinter.printOrder('receipt',JSON.stringify({header:this.receiptHeader('ใบแจ้งยอด'),table:((s.mergedTableNos&&s.mergedTableNos.length)?('โต๊ะ '+s.activeTable+' (รวมโต๊ะ '+s.mergedTableNos.join(', ')+')'):('โต๊ะ '+s.activeTable)),guests:s.activeGuestCount||1,items:billItems,note:(s.note?'หมายเหตุ: '+s.note+'\n':'')+'รวมทั้งสิ้น ฿'+Number(totals.netTotal).toFixed(2)+'\nยังไม่ชำระเงิน'}),'table-bill-'+Date.now());
     this.setState({orderError:null});
   }
-  toggleAutoPrintCheckoutReceipt(){this.setState(s=>{const enabled=!s.autoPrintCheckoutReceipt;try{localStorage.setItem('gg_pos_auto_print_checkout_receipt',enabled?'1':'0')}catch(_e){}return{autoPrintCheckoutReceipt:enabled}},()=>this.showSaveNotice(this.state.autoPrintCheckoutReceipt?'เปิดพิมพ์ใบเสร็จอัตโนมัติหลังเช็คบิลแล้ว':'ปิดพิมพ์ใบเสร็จอัตโนมัติหลังเช็คบิลแล้ว'))}
-  toggleAutoPrintOrderSummary(){this.setState(s=>{const enabled=!s.autoPrintOrderSummary;try{localStorage.setItem('gg_pos_auto_print_order_summary',enabled?'1':'0')}catch(_e){}return{autoPrintOrderSummary:enabled}},()=>this.showSaveNotice(this.state.autoPrintOrderSummary?'เปิดพิมพ์บิลสรุปหลังคีย์ออเดอร์แล้ว':'ปิดพิมพ์บิลสรุปหลังคีย์ออเดอร์แล้ว'))}
-  toggleAutoPrintKitchenOrder(){this.setState(s=>{const enabled=!s.autoPrintKitchenOrder;try{localStorage.setItem('gg_pos_auto_print_kitchen_order',enabled?'1':'0')}catch(_e){}return{autoPrintKitchenOrder:enabled}},()=>this.showSaveNotice(this.state.autoPrintKitchenOrder?'เปิดพิมพ์ใบส่งครัวอัตโนมัติแล้ว':'ปิดพิมพ์ใบส่งครัวอัตโนมัติแล้ว'))}
+  toggleAutoPrintCheckoutReceipt(){this.setState(s=>{const enabled=!s.autoPrintCheckoutReceipt;try{localStorage.setItem('gg_pos_auto_print_checkout_receipt',enabled?'1':'0')}catch(_e){}return{autoPrintCheckoutReceipt:enabled}})}
+  toggleAutoPrintOrderSummary(){this.setState(s=>{const enabled=!s.autoPrintOrderSummary;try{localStorage.setItem('gg_pos_auto_print_order_summary',enabled?'1':'0')}catch(_e){}return{autoPrintOrderSummary:enabled}})}
+  toggleAutoPrintKitchenOrder(){this.setState(s=>{const enabled=!s.autoPrintKitchenOrder;try{localStorage.setItem('gg_pos_auto_print_kitchen_order',enabled?'1':'0')}catch(_e){}return{autoPrintKitchenOrder:enabled}})}
   printLastCheckoutReceipt(){const s=this.state;if(s.lastPaidOrder){this.printHistoryReceipt(s.lastPaidOrder);this.showSaveNotice('ส่งพิมพ์ใบเสร็จรับเงินแล้ว')}else{this.setState({orderError:'ไม่พบบิลล่าสุดสำหรับพิมพ์'})}}
   retryKitchenPrint(){
     if(!this.state.activeTable||!this.state.cart.length){this.setState({orderError:'ยังไม่มีรายการอาหารสำหรับส่งครัว'});return}
@@ -3404,6 +3404,51 @@ class Component extends DCLogic {
     });
 
     // ---- settings ----
+    const autoPrintCheckoutReceiptActive = !!s.autoPrintCheckoutReceipt;
+    const autoPrintCheckoutReceiptLabel = autoPrintCheckoutReceiptActive ? 'เปิด' : 'ปิด';
+    const autoPrintCheckoutReceiptBadgeStyle = autoPrintCheckoutReceiptActive
+      ? 'font-size:12.5px;font-weight:900;padding:4px 10px;border-radius:6px;background:#DCFCE7;color:#15803D;flex:none'
+      : 'font-size:12.5px;font-weight:900;padding:4px 10px;border-radius:6px;background:#F1F5F9;color:#64748B;flex:none';
+    const autoPrintCheckoutReceiptTrackStyle = autoPrintCheckoutReceiptActive
+      ? 'width:52px;height:30px;border-radius:16px;background:#16A34A;position:relative;flex:none;box-shadow:inset 0 1px 3px rgba(0,0,0,0.15);transition:all .2s ease'
+      : 'width:52px;height:30px;border-radius:16px;background:#CBD5E1;position:relative;flex:none;box-shadow:inset 0 1px 3px rgba(0,0,0,0.15);transition:all .2s ease';
+    const autoPrintCheckoutReceiptKnobStyle = autoPrintCheckoutReceiptActive
+      ? 'width:24px;height:24px;border-radius:50%;background:#FFFFFF;position:absolute;top:3px;left:25px;box-shadow:0 2px 5px rgba(0,0,0,0.25);transition:all .2s ease'
+      : 'width:24px;height:24px;border-radius:50%;background:#FFFFFF;position:absolute;top:3px;left:3px;box-shadow:0 2px 5px rgba(0,0,0,0.25);transition:all .2s ease';
+    const autoPrintCheckoutReceiptCardStyle = autoPrintCheckoutReceiptActive
+      ? 'width:100%;min-height:72px;padding:12px 16px;border:1.5px solid #86EFAC;border-radius:12px;background:#F0FDF4;color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;gap:14px;cursor:pointer;box-sizing:border-box;transition:all .15s ease'
+      : 'width:100%;min-height:72px;padding:12px 16px;border:1.5px solid #CBD5E1;border-radius:12px;background:#FFFFFF;color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;gap:14px;cursor:pointer;box-sizing:border-box;transition:all .15s ease';
+
+    const autoPrintOrderSummaryActive = !!s.autoPrintOrderSummary;
+    const autoPrintOrderSummaryLabel = autoPrintOrderSummaryActive ? 'เปิด' : 'ปิด';
+    const autoPrintOrderSummaryBadgeStyle = autoPrintOrderSummaryActive
+      ? 'font-size:12.5px;font-weight:900;padding:4px 10px;border-radius:6px;background:#DCFCE7;color:#15803D;flex:none'
+      : 'font-size:12.5px;font-weight:900;padding:4px 10px;border-radius:6px;background:#F1F5F9;color:#64748B;flex:none';
+    const autoPrintOrderSummaryTrackStyle = autoPrintOrderSummaryActive
+      ? 'width:52px;height:30px;border-radius:16px;background:#16A34A;position:relative;flex:none;box-shadow:inset 0 1px 3px rgba(0,0,0,0.15);transition:all .2s ease'
+      : 'width:52px;height:30px;border-radius:16px;background:#CBD5E1;position:relative;flex:none;box-shadow:inset 0 1px 3px rgba(0,0,0,0.15);transition:all .2s ease';
+    const autoPrintOrderSummaryKnobStyle = autoPrintOrderSummaryActive
+      ? 'width:24px;height:24px;border-radius:50%;background:#FFFFFF;position:absolute;top:3px;left:25px;box-shadow:0 2px 5px rgba(0,0,0,0.25);transition:all .2s ease'
+      : 'width:24px;height:24px;border-radius:50%;background:#FFFFFF;position:absolute;top:3px;left:3px;box-shadow:0 2px 5px rgba(0,0,0,0.25);transition:all .2s ease';
+    const autoPrintOrderSummaryCardStyle = autoPrintOrderSummaryActive
+      ? 'width:100%;min-height:72px;padding:12px 16px;border:1.5px solid #86EFAC;border-radius:12px;background:#F0FDF4;color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;gap:14px;cursor:pointer;box-sizing:border-box;transition:all .15s ease'
+      : 'width:100%;min-height:72px;padding:12px 16px;border:1.5px solid #CBD5E1;border-radius:12px;background:#FFFFFF;color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;gap:14px;cursor:pointer;box-sizing:border-box;transition:all .15s ease';
+
+    const autoPrintKitchenOrderActive = !!s.autoPrintKitchenOrder;
+    const autoPrintKitchenOrderLabel = autoPrintKitchenOrderActive ? 'เปิด' : 'ปิด';
+    const autoPrintKitchenOrderBadgeStyle = autoPrintKitchenOrderActive
+      ? 'font-size:12.5px;font-weight:900;padding:4px 10px;border-radius:6px;background:#DCFCE7;color:#15803D;flex:none'
+      : 'font-size:12.5px;font-weight:900;padding:4px 10px;border-radius:6px;background:#F1F5F9;color:#64748B;flex:none';
+    const autoPrintKitchenOrderTrackStyle = autoPrintKitchenOrderActive
+      ? 'width:52px;height:30px;border-radius:16px;background:#16A34A;position:relative;flex:none;box-shadow:inset 0 1px 3px rgba(0,0,0,0.15);transition:all .2s ease'
+      : 'width:52px;height:30px;border-radius:16px;background:#CBD5E1;position:relative;flex:none;box-shadow:inset 0 1px 3px rgba(0,0,0,0.15);transition:all .2s ease';
+    const autoPrintKitchenOrderKnobStyle = autoPrintKitchenOrderActive
+      ? 'width:24px;height:24px;border-radius:50%;background:#FFFFFF;position:absolute;top:3px;left:25px;box-shadow:0 2px 5px rgba(0,0,0,0.25);transition:all .2s ease'
+      : 'width:24px;height:24px;border-radius:50%;background:#FFFFFF;position:absolute;top:3px;left:3px;box-shadow:0 2px 5px rgba(0,0,0,0.25);transition:all .2s ease';
+    const autoPrintKitchenOrderCardStyle = autoPrintKitchenOrderActive
+      ? 'width:100%;min-height:72px;padding:12px 16px;border:1.5px solid #86EFAC;border-radius:12px;background:#F0FDF4;color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;gap:14px;cursor:pointer;box-sizing:border-box;transition:all .15s ease'
+      : 'width:100%;min-height:72px;padding:12px 16px;border:1.5px solid #CBD5E1;border-radius:12px;background:#FFFFFF;color:#0F172A;font:inherit;text-align:left;display:flex;align-items:center;gap:14px;cursor:pointer;box-sizing:border-box;transition:all .15s ease';
+
     const settingsCardStyle = `background:${c.cardBg};border-radius:14px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.07)`;
     const keyInputStyle = `width:100%;box-sizing:border-box;padding:12px 14px;border-radius:10px;border:1px solid rgba(0,0,0,0.14);font-size:13px;font-family:ui-monospace,monospace;background:${c.bg};color:${c.ink}`;
     const connMsgStyle = `margin-top:12px;font-size:12.5px;font-weight:600;color:${s.connMsgOk ? '#15803D' : '#D93838'}`;
@@ -3682,7 +3727,11 @@ class Component extends DCLogic {
       if (typeof p.openCashDrawer === 'function') return 'padding:5px 10px;border-radius:7px;background:#DCFCE7;color:#166534;font-size:11.5px;font-weight:850';
       return 'padding:5px 10px;border-radius:7px;background:#FEE2E2;color:#991B1B;font-size:11.5px;font-weight:850';
     })(),
-    settingsCardStyle,autoPrintCheckoutReceipt:s.autoPrintCheckoutReceipt,toggleAutoPrintCheckoutReceipt:()=>this.toggleAutoPrintCheckoutReceipt(),autoPrintOrderSummary:s.autoPrintOrderSummary,toggleAutoPrintOrderSummary:()=>this.toggleAutoPrintOrderSummary(),autoPrintKitchenOrder:s.autoPrintKitchenOrder,toggleAutoPrintKitchenOrder:()=>this.toggleAutoPrintKitchenOrder(),printLastCheckoutReceipt:()=>this.printLastCheckoutReceipt(),testMainPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('main'),testKitchenPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('kitchen'),testReceiptPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('receipt'),canManagePayments:s.canCreateMenu,tableCountInput:s.tableCountInput,onTableCountInput:e=>this.setState({tableCountInput:e.target.value,connMsg:null}),saveTableCount:()=>this.saveTableCount(),tableDisplayChoices:[],tableEditorRows,canvasEditorTables,canvasSelectionButtons,selectedCanvasCount:s.selectedCanvasTables.length,canvasWidthInput:s.canvasWidthInput,canvasHeightInput:s.canvasHeightInput,onCanvasWidthInput:e=>this.setState({canvasWidthInput:e.target.value}),onCanvasHeightInput:e=>this.setState({canvasHeightInput:e.target.value}),selectAllCanvasTables:()=>this.selectAllCanvasTables(),clearCanvasTableSelection:()=>this.clearCanvasTableSelection(),applyCanvasTableSize:()=>this.applyCanvasTableSize(),arrangeCanvasTables:()=>this.arrangeCanvasTables(),addCanvasTable:()=>this.addCanvasTable(),addTableEditorRow:()=>this.addTableEditorRow(),tableLayoutSaving:s.tableLayoutSaving,tableLayoutSaveLabel:s.tableLayoutSaving?'กำลังบันทึก...':'บันทึกผังโต๊ะ',saveTableLayout:()=>this.saveTableLayout(),tableShapeChoices:[],
+    settingsCardStyle,
+      autoPrintCheckoutReceiptActive,autoPrintCheckoutReceiptLabel,autoPrintCheckoutReceiptBadgeStyle,autoPrintCheckoutReceiptTrackStyle,autoPrintCheckoutReceiptKnobStyle,autoPrintCheckoutReceiptCardStyle,toggleAutoPrintCheckoutReceipt:()=>this.toggleAutoPrintCheckoutReceipt(),
+      autoPrintOrderSummaryActive,autoPrintOrderSummaryLabel,autoPrintOrderSummaryBadgeStyle,autoPrintOrderSummaryTrackStyle,autoPrintOrderSummaryKnobStyle,autoPrintOrderSummaryCardStyle,toggleAutoPrintOrderSummary:()=>this.toggleAutoPrintOrderSummary(),
+      autoPrintKitchenOrderActive,autoPrintKitchenOrderLabel,autoPrintKitchenOrderBadgeStyle,autoPrintKitchenOrderTrackStyle,autoPrintKitchenOrderKnobStyle,autoPrintKitchenOrderCardStyle,toggleAutoPrintKitchenOrder:()=>this.toggleAutoPrintKitchenOrder(),
+      printLastCheckoutReceipt:()=>this.printLastCheckoutReceipt(),testMainPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('main'),testKitchenPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('kitchen'),testReceiptPrinter:()=>window.ggTestPrinterRoute&&window.ggTestPrinterRoute('receipt'),canManagePayments:s.canCreateMenu,tableCountInput:s.tableCountInput,onTableCountInput:e=>this.setState({tableCountInput:e.target.value,connMsg:null}),saveTableCount:()=>this.saveTableCount(),tableDisplayChoices:[],tableEditorRows,canvasEditorTables,canvasSelectionButtons,selectedCanvasCount:s.selectedCanvasTables.length,canvasWidthInput:s.canvasWidthInput,canvasHeightInput:s.canvasHeightInput,onCanvasWidthInput:e=>this.setState({canvasWidthInput:e.target.value}),onCanvasHeightInput:e=>this.setState({canvasHeightInput:e.target.value}),selectAllCanvasTables:()=>this.selectAllCanvasTables(),clearCanvasTableSelection:()=>this.clearCanvasTableSelection(),applyCanvasTableSize:()=>this.applyCanvasTableSize(),arrangeCanvasTables:()=>this.arrangeCanvasTables(),addCanvasTable:()=>this.addCanvasTable(),addTableEditorRow:()=>this.addTableEditorRow(),tableLayoutSaving:s.tableLayoutSaving,tableLayoutSaveLabel:s.tableLayoutSaving?'กำลังบันทึก...':'บันทึกผังโต๊ะ',saveTableLayout:()=>this.saveTableLayout(),tableShapeChoices:[],
       hasOpenShift:!!s.currentShift,hasLastShiftSummary:!!s.lastShiftSummary,noOpenShift:!s.currentShift&&!s.lastShiftSummary,goShiftManagement:()=>this.setState({screen:'shift'}),
       lastShiftTotal:s.lastShiftSummary?this.fmt(s.lastShiftSummary.total):'0',lastShiftBillCount:s.lastShiftSummary?s.lastShiftSummary.billCount:0,lastShiftCancelledCount:s.lastShiftSummary?s.lastShiftSummary.cancelledCount:0,lastShiftCancelledTotal:s.lastShiftSummary?this.fmt(s.lastShiftSummary.cancelledTotal):'0',lastShiftPayments:s.lastShiftSummary?(s.lastShiftSummary.payments||[]).map(x=>({label:x.label,amount:this.fmt(x.amount)})):[],lastShiftPrintMessage:s.lastShiftSummary&&s.lastShiftSummary.printed?'พิมพ์รายงานฉบับเต็มและใบสรุปยอดแล้ว':'ไม่พบเครื่องพิมพ์ กรุณาตรวจการเชื่อมต่อ',finishClosedShift:()=>this.logout(),
       shiftStartRequired: !!s.sessionToken && !s.currentShift && s.screen !== 'shift' && !WAITER_MODE,
