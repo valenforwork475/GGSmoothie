@@ -110,6 +110,7 @@ public class MainActivity extends Activity {
     private List<String> wrap(String text,Paint paint,float max){List<String> out=new ArrayList<>();for(String paragraph:(text==null?"":text).replace("\r","").split("\n",-1)){if(paragraph.isEmpty()){out.add("");continue;}String rest=paragraph;while(!rest.isEmpty()){int end=paint.breakText(rest,true,max,null);if(end<=0)end=1;if(end<rest.length()){int space=rest.lastIndexOf(' ',end-1);if(space>end/2)end=space+1;}out.add(rest.substring(0,end).trim());rest=rest.substring(end).trim();}}return out;}
     private void addWrapped(List<Line> lines,String text,float size,boolean bold,Paint.Align align,float width){Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);p.setTextSize(size);p.setFakeBoldText(bold);for(String s:wrap(text,p,width))lines.add(new Line(s,size,bold,align));}
     private Bitmap render(String route,JSONObject data)throws Exception{
+        if("receipt".equals(route)&&data.optBoolean("professionalLayout",false))return renderProfessionalReceipt(data);
         final int width=576;final float content=528;List<Line> lines=new ArrayList<>();
         String header=data.optString("header","");if(!header.isEmpty())addWrapped(lines,header,25,true,Paint.Align.CENTER,content);
         String title=data.optString("title","");if(!title.isEmpty())addWrapped(lines,title,36,true,Paint.Align.CENTER,content);
@@ -129,7 +130,37 @@ public class MainActivity extends Activity {
         if(!barcode.isEmpty()){Bitmap bars=code128(barcode,500,105);c.drawBitmap(bars,null,new Rect(38,(int)y,538,(int)y+105),p);bars.recycle();y+=125;p.setTextAlign(Paint.Align.CENTER);p.setTextSize(21);p.setFakeBoldText(true);c.drawText(barcodeLabel,width/2f,y,p);}
         return bmp;
     }
+    private Bitmap renderProfessionalReceipt(JSONObject data)throws Exception{
+        final int width=576;final float content=528;List<Line> lines=new ArrayList<>();
+        addWrapped(lines,"MR.STEAK",46,true,Paint.Align.CENTER,content);
+        addWrapped(lines,data.optString("companyName",""),23,true,Paint.Align.CENTER,content);
+        addWrapped(lines,data.optString("branchName",""),21,false,Paint.Align.CENTER,content);
+        addWrapped(lines,data.optString("address",""),19,false,Paint.Align.CENTER,content);
+        String taxId=data.optString("taxId","");if(!taxId.isEmpty())addWrapped(lines,"เลขประจำตัวผู้เสียภาษี "+taxId,19,false,Paint.Align.CENTER,content);
+        lines.add(new Line("================================",17,false,Paint.Align.CENTER));
+        addWrapped(lines,data.optString("billTitle","ใบเสร็จรับเงิน"),32,true,Paint.Align.CENTER,content);
+        String table=data.optString("table","");String tableLabel=data.optString("tableLabel","เลขโต๊ะ");if(!table.isEmpty())addWrapped(lines,tableLabel+"  "+table,25,true,Paint.Align.LEFT,content);
+        String docNo=data.optString("docNo","");if(!docNo.isEmpty())addWrapped(lines,"เลขที่บิล  "+docNo,22,false,Paint.Align.LEFT,content);
+        String date=data.optString("date","");if(!date.isEmpty())addWrapped(lines,"วันที่  "+date,20,false,Paint.Align.LEFT,content);
+        lines.add(new Line("--------------------------------",17,false,Paint.Align.CENTER));
+        JSONArray items=data.optJSONArray("items");if(items!=null)for(int i=0;i<items.length();i++){JSONObject item=items.getJSONObject(i);int qty=item.optInt("qty",1);String name=item.optString("name","");addWrapped(lines,qty+" × "+name,27,true,Paint.Align.LEFT,content);String detail=item.optString("detail","");if(!detail.isEmpty())addWrapped(lines,"  "+detail,20,false,Paint.Align.LEFT,content);if(item.has("price"))addWrapped(lines,"฿"+String.format(Locale.US,"%.2f",item.optDouble("price",0)*qty),25,true,Paint.Align.RIGHT,content);}
+        lines.add(new Line("--------------------------------",17,false,Paint.Align.CENTER));
+        addWrapped(lines,"ยอดก่อน VAT   ฿"+String.format(Locale.US,"%.2f",data.optDouble("subtotal",0)),23,false,Paint.Align.RIGHT,content);
+        addWrapped(lines,"VAT 7%   ฿"+String.format(Locale.US,"%.2f",data.optDouble("vat",0)),23,false,Paint.Align.RIGHT,content);
+        addWrapped(lines,"รวมทั้งสิ้น   ฿"+String.format(Locale.US,"%.2f",data.optDouble("total",0)),32,true,Paint.Align.RIGHT,content);
+        addWrapped(lines,"ชำระโดย  "+data.optString("payment","-"),22,false,Paint.Align.LEFT,content);
+        lines.add(new Line("================================",17,false,Paint.Align.CENTER));
+        String loyaltyCode=data.optString("barcode","");int qrSpace=loyaltyCode.isEmpty()?0:310;
+        if(!loyaltyCode.isEmpty()){addWrapped(lines,"สแกนเพื่อสะสมแต้ม",28,true,Paint.Align.CENTER,content);addWrapped(lines,"ทุก 300 บาท = 1 แต้ม · ใช้สิทธิ์ภายใน 24 ชั่วโมง",19,false,Paint.Align.CENTER,content);}
+        addWrapped(lines,"ขอบคุณที่ใช้บริการ",23,true,Paint.Align.CENTER,content);
+        int height=54;for(Line l:lines)height+=(int)(l.size*1.45f);height+=qrSpace+42;height=Math.max(height,620);
+        Bitmap bmp=Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(bmp);c.drawColor(Color.WHITE);Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);p.setColor(Color.BLACK);float y=42;
+        for(Line l:lines){p.setTextSize(l.size);p.setFakeBoldText(l.bold);p.setTextAlign(l.align);float x=l.align==Paint.Align.CENTER?width/2f:l.align==Paint.Align.RIGHT?width-24:24;c.drawText(l.text,x,y,p);y+=l.size*1.45f;}
+        if(!loyaltyCode.isEmpty()){String orderId=loyaltyCode.startsWith("SKY-")?loyaltyCode.substring(4):loyaltyCode;if(orderId.matches("[0-9A-Fa-f]{32}"))orderId=orderId.substring(0,8)+"-"+orderId.substring(8,12)+"-"+orderId.substring(12,16)+"-"+orderId.substring(16,20)+"-"+orderId.substring(20);String qrValue="https://sky-pos.vercel.app/?claim="+orderId;Bitmap qr=qrCode(qrValue,250);c.drawBitmap(qr,null,new Rect(163,(int)y,413,(int)y+250),p);qr.recycle();y+=272;p.setTextAlign(Paint.Align.CENTER);p.setTextSize(17);p.setFakeBoldText(false);c.drawText(loyaltyCode,width/2f,y,p);}
+        return bmp;
+    }
     private Bitmap code128(String value,int width,int height)throws Exception{BitMatrix matrix=new MultiFormatWriter().encode(value,BarcodeFormat.CODE_128,width,height);Bitmap bitmap=Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);for(int y=0;y<height;y++)for(int x=0;x<width;x++)bitmap.setPixel(x,y,matrix.get(x,y)?Color.BLACK:Color.WHITE);return bitmap;}
+    private Bitmap qrCode(String value,int size)throws Exception{BitMatrix matrix=new MultiFormatWriter().encode(value,BarcodeFormat.QR_CODE,size,size);Bitmap bitmap=Bitmap.createBitmap(size,size,Bitmap.Config.ARGB_8888);for(int y=0;y<size;y++)for(int x=0;x<size;x++)bitmap.setPixel(x,y,matrix.get(x,y)?Color.BLACK:Color.WHITE);return bitmap;}
     private void send(String route,Bitmap bitmap)throws Exception{try(Socket socket=new Socket()){socket.connect(new InetSocketAddress(host(route),port(route)),5000);socket.setSoTimeout(5000);OutputStream out=socket.getOutputStream();out.write(new byte[]{0x1b,0x40});out.write(raster(bitmap));out.write(new byte[]{0x0a,0x0a,0x0a,0x1d,0x56,0x00});out.flush();}}
     private void sendCashDrawerPulse()throws Exception{try(Socket socket=new Socket()){socket.connect(new InetSocketAddress(host("receipt"),port("receipt")),5000);socket.setSoTimeout(5000);OutputStream out=socket.getOutputStream();out.write(new byte[]{0x1b,0x40,0x1b,0x70,0x00,0x19,(byte)0xFA});out.flush();}}
     private synchronized Bitmap getReceiptLogo(){if(receiptLogo!=null&&!receiptLogo.isRecycled())return receiptLogo;Bitmap source=BitmapFactory.decodeResource(getResources(),R.drawable.receipt_logo);if(source==null)return null;Bitmap scaled=Bitmap.createScaledBitmap(source,280,280,true);source.recycle();receiptLogo=outlineLogo(scaled);scaled.recycle();return receiptLogo;}
