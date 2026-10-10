@@ -12,12 +12,12 @@
     },
     {
       "source": "/sunmi",
-      "destination": "/downloads/SkyPOS-Sunmi-v1.4.8.apk",
+      "destination": "/downloads/SkyPOS-Sunmi-v1.4.9.apk",
       "permanent": false
     },
     {
       "source": "/apk",
-      "destination": "/downloads/SkyPOS-Sunmi-v1.4.8.apk",
+      "destination": "/downloads/SkyPOS-Sunmi-v1.4.9.apk",
       "permanent": false
     }
   ],
