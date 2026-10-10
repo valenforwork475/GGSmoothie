@@ -2739,7 +2739,7 @@ class Component extends DCLogic {
     const receiptItems = s.cart.map(line => {
       const srcTable = line.sourceTable || (line.modText && line.modText.includes('[จากโต๊ะ') ? (line.modText.match(/\[จากโต๊ะ ([^\]]+)\]/) || [])[1] : s.activeTable);
       const itemDetail = isMerged ? ('[โต๊ะ ' + srcTable + '] ' + (line.modText || '')).trim() : (line.modText || '');
-      return { name: line.name, qty: line.qty, detail: itemDetail, price: s.showPricesBeforeVat?this.netUnitPrice(line):this.grossUnitPrice(line) };
+      return { name: line.name, qty: line.qty, detail: itemDetail, price: Number(line.unitPrice)||0 };
     });
     if(totals.discount>0)receiptItems.push({name:s.discountLabel||'ส่วนลด',qty:1,detail:'ส่วนลด',price:-totals.discount});
     if(totals.couponTotal>0)receiptItems.push({name:'คูปองส่วนลด ฿100 × '+totals.couponCount,qty:1,detail:'คูปองแทนเงินสด',price:-totals.couponTotal});
@@ -2747,7 +2747,7 @@ class Component extends DCLogic {
     const receiptNote='ยอดรวม ฿'+Number(totals.netTotal).toFixed(2)+((payment==='cash'&&totals.rounding!==0)?'\nปัดเศษเงินสด: '+(totals.rounding>0?'+':'')+Number(totals.rounding).toFixed(2):'')+'\nรวมทั้งสิ้น ฿'+Number(total).toFixed(2)+'\nชำระโดย '+(PAY_TH[payment]||payment||'');
     const loyaltyCode=orderId&&/^[0-9a-f-]{36}$/i.test(String(orderId))?'SKY-'+String(orderId).replace(/-/g,'').toUpperCase():'';
     const b=s.receiptBusiness||DEFAULT_RECEIPT_BUSINESS;
-    nativePrinter.printOrder('receipt',JSON.stringify({professionalLayout:true,companyName:b.company_name||'บริษัท มิสเตอร์สเต็ก ราชาเทวา จำกัด',branchName:RECEIPT_BRANCH_EN,address:b.address||'',taxId:b.tax_id||'',billTitle:'ใบเสร็จรับเงิน',tableLabel:'เลขโต๊ะ',table:String(s.activeTable||'-')+((s.mergedTableNos&&s.mergedTableNos.length)?' / '+s.mergedTableNos.join(', '):''),docNo:queueNo?this.queueFmt(queueNo):'-',date:new Date().toLocaleString('th-TH'),items:receiptItems,subtotal:Math.max(0,totals.netTotal-totals.vatAmount),vat:totals.vatAmount,total:Number(total),payment:PAY_TH[payment]||payment||'',barcode:loyaltyCode}),'receipt-'+Date.now());
+    nativePrinter.printOrder('receipt',JSON.stringify({professionalLayout:true,companyName:b.company_name||'บริษัท มิสเตอร์สเต็ก ราชาเทวา จำกัด',branchName:RECEIPT_BRANCH_EN,address:b.address||'',taxId:b.tax_id||'',billTitle:'ใบเสร็จรับเงิน',tableLabel:'Table',table:String(s.activeTable||'-')+((s.mergedTableNos&&s.mergedTableNos.length)?' / '+s.mergedTableNos.join(', '):''),docNo:queueNo?this.queueFmt(queueNo):'-',date:new Date().toLocaleString('th-TH'),items:receiptItems,subtotal:Math.max(0,totals.netTotal-totals.vatAmount),vat:totals.vatAmount,total:Number(total),payment:PAY_TH[payment]||payment||'',barcode:loyaltyCode}),'receipt-'+Date.now());
   }
   awardMemberPoints(phone,orderId,queueNo){
     const clean=String(phone||'').replace(/\D/g,'');if(clean.length!==10||!orderId)return Promise.resolve(null);
@@ -2756,11 +2756,11 @@ class Component extends DCLogic {
   }
   printHistoryReceipt(order){
     const nativePrinter=window.GGPrinter;if(!nativePrinter||typeof nativePrinter.printOrder!=='function'||!order)return false;
-    const items=(order.items||[]).map(line=>({name:line.name,qty:Number(line.qty)||1,detail:line.modText||line.desc||'',price:Number(line.price)||0}));
+    const items=(order.items||[]).map(line=>{const menu=this.state.menuItems.find(item=>String(item.id||item.dbId||'')===String(line.menu_id||line.menuId||'')||String(item.name||'').trim()===String(line.name||'').trim());return{name:line.name,qty:Number(line.qty)||1,detail:line.modText||line.desc||'',price:menu?Number(menu.price)||0:Number(line.price)||0}});
     const loyaltyCode=order.uid&&/^[0-9a-f-]{36}$/i.test(String(order.uid))?'SKY-'+String(order.uid).replace(/-/g,'').toUpperCase():'';
     const noteTable=String(order.note||'').match(/TABLE:([^·\s]+)/i),tableSource=String(order.table_no||order.table||(noteTable&&noteTable[1])||order.customer_name||order.id||'หน้าร้าน'),tableMatch=tableSource.match(/โต๊ะ\s*([^\s(]+)/i),table=tableMatch?tableMatch[1]:(/^TA-/i.test(tableSource)?tableSource:'หน้าร้าน');
     const total=Number(order.total||0),vat=Math.round((total*7/107)*100)/100,subtotal=Math.max(0,total-vat),b=this.state.receiptBusiness||DEFAULT_RECEIPT_BUSINESS;
-    nativePrinter.printOrder('receipt',JSON.stringify({professionalLayout:true,companyName:b.company_name||'บริษัท มิสเตอร์สเต็ก ราชาเทวา จำกัด',branchName:RECEIPT_BRANCH_EN,address:b.address||'',taxId:b.tax_id||'',billTitle:'สำเนาใบเสร็จรับเงิน',tableLabel:table==='หน้าร้าน'?'ประเภท':'เลขโต๊ะ',table,docNo:this.queueFmt(order.queue_no),date:order.created_at?new Date(order.created_at).toLocaleString('th-TH'):('เวลา '+(order.time||'')),items,subtotal,vat,total,payment:order.paymentLabel||PAY_TH[order.pay_method]||order.pay_method||'-',barcode:loyaltyCode}),'history-receipt-'+order.uid+'-'+Date.now());
+    nativePrinter.printOrder('receipt',JSON.stringify({professionalLayout:true,companyName:b.company_name||'บริษัท มิสเตอร์สเต็ก ราชาเทวา จำกัด',branchName:RECEIPT_BRANCH_EN,address:b.address||'',taxId:b.tax_id||'',billTitle:'สำเนาใบเสร็จรับเงิน',tableLabel:table==='หน้าร้าน'?'Type':'Table',table,docNo:this.queueFmt(order.queue_no),date:order.created_at?new Date(order.created_at).toLocaleString('th-TH'):('เวลา '+(order.time||'')),items,subtotal,vat,total,payment:order.paymentLabel||PAY_TH[order.pay_method]||order.pay_method||'-',barcode:loyaltyCode}),'history-receipt-'+order.uid+'-'+Date.now());
     this.showSaveNotice('ส่งพิมพ์ใบเสร็จย้อนหลังแล้ว');return true;
   }
   async reprintHistoryDocument(order){
@@ -2789,11 +2789,12 @@ class Component extends DCLogic {
     nativePrinter.printOrder('receipt',JSON.stringify({header:this.receiptHeader('ใบแจ้งยอด'),table:((s.mergedTableNos&&s.mergedTableNos.length)?('โต๊ะ '+s.activeTable+' (รวมโต๊ะ '+s.mergedTableNos.join(', ')+')'):('โต๊ะ '+s.activeTable)),guests:s.activeGuestCount||1,items:billItems,note:(s.note?'หมายเหตุ: '+s.note+'\n':'')+'รวมทั้งสิ้น ฿'+Number(totals.netTotal).toFixed(2)+'\nยังไม่ชำระเงิน'}),'table-bill-'+Date.now());
     this.setState({orderError:null});
   }
-  printTableBillFromMap(tableNo){
-    const order=this.state.tableOrders[String(tableNo)],nativePrinter=window.GGPrinter;if(!order||!order.cart||!order.cart.length||!nativePrinter||typeof nativePrinter.printOrder!=='function')return;
-    const totals=this.cartTotals(order.cart),items=order.cart.map(line=>({name:line.name,qty:line.qty,detail:line.modText||'',price:this.grossUnitPrice(line)}));
-    nativePrinter.printOrder('receipt',JSON.stringify({header:this.receiptHeader('ใบแจ้งยอด'),table:'โต๊ะ '+tableNo,guests:order.guestCount||1,items,note:(order.note?'หมายเหตุ: '+order.note+'\n':'')+'รวมทั้งสิ้น ฿'+Number(totals.netTotal).toFixed(2)+'\nยังไม่ชำระเงิน'}),'table-map-bill-'+tableNo+'-'+Date.now());
-    this.showSaveNotice('ส่งพิมพ์บิลโต๊ะ '+tableNo+' แล้ว');
+  async printTableBillFromMap(tableNo){
+    const order=this.state.tableOrders[String(tableNo)];if(!order||!order.cart||!order.cart.length)return;
+    const totals=this.cartTotals(order.cart),items=order.cart.map(line=>({name:line.name,qty:line.qty,detail:line.modText||'',price:Number(line.unitPrice)||0}));
+    const payload={header:this.receiptHeader('ใบแจ้งยอด'),table:'Table '+tableNo,guests:order.guestCount||1,items,note:(order.note?'หมายเหตุ: '+order.note+'\n':'')+'รวมทั้งสิ้น ฿'+Number(totals.netTotal).toFixed(2)+'\nยังไม่ชำระเงิน'};
+    const nativePrinter=window.GGPrinter;if(nativePrinter&&typeof nativePrinter.printOrder==='function'){nativePrinter.printOrder('receipt',JSON.stringify(payload),'table-map-bill-'+tableNo+'-'+Date.now());this.showSaveNotice('ส่งพิมพ์บิลโต๊ะ '+tableNo+' แล้ว');return}
+    try{await this.api('POST','rpc/request_pos_table_bill_print',{p_table_no:String(tableNo),p_payload:payload});this.showSaveNotice('ส่งคำสั่งพิมพ์บิลโต๊ะ '+tableNo+' ไปยังเครื่อง POS แล้ว')}catch(error){this.setState({tableSyncError:'ส่งพิมพ์จาก iPad ไม่สำเร็จ: '+(error.message||'กรุณาตรวจว่าเครื่อง POS เปิดอยู่')})}
   }
   toggleAutoPrintCheckoutReceipt(){this.setState(s=>{const enabled=!s.autoPrintCheckoutReceipt;try{localStorage.setItem('gg_pos_auto_print_checkout_receipt',enabled?'1':'0')}catch(_e){}return{autoPrintCheckoutReceipt:enabled}})}
   toggleAutoPrintOrderSummary(){this.setState(s=>{const enabled=!s.autoPrintOrderSummary;try{localStorage.setItem('gg_pos_auto_print_order_summary',enabled?'1':'0')}catch(_e){}return{autoPrintOrderSummary:enabled}})}
