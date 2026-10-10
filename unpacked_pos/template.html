@@ -2455,14 +2455,14 @@ class Component extends DCLogic {
     const since = new Date();
     since.setDate(1);
     since.setHours(0, 0, 0, 0);
-    this.api('GET', 'orders?created_at=gte.' + since.toISOString() + '&order=created_at.desc&select=id,queue_no,customer_name,phone,items,total,pay_method,status,source,note,created_at,cancelled_at')
+    this.api('GET', 'orders?created_at=gte.' + since.toISOString() + '&order=created_at.desc&select=id,queue_no,customer_name,phone,items,total,pay_method,payment_parts,status,source,note,created_at,cancelled_at')
       .then((rows) => {
         this.setState({
           history: (rows || []).map((o) => ({
             id: (o.customer_name && /^(โต๊ะ|Takeaway)/i.test(o.customer_name)) ? o.customer_name : (o.source === 'web' ? 'ออเดอร์ออนไลน์' : 'หน้าร้าน'),
             uid: o.id,
             time: new Date(o.created_at).toLocaleString('th-TH', { day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit' }),
-            items: (o.items || []).map((it) => ({ name: it.name, qty: it.qty, price:Number(it.price)||0, modText: it.desc || '', cal: it.cal || 0, p: it.p || 0, f: it.f || 0, sug: it.sug || 0 })),
+            items: (o.items || []).map((it) => ({ menu_id:it.menu_id||null, name: it.name, nameEn:it.name_en||'', qty: it.qty, price:Number(it.price)||0, modText: it.desc || '', cal: it.cal || 0, p: it.p || 0, f: it.f || 0, sug: it.sug || 0 })),
             total: Number(o.total),
             paymentLabel: (this.state.paymentMethodsConfig.find(method=>method.id===o.pay_method)||{}).label || PAY_TH[o.pay_method] || o.pay_method || '-',
             status: STATUS_TH[o.status] || o.status,
@@ -2474,6 +2474,7 @@ class Component extends DCLogic {
             source: o.source,
             created_at:o.created_at,
             note:o.note||'',
+            payment_parts:Array.isArray(o.payment_parts)?o.payment_parts:[],
             cancelled_at:o.cancelled_at,
           })),
           connOk: true,
@@ -2569,7 +2570,10 @@ class Component extends DCLogic {
   isCorrectedVatExclusiveLine(line){const id=String(line&&line.menuId||''),name=String(line&&line.name||'').trim();return id==='p_8de969601a04'||id==='p_f443de36269d'||id==='pmuwhwfrm'||name==='คุโรบูตะ'||name==='cheese chicken fries'||name==='เซ็ตทัวร์บุฟเฟต์ *สั่งเพิ่ม'}
   grossUnitPrice(line){const base=Number(line&&line.unitPrice)||0,rate=Math.max(0,Number(line&&line.vatRate)||0),vatIncluded=this.isCorrectedVatExclusiveLine(line)?false:line&&line.vatIncluded!==false;return Math.round((vatIncluded?base:base*(1+rate/100))*100)/100}
   netUnitPrice(line){if(this.isCorrectedVatExclusiveLine(line))return Math.round((Number(line&&line.unitPrice)||0)*100)/100;const gross=this.grossUnitPrice(line),rate=Math.max(0,Number(line&&line.vatRate)||0);return Math.round((rate?gross/(1+rate/100):gross)*100)/100}
-  paymentParts(order){const marker='PAYMENTS:';const note=String(order&&order.note||'');const at=note.indexOf(marker);if(at>=0){try{const raw=note.slice(at+marker.length).split(' · ')[0],parts=JSON.parse(decodeURIComponent(raw));if(Array.isArray(parts)&&parts.length)return parts.map(x=>({methodId:String(x.methodId||'other'),label:String(x.label||x.methodId||'อื่นๆ'),amount:Number(x.amount)||0,isCash:!!x.isCash}))}catch(_e){}}const id=String(order&&order.pay_method||'other');return[{methodId:id,label:PAY_TH[id]||id,amount:Number(order&&order.total||0),isCash:id==='cash'}]}
+  paymentParts(order){const normalize=parts=>parts.map(x=>({methodId:String(x.methodId||'other'),label:String(x.label||x.methodId||'อื่นๆ'),amount:Number(x.amount)||0,isCash:!!x.isCash,cashReceived:Number(x.cashReceived)||0,changeDue:Number(x.changeDue)||0}));if(order&&Array.isArray(order.payment_parts)&&order.payment_parts.length)return normalize(order.payment_parts);const marker='PAYMENTS:';const note=String(order&&order.note||'');const at=note.indexOf(marker);if(at>=0){try{const raw=note.slice(at+marker.length).split(' · ')[0],parts=JSON.parse(decodeURIComponent(raw));if(Array.isArray(parts)&&parts.length)return normalize(parts)}catch(_e){}}const id=String(order&&order.pay_method||'other');return[{methodId:id,label:PAY_TH[id]||id,amount:Number(order&&order.total||0),isCash:id==='cash',cashReceived:0,changeDue:0}]}
+  cleanReceiptName(value){return String(value||'').normalize('NFC').replace(/^[\s,.;:·•\-–—'"`ิีึืฺุู็่้๊๋์ํ๎]+/u,'').trim()}
+  receiptItemName(line){const clean=this.cleanReceiptName(line&&line.name),menu=this.state.menuItems.find(item=>String(item.id||item.dbId||'')===String(line&& (line.menu_id||line.menuId)||'')||this.cleanReceiptName(item.name)===clean),english=this.cleanReceiptName(line&&line.nameEn||menu&&menu.nameEn||'');return english&&english.toLowerCase()!==clean.toLowerCase()?clean+'\n'+english:clean}
+  cleanReceiptDetail(value){return String(value||'').split(' · ').map(part=>{const pair=part.split(':');if(pair.length<2)return this.cleanReceiptName(part);let group=this.cleanReceiptName(pair.shift()),choice=this.cleanReceiptName(pair.join(':'));if(/[ก-๙]/.test(group))group=group.replace(/\s+[A-Za-z][A-Za-z0-9 '&/().-]*$/,'').trim();return group&&choice?group+': '+choice:(choice||group)}).filter(Boolean).join(' · ')}
   cartTotals(cart) {
     let vatBeforeDiscount=0;
     const subtotal = (cart||[]).reduce((sum,l)=>{const base=(Number(l.unitPrice)||0)*(Number(l.qty)||0),rate=Math.max(0,Number(l.vatRate)||0),vatIncluded=this.isCorrectedVatExclusiveLine(l)?false:l.vatIncluded!==false,vat=vatIncluded?base*rate/(100+rate):base*rate/100;vatBeforeDiscount+=vat;return sum+(vatIncluded?0:vat)+base},0);
@@ -2738,8 +2742,8 @@ class Component extends DCLogic {
     const isMerged = s.mergedTableNos && s.mergedTableNos.length;
     const receiptItems = s.cart.map(line => {
       const srcTable = line.sourceTable || (line.modText && line.modText.includes('[จากโต๊ะ') ? (line.modText.match(/\[จากโต๊ะ ([^\]]+)\]/) || [])[1] : s.activeTable);
-      const itemDetail = isMerged ? ('[โต๊ะ ' + srcTable + '] ' + (line.modText || '')).trim() : (line.modText || '');
-      return { name: line.name, qty: line.qty, detail: itemDetail, price: Number(line.unitPrice)||0 };
+      const rawDetail = isMerged ? ('[โต๊ะ ' + srcTable + '] ' + (line.modText || '')).trim() : (line.modText || '');
+      return { name: this.receiptItemName(line), qty: line.qty, detail: this.cleanReceiptDetail(rawDetail), price: this.grossUnitPrice(line) };
     });
     if(totals.discount>0)receiptItems.push({name:s.discountLabel||'ส่วนลด',qty:1,detail:'ส่วนลด',price:-totals.discount});
     if(totals.couponTotal>0)receiptItems.push({name:'คูปองส่วนลด ฿100 × '+totals.couponCount,qty:1,detail:'คูปองแทนเงินสด',price:-totals.couponTotal});
@@ -2747,7 +2751,10 @@ class Component extends DCLogic {
     const receiptNote='ยอดรวม ฿'+Number(totals.netTotal).toFixed(2)+((payment==='cash'&&totals.rounding!==0)?'\nปัดเศษเงินสด: '+(totals.rounding>0?'+':'')+Number(totals.rounding).toFixed(2):'')+'\nรวมทั้งสิ้น ฿'+Number(total).toFixed(2)+'\nชำระโดย '+(PAY_TH[payment]||payment||'');
     const loyaltyCode=orderId&&/^[0-9a-f-]{36}$/i.test(String(orderId))?'SKY-'+String(orderId).replace(/-/g,'').toUpperCase():'';
     const b=s.receiptBusiness||DEFAULT_RECEIPT_BUSINESS;
-    nativePrinter.printOrder('receipt',JSON.stringify({professionalLayout:true,companyName:b.company_name||'บริษัท มิสเตอร์สเต็ก ราชาเทวา จำกัด',branchName:RECEIPT_BRANCH_EN,address:b.address||'',taxId:b.tax_id||'',billTitle:'ใบเสร็จรับเงิน',tableLabel:'Table',table:String(s.activeTable||'-')+((s.mergedTableNos&&s.mergedTableNos.length)?' / '+s.mergedTableNos.join(', '):''),docNo:queueNo?this.queueFmt(queueNo):'-',date:new Date().toLocaleString('th-TH'),items:receiptItems,subtotal:Math.max(0,totals.netTotal-totals.vatAmount),vat:totals.vatAmount,total:Number(total),payment:PAY_TH[payment]||payment||'',barcode:loyaltyCode}),'receipt-'+Date.now());
+    const parts=(s.splitPayments||[]).length?s.splitPayments:[];
+    const cashReceived=parts.length?parts.filter(x=>x.isCash).reduce((sum,x)=>sum+(Number(x.cashReceived)||0),0):((s.paymentMethodsConfig.find(x=>x.id===s.paymentMethod)||{}).kind==='cash'?Number(s.cashReceived)||0:0);
+    const changeDue=parts.length?parts.filter(x=>x.isCash).reduce((sum,x)=>sum+(Number(x.changeDue)||0),0):Math.max(0,cashReceived-Number(total||0));
+    nativePrinter.printOrder('receipt',JSON.stringify({professionalLayout:true,companyName:b.company_name||'บริษัท มิสเตอร์สเต็ก ราชาเทวา จำกัด',branchName:RECEIPT_BRANCH_EN,address:b.address||'',taxId:b.tax_id||'',billTitle:'ใบเสร็จรับเงิน',tableLabel:'Table',table:String(s.activeTable||'-')+((s.mergedTableNos&&s.mergedTableNos.length)?' / '+s.mergedTableNos.join(', '):''),docNo:queueNo?this.queueFmt(queueNo):'-',date:new Date().toLocaleString('th-TH'),items:receiptItems,subtotal:Math.max(0,totals.netTotal-totals.vatAmount),vat:totals.vatAmount,total:Number(total),payment:PAY_TH[payment]||payment||'',cashReceived,changeDue,barcode:loyaltyCode}),'receipt-'+Date.now());
   }
   awardMemberPoints(phone,orderId,queueNo){
     const clean=String(phone||'').replace(/\D/g,'');if(clean.length!==10||!orderId)return Promise.resolve(null);
@@ -2756,11 +2763,12 @@ class Component extends DCLogic {
   }
   printHistoryReceipt(order){
     const nativePrinter=window.GGPrinter;if(!nativePrinter||typeof nativePrinter.printOrder!=='function'||!order)return false;
-    const items=(order.items||[]).map(line=>{const menu=this.state.menuItems.find(item=>String(item.id||item.dbId||'')===String(line.menu_id||line.menuId||'')||String(item.name||'').trim()===String(line.name||'').trim());return{name:line.name,qty:Number(line.qty)||1,detail:line.modText||line.desc||'',price:menu?Number(menu.price)||0:Number(line.price)||0}});
+    const items=(order.items||[]).map(line=>({name:this.receiptItemName(line),qty:Number(line.qty)||1,detail:this.cleanReceiptDetail(line.modText||line.desc||''),price:Number(line.price)||0}));
     const loyaltyCode=order.uid&&/^[0-9a-f-]{36}$/i.test(String(order.uid))?'SKY-'+String(order.uid).replace(/-/g,'').toUpperCase():'';
     const noteTable=String(order.note||'').match(/TABLE:([^·\s]+)/i),tableSource=String(order.table_no||order.table||(noteTable&&noteTable[1])||order.customer_name||order.id||'หน้าร้าน'),tableMatch=tableSource.match(/โต๊ะ\s*([^\s(]+)/i),table=tableMatch?tableMatch[1]:(/^TA-/i.test(tableSource)?tableSource:'หน้าร้าน');
     const total=Number(order.total||0),vat=Math.round((total*7/107)*100)/100,subtotal=Math.max(0,total-vat),b=this.state.receiptBusiness||DEFAULT_RECEIPT_BUSINESS;
-    nativePrinter.printOrder('receipt',JSON.stringify({professionalLayout:true,companyName:b.company_name||'บริษัท มิสเตอร์สเต็ก ราชาเทวา จำกัด',branchName:RECEIPT_BRANCH_EN,address:b.address||'',taxId:b.tax_id||'',billTitle:'สำเนาใบเสร็จรับเงิน',tableLabel:table==='หน้าร้าน'?'Type':'Table',table,docNo:this.queueFmt(order.queue_no),date:order.created_at?new Date(order.created_at).toLocaleString('th-TH'):('เวลา '+(order.time||'')),items,subtotal,vat,total,payment:order.paymentLabel||PAY_TH[order.pay_method]||order.pay_method||'-',barcode:loyaltyCode}),'history-receipt-'+order.uid+'-'+Date.now());
+    const paymentParts=this.paymentParts(order),cashReceived=paymentParts.filter(x=>x.isCash).reduce((sum,x)=>sum+(Number(x.cashReceived)||0),0),changeDue=paymentParts.filter(x=>x.isCash).reduce((sum,x)=>sum+(Number(x.changeDue)||0),0);
+    nativePrinter.printOrder('receipt',JSON.stringify({professionalLayout:true,companyName:b.company_name||'บริษัท มิสเตอร์สเต็ก ราชาเทวา จำกัด',branchName:RECEIPT_BRANCH_EN,address:b.address||'',taxId:b.tax_id||'',billTitle:'สำเนาใบเสร็จรับเงิน',tableLabel:table==='หน้าร้าน'?'Type':'Table',table,docNo:this.queueFmt(order.queue_no),date:order.created_at?new Date(order.created_at).toLocaleString('th-TH'):('เวลา '+(order.time||'')),items,subtotal,vat,total,payment:paymentParts.map(x=>x.label+' '+Number(x.amount).toFixed(2)).join(' + ')||order.paymentLabel||PAY_TH[order.pay_method]||order.pay_method||'-',cashReceived,changeDue,barcode:loyaltyCode}),'history-receipt-'+order.uid+'-'+Date.now());
     this.showSaveNotice('ส่งพิมพ์ใบเสร็จย้อนหลังแล้ว');return true;
   }
   async reprintHistoryDocument(order){
@@ -3155,7 +3163,8 @@ class Component extends DCLogic {
       return {
         kind: 'pos',
         menu_id: base ? base.id : (l.menuId || null),
-        name: l.name,
+        name: this.cleanReceiptName(l.name),
+        name_en: base ? (base.nameEn||'') : '',
         qty: l.qty,
         price: this.grossUnitPrice(l),
         desc: l.modText,
@@ -3183,22 +3192,25 @@ class Component extends DCLogic {
     }
     const orderCustomerName=s.activeTable?(String(s.activeTable).startsWith('TA-')?('Takeaway '+s.activeTable):('โต๊ะ '+s.activeTable)):(s.coName||'หน้าร้าน');
     const tableNote=s.activeTable?('TABLE:'+s.activeTable):'';
-    const splitNote = hasSplit ? ('PAYMENTS:' + encodeURIComponent(JSON.stringify(s.splitPayments.map(p=>({methodId:p.methodId,label:p.label,amount:Number(p.amount)||0,isCash:!!p.isCash})))) + ' · ชำระ: ' + s.splitPayments.map(p=>p.label+' ฿'+this.fmt(p.amount)).join(', ')) : '';
     const { couponCount, couponTotal } = this.cartTotals(s.cart);
     const payableTotal=(!hasSplit&&selectedPayment.kind==='cash')?Math.round(total):total;
     const appliedRounding=Math.round((payableTotal-total)*100)/100;
+    const paymentParts=hasSplit?s.splitPayments.map(p=>({methodId:p.methodId,label:p.label,amount:Number(p.amount)||0,isCash:!!p.isCash,cashReceived:Number(p.cashReceived)||0,changeDue:Number(p.changeDue)||0})):[{methodId:savedPayMethod,label:selectedPayment.label,amount:payableTotal,isCash:selectedPayment.kind==='cash',cashReceived:selectedPayment.kind==='cash'?(Number(s.cashReceived)||0):0,changeDue:selectedPayment.kind==='cash'?Math.max(0,(Number(s.cashReceived)||0)-payableTotal):0}];
+    const splitNote = hasSplit ? ('PAYMENTS:' + encodeURIComponent(JSON.stringify(paymentParts)) + ' · ชำระ: ' + paymentParts.map(p=>p.label+' ฿'+this.fmt(p.amount)).join(', ')) : '';
+    const orderNote=[tableNote,s.note||'',splitNote,discount>0?'ส่วนลด: '+(s.discountLabel||discount):'',couponTotal>0?'คูปอง ฿100: '+couponCount+' ใบ':'',appliedRounding!==0?'ปัดเศษเงินสด: '+(appliedRounding>0?'+':'')+appliedRounding:''].filter(Boolean).join(' · ')||null;
     if (!this.key() || this.session() === DEMO_SESSION) {
       SEQ += 1;
       if(discount>0)items.push({kind:'discount',menu_id:null,name:s.discountLabel||'ส่วนลด',qty:1,price:-discount,desc:'ส่วนลดจากยอด '+subtotal});
       if(couponTotal>0)items.push({kind:'coupon',menu_id:null,name:'คูปองส่วนลด ฿100 × '+couponCount,qty:1,price:-couponTotal,desc:'คูปองแทนเงินสด'});
       if(appliedRounding!==0)items.push({kind:'rounding',menu_id:null,name:'ปัดเศษเงินสด',qty:1,price:appliedRounding,desc:'ปัดเศษเงินสด'});
-      const demoOrder={id:'demo-'+Date.now(),queue_no:SEQ,customer_name:orderCustomerName,phone:s.coPhone||'',items,total:payableTotal,pay_method:savedPayMethod,paymentLabel:selectedPayment.label,status:'done',source:'pos',note:[tableNote,s.note||'',splitNote,discount>0?'ส่วนลด: '+(s.discountLabel||discount):'',couponTotal>0?'คูปอง ฿100: '+couponCount+' ใบ':'',appliedRounding!==0?'ปัดเศษเงินสด: '+(appliedRounding>0?'+':'')+appliedRounding:''].filter(Boolean).join(' · ')||null,created_at:new Date().toISOString()};
+      const demoOrder={id:'demo-'+Date.now(),queue_no:SEQ,customer_name:orderCustomerName,phone:s.coPhone||'',items,total:payableTotal,pay_method:savedPayMethod,paymentLabel:selectedPayment.label,payment_parts:paymentParts,status:'done',source:'pos',note:orderNote,created_at:new Date().toISOString()};
       if(!s.skipKitchenPrint && s.autoPrintKitchenOrder && (String(s.activeTable||'').startsWith('TA-')||!Number(s.activeTableVersion||0)))this.printNativeTableOrder();
       if(s.autoPrintCheckoutReceipt)this.printNativeReceipt(payableTotal,demoOrder.pay_method);
       if((!hasSplit&&selectedPayment.kind==='cash')||(hasSplit&&(s.splitPayments||[]).some(x=>x.isCash))){try{this.openNativeCashDrawer()}catch(_e){}}
       const totalCashInOrder=hasSplit?s.splitPayments.filter(x=>x.isCash).reduce((sum,x)=>sum+x.amount,0):(selectedPayment.kind==='cash'?payableTotal:0);const shift=s.currentShift,expected=shift?Number(shift.expected_cash||0)+totalCashInOrder:Number(shift?.expected_cash||0);
       const tableOrders=this.closePaidTable(s.activeTable)||s.tableOrders;
-      this.setState({lastOrder:{queue:SEQ,total:payableTotal,paymentKind:selectedPayment.kind,cashReceived:selectedPayment.kind==='cash'?Number(s.cashReceived)||0:0,changeDue:selectedPayment.kind==='cash'?Math.max(0,Math.round((Number(s.cashReceived)||0)-payableTotal)):0},lastPaidOrder:{uid:demoOrder.id,queue_no:SEQ,isDone:true,id:orderCustomerName,customer_name:orderCustomerName,table:s.activeTable,note:tableNote,pay_method:demoOrder.pay_method,paymentLabel:selectedPayment.label,created_at:demoOrder.created_at,items:s.cart.map(x=>({name:x.name,qty:x.qty,price:this.grossUnitPrice(x),desc:x.modText||''})),total:payableTotal},history:[{id:orderCustomerName,uid:demoOrder.id,time:new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}),items:items.map(x=>({name:x.name,qty:x.qty,modText:x.desc||''})),total:payableTotal,paymentLabel:selectedPayment.label,status:STATUS_TH.done,isDone:true,source:'pos',pay_method:demoOrder.pay_method,queue_no:SEQ},...s.history],tableOrders,activeTable:null,currentShift:shift?{...shift,expected_cash:expected}:shift,cart:[],screen:'confirmed',note:'',paymentMethod:null,cashReceived:'',paymentVerified:false,promoCode:'',promoMsg:null,discountAmount:0,discountLabel:'',manualDiscount:'',couponCount:0,orderError:null,coName:'หน้าร้าน',coPhone:'',activeMember:null,mergedTableNos:[],skipKitchenPrint:false,splitPayments:[],splitModalOpen:false,splitAmountInput:'',splitCashReceived:'',splitError:null});
+      const cashReceived=paymentParts.filter(x=>x.isCash).reduce((sum,x)=>sum+x.cashReceived,0),changeDue=paymentParts.filter(x=>x.isCash).reduce((sum,x)=>sum+x.changeDue,0);
+      this.setState({lastOrder:{queue:SEQ,total:payableTotal,paymentKind:selectedPayment.kind,cashReceived,changeDue},lastPaidOrder:{uid:demoOrder.id,queue_no:SEQ,isDone:true,id:orderCustomerName,customer_name:orderCustomerName,table:s.activeTable,note:orderNote,pay_method:demoOrder.pay_method,paymentLabel:selectedPayment.label,payment_parts:paymentParts,created_at:demoOrder.created_at,items:items.map(x=>({menu_id:x.menu_id,name:x.name,nameEn:x.name_en||'',qty:x.qty,price:x.price,desc:x.desc||''})),total:payableTotal},history:[{id:orderCustomerName,uid:demoOrder.id,time:new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}),items:items.map(x=>({menu_id:x.menu_id,name:x.name,nameEn:x.name_en||'',qty:x.qty,price:x.price,modText:x.desc||''})),total:payableTotal,paymentLabel:selectedPayment.label,payment_parts:paymentParts,note:orderNote,status:STATUS_TH.done,isDone:true,source:'pos',pay_method:demoOrder.pay_method,queue_no:SEQ},...s.history],tableOrders,activeTable:null,currentShift:shift?{...shift,expected_cash:expected}:shift,cart:[],screen:'confirmed',note:'',paymentMethod:null,cashReceived:'',paymentVerified:false,promoCode:'',promoMsg:null,discountAmount:0,discountLabel:'',manualDiscount:'',couponCount:0,orderError:null,coName:'หน้าร้าน',coPhone:'',activeMember:null,mergedTableNos:[],skipKitchenPrint:false,splitPayments:[],splitModalOpen:false,splitAmountInput:'',splitCashReceived:'',splitError:null});
       return;
     }
     this.setState({ sending: true, orderError: null });
@@ -3214,16 +3226,20 @@ class Component extends DCLogic {
         p_pay_method:savedPayMethod,p_promo_code:s.promoCode||null,
         p_manual_discount:(Number(s.manualDiscount)||0)+(Number(couponCount||0)*100)
       }));
-    submitOrder().then((o) => {
-      this.api('POST','rpc/set_pos_order_note',{p_order_id:o.id,p_note:[tableNote,s.note||'',splitNote,discount>0?'ส่วนลด: '+(s.discountLabel||discount):'',couponTotal>0?'คูปอง ฿100: '+couponCount+' ใบ':'',appliedRounding!==0?'ปัดเศษเงินสด: '+(appliedRounding>0?'+':'')+appliedRounding:''].filter(Boolean).join(' · ')||null}).catch(()=>{});
+    submitOrder().then(async (o) => {
+      await Promise.all([
+        this.api('POST','rpc/set_pos_order_note',{p_order_id:o.id,p_note:orderNote}),
+        this.api('POST','rpc/set_pos_order_payment_parts',{p_order_id:o.id,p_payment_parts:paymentParts})
+      ]);
       this.api('POST','rpc/set_pos_order_guest_count',{p_order_id:o.id,p_guest_count:s.activeGuestCount||1}).catch(()=>{});
       if(!s.skipKitchenPrint && s.autoPrintKitchenOrder && (String(s.activeTable||'').startsWith('TA-')||!Number(s.activeTableVersion||0)))this.printNativeTableOrder();
       const savedTotal=Number(o.total),finalTotal=Number.isFinite(savedTotal)?savedTotal:payableTotal;
       if(s.autoPrintCheckoutReceipt)this.printNativeReceipt(finalTotal,selectedPayment.label,o.id,o.queue_no);
       if((!hasSplit&&selectedPayment.kind==='cash')||(hasSplit&&(s.splitPayments||[]).some(x=>x.isCash))){try{this.openNativeCashDrawer()}catch(_e){}}
       const tableOrders=this.closePaidTable(s.activeTable)||s.tableOrders;
-      const paidOrder={uid:o.id,queue_no:o.queue_no,isDone:true,id:orderCustomerName,customer_name:orderCustomerName,table:s.activeTable,note:tableNote,pay_method:savedPayMethod,paymentLabel:selectedPayment.label,created_at:new Date().toISOString(),items:s.cart.map(x=>({name:x.name,qty:x.qty,price:this.grossUnitPrice(x),desc:x.modText||''})),total:finalTotal};
-      this.setState({ sending: false, lastOrder: { queue:o.queue_no,total:finalTotal,paymentKind:selectedPayment.kind,cashReceived:selectedPayment.kind==='cash'?Number(s.cashReceived)||0:0,changeDue:selectedPayment.kind==='cash'?Math.max(0,Math.round((Number(s.cashReceived)||0)-finalTotal)):0,loyaltyMessage:memberPhone?(finalTotal>=300?'กำลังสะสมพอยต์ให้สมาชิก…':'ยอดไม่ถึง 300 บาท จึงยังไม่ได้รับพอยต์'):null,loyaltyOk:false },lastPaidOrder:paidOrder, tableOrders,activeTable:null,cart: [], screen: 'confirmed', note: '', paymentMethod: null, cashReceived:'', paymentVerified:false, promoCode: '', promoMsg:null, discountAmount:0, discountLabel:'', manualDiscount:'', couponCount:0, coName: 'หน้าร้าน', coPhone: '', activeMember: null, mergedTableNos:[], skipKitchenPrint:false, splitPayments:[], splitModalOpen:false, splitAmountInput:'', splitCashReceived:'', splitError:null },()=>{if(memberPhone&&finalTotal>=300)this.awardMemberPoints(memberPhone,o.id,o.queue_no)});
+      const paidOrder={uid:o.id,queue_no:o.queue_no,isDone:true,id:orderCustomerName,customer_name:orderCustomerName,table:s.activeTable,note:orderNote,pay_method:savedPayMethod,paymentLabel:selectedPayment.label,payment_parts:paymentParts,created_at:new Date().toISOString(),items:items.map(x=>({menu_id:x.menu_id,name:x.name,nameEn:x.name_en||'',qty:x.qty,price:x.price,desc:x.desc||''})),total:finalTotal};
+      const cashReceived=paymentParts.filter(x=>x.isCash).reduce((sum,x)=>sum+x.cashReceived,0),changeDue=paymentParts.filter(x=>x.isCash).reduce((sum,x)=>sum+x.changeDue,0);
+      this.setState({ sending: false, lastOrder: { queue:o.queue_no,total:finalTotal,paymentKind:selectedPayment.kind,cashReceived,changeDue,loyaltyMessage:memberPhone?(finalTotal>=300?'กำลังสะสมพอยต์ให้สมาชิก…':'ยอดไม่ถึง 300 บาท จึงยังไม่ได้รับพอยต์'):null,loyaltyOk:false },lastPaidOrder:paidOrder, tableOrders,activeTable:null,cart: [], screen: 'confirmed', note: '', paymentMethod: null, cashReceived:'', paymentVerified:false, promoCode: '', promoMsg:null, discountAmount:0, discountLabel:'', manualDiscount:'', couponCount:0, coName: 'หน้าร้าน', coPhone: '', activeMember: null, mergedTableNos:[], skipKitchenPrint:false, splitPayments:[], splitModalOpen:false, splitAmountInput:'', splitCashReceived:'', splitError:null },()=>{if(memberPhone&&finalTotal>=300)this.awardMemberPoints(memberPhone,o.id,o.queue_no)});
       this.loadQueue();
     }).catch((error) => {
       this.setState({ sending: false, orderError: 'ส่งออเดอร์ไม่สำเร็จ — '+(error&&error.message?error.message:'กรุณาเข้าสู่ระบบใหม่หรือติดต่อผู้ดูแล') });
