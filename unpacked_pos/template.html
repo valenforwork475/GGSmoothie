@@ -1257,6 +1257,8 @@ button { -webkit-tap-highlight-color:transparent; }
 
           <sc-if value="{{noOpenShift}}"><div style="{{settingsCardStyle}};border:1px solid #BFDBFE"><div style="font-size:16px;font-weight:900">{{txt.reopenShift}}</div><div style="font-size:12px;color:#64748B;line-height:1.6;margin-top:5px">{{txt.reopenHint}}</div><input aria-label="{{txt.reopenShift}}" value="{{reopenReason}}" oninput="{{onReopenReasonChange}}" placeholder="{{txt.reopenReasonPlaceholder}}" style="{{keyInputStyle}};margin-top:12px"><button disabled="{{reopenDisabled}}" onclick="{{requestReopen}}" style="width:100%;min-height:46px;margin-top:10px;border:1px solid #2563EB;border-radius:10px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-weight:850;cursor:pointer">{{txt.reopenShift}}</button><sc-if value="{{reopenPending}}"><div style="margin-top:10px;padding:10px;border-radius:9px;background:#DCFCE7;color:#166534;font-size:12px;font-weight:750">{{txt.reopenPending}}</div></sc-if></div></sc-if>
 
+          <div style="max-width:620px;margin:16px auto 0;padding:18px;border:1px solid #CBD5E1;border-radius:12px;background:#FFFFFF;box-shadow:0 5px 16px rgba(15,23,42,.05)"><div style="font-size:16px;font-weight:900;color:#0F172A">พิมพ์ใบสรุปยอดย้อนหลัง</div><div style="margin-top:4px;font-size:12px;color:#64748B">ใส่รหัสตัวเลข 4 หลักเพื่อดูรายการปิดกะย้อนหลัง</div><sc-if value="{{shiftReprintLocked}}"><div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:12px"><input type="password" inputmode="numeric" maxlength="4" value="{{shiftReprintPin}}" oninput="{{onShiftReprintPin}}" placeholder="รหัส 4 หลัก" aria-label="รหัสพิมพ์สรุปย้อนหลัง" style="{{keyInputStyle}};margin:0"><button type="button" disabled="{{shiftReprintLoading}}" onclick="{{unlockShiftReprints}}" style="min-width:108px;border:0;border-radius:9px;background:#334155;color:#fff;font:inherit;font-weight:850">ยืนยัน</button></div></sc-if><sc-if value="{{shiftReprintUnlocked}}"><label style="display:block;margin-top:12px;font-size:12px;font-weight:800;color:#475569">เลือกรอบที่ปิดแล้ว<select value="{{shiftReprintSelected}}" onchange="{{onShiftReprintSelected}}" style="{{keyInputStyle}};margin-top:6px"><sc-for list="{{shiftReprintOptions}}" as="row"><option value="{{row.value}}">{{row.label}}</option></sc-for></select></label><sc-if value="{{hasShiftReprintRows}}"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><button type="button" disabled="{{shiftReprintLoading}}" onclick="{{printHistoricalShiftFull}}" style="min-height:46px;border:1px solid #93C5FD;border-radius:9px;background:#EFF6FF;color:#1D4ED8;font:inherit;font-weight:850">พิมพ์ฉบับเต็ม</button><button type="button" disabled="{{shiftReprintLoading}}" onclick="{{printHistoricalShiftShort}}" style="min-height:46px;border:1px solid #CBD5E1;border-radius:9px;background:#FFFFFF;color:#334155;font:inherit;font-weight:850">พิมพ์อย่างย่อ</button></div></sc-if><sc-if value="{{noShiftReprintRows}}"><div style="margin-top:10px;padding:12px;border-radius:9px;background:#F8FAFC;color:#64748B;font-size:12px">ยังไม่พบกะที่ปิดแล้วสำหรับบัญชีนี้</div></sc-if></sc-if><sc-if value="{{hasShiftReprintError}}"><div style="margin-top:10px;color:#B91C1C;font-size:12px;font-weight:750">{{shiftReprintError}}</div></sc-if></div>
+
           <sc-if value="{{hasShiftMsg}}">
             <div style="margin-top:12px;padding:11px 13px;border-radius:10px;background:rgba(27,51,37,.08);font-size:12px;font-weight:700">{{shiftMsg}}</div>
           </sc-if>
@@ -1956,6 +1958,7 @@ class Component extends DCLogic {
     shiftMsg: null,
     shiftLoading: false,
     lastShiftSummary: null,
+    shiftReprintPin:'',shiftReprintUnlocked:false,shiftReprintRows:[],shiftReprintSelected:'',shiftReprintLoading:false,shiftReprintError:null,
     reopenReason: '',
     reopenPending: false,
   };
@@ -2218,7 +2221,7 @@ class Component extends DCLogic {
     }).catch((e) => this.setState({ shiftLoading: false, shiftMsg: e.message || 'บันทึกรายการไม่สำเร็จ' }));
   }
 
-  printShiftSummary(orders,shift,countedCash,countedProvided) {
+  printShiftSummary(orders,shift,countedCash,countedProvided,printMode='both') {
     const rows=Array.isArray(orders)?orders:[];
     const cancelled=rows.filter(o=>o.status==='cancelled'||o.status===STATUS_TH.cancelled||o.status==='ยกเลิก');
     const completed=rows.filter(o=>o.status==='done'||o.status===STATUS_TH.done||o.isDone===true);
@@ -2242,21 +2245,24 @@ class Component extends DCLogic {
     if(countedProvided){items.push({name:'เงินสดที่นับจริง',qty:1,detail:'฿'+this.fmt(countedCash)});items.push({name:'เงินสดขาด/เกิน',qty:1,detail:'฿'+this.fmt(countedCash-Number(shift.expected_cash||0))})}
     const nativePrinter=window.GGPrinter;
     if(!nativePrinter||typeof nativePrinter.printOrder!=='function')return summary;
+    const closeNote=String(shift.close_note||this.state.shiftNote||'').trim();
     const fullPayload={header:this.receiptHeader('สรุปยอดปิดระบบ · ฉบับเต็ม'),table:'รายงานปิดกะ',items,
-      note:'เปิด '+openedAt.toLocaleString('th-TH')+'\nปิด '+closedAt.toLocaleString('th-TH')+(this.state.shiftNote?'\nหมายเหตุ: '+this.state.shiftNote:'')};
+      note:'เปิด '+openedAt.toLocaleString('th-TH')+'\nปิด '+closedAt.toLocaleString('th-TH')+(closeNote?'\nหมายเหตุ: '+closeNote:'')};
     const shortPayload={header:this.receiptHeader('สรุปยอดปิดระบบ'),table:'ใบสรุปย่อ',items:[
         {name:'ยอดขายรวม',qty:1,detail:'฿'+this.fmt(total)},
         {name:'จำนวนบิล',qty:1,detail:String(completed.length)+' บิล'},
         ...paymentRows.map(method=>({name:method.label,qty:1,detail:'฿'+this.fmt(method.amount)})),
         {name:'บิลยกเลิก',qty:1,detail:String(cancelled.length)+' บิล'}
       ],note:'ปิด '+closedAt.toLocaleString('th-TH')};
-    nativePrinter.printOrder('receipt',JSON.stringify(fullPayload),'shift-summary-full-'+Date.now());
-    nativePrinter.printOrder('receipt',JSON.stringify(shortPayload),'shift-summary-short-'+Date.now());
+    if(printMode==='both'||printMode==='full')nativePrinter.printOrder('receipt',JSON.stringify(fullPayload),'shift-summary-full-'+Date.now());
+    if(printMode==='both'||printMode==='short')nativePrinter.printOrder('receipt',JSON.stringify(shortPayload),'shift-summary-short-'+Date.now());
     summary.fullPayload=fullPayload;summary.shortPayload=shortPayload;
     summary.printed=true;
     return summary;
   }
   reprintShiftSummary(kind){const summary=this.state.lastShiftSummary,nativePrinter=window.GGPrinter,payload=summary&&(kind==='short'?summary.shortPayload:summary.fullPayload);if(!payload||!nativePrinter||typeof nativePrinter.printOrder!=='function'){this.setState({shiftMsg:'ไม่พบข้อมูลสรุปหรือเครื่องพิมพ์'});return}nativePrinter.printOrder('receipt',JSON.stringify(payload),'shift-summary-'+kind+'-'+Date.now());this.showSaveNotice(kind==='short'?'พิมพ์ใบสรุปยอดอย่างย่อแล้ว':'พิมพ์ใบสรุปยอดฉบับเต็มแล้ว')}
+  unlockShiftReprints(){const pin=String(this.state.shiftReprintPin||'');if(pin!=='1111'){this.setState({shiftReprintError:'รหัสไม่ถูกต้อง'});return}if(this.session()===DEMO_SESSION){this.setState({shiftReprintUnlocked:true,shiftReprintRows:[],shiftReprintError:null});return}this.setState({shiftReprintLoading:true,shiftReprintError:null});this.api('POST','rpc/list_pos_shift_reprints',{p_pin:pin}).then(rows=>this.setState({shiftReprintUnlocked:true,shiftReprintRows:Array.isArray(rows)?rows:[],shiftReprintSelected:rows&&rows[0]?rows[0].id:'',shiftReprintLoading:false})).catch(e=>this.setState({shiftReprintLoading:false,shiftReprintError:e.message&&e.message.includes('invalid reprint pin')?'รหัสไม่ถูกต้อง':(e.message||'โหลดรายการปิดกะไม่สำเร็จ')}))}
+  printHistoricalShift(kind){const s=this.state,id=s.shiftReprintSelected;if(!id||s.shiftReprintLoading)return;this.setState({shiftReprintLoading:true,shiftReprintError:null});this.api('POST','rpc/get_pos_shift_reprint',{p_shift_id:id,p_pin:String(s.shiftReprintPin||'')}).then(data=>{if(!data||!data.shift)throw new Error('ไม่พบข้อมูลกะ');const shift=data.shift,counted=Number(shift.closing_cash||shift.expected_cash||0),provided=shift.closing_cash!=null;this.printShiftSummary(data.orders||[],shift,counted,provided,kind);this.setState({shiftReprintLoading:false});this.showSaveNotice(kind==='short'?'พิมพ์สรุปย้อนหลังอย่างย่อแล้ว':'พิมพ์สรุปย้อนหลังฉบับเต็มแล้ว')}).catch(e=>this.setState({shiftReprintLoading:false,shiftReprintError:e.message||'พิมพ์สรุปย้อนหลังไม่สำเร็จ'}))}
 
   closeShift() {
     const shift = this.state.currentShift;
@@ -4089,6 +4095,7 @@ class Component extends DCLogic {
       onShiftClosingChange: (e) => this.setState({ shiftClosing: e.target.value }),
       shiftNote: s.shiftNote,
       onShiftNoteChange: (e) => this.setState({ shiftNote: e.target.value }),
+      shiftReprintPin:s.shiftReprintPin,shiftReprintLocked:!s.shiftReprintUnlocked,shiftReprintUnlocked:!!s.shiftReprintUnlocked,shiftReprintLoading:!!s.shiftReprintLoading,onShiftReprintPin:e=>this.setState({shiftReprintPin:String(e.target.value||'').replace(/\D/g,'').slice(0,4),shiftReprintError:null}),unlockShiftReprints:()=>this.unlockShiftReprints(),shiftReprintSelected:s.shiftReprintSelected,onShiftReprintSelected:e=>this.setState({shiftReprintSelected:e.target.value}),shiftReprintOptions:(s.shiftReprintRows||[]).map(row=>({value:row.id,label:new Date(row.closed_at).toLocaleString('th-TH')+' · เงินสดปิดกะ ฿'+this.fmt(row.closing_cash||0)})),hasShiftReprintRows:(s.shiftReprintRows||[]).length>0,noShiftReprintRows:s.shiftReprintUnlocked&&!(s.shiftReprintRows||[]).length,printHistoricalShiftFull:()=>this.printHistoricalShift('full'),printHistoricalShiftShort:()=>this.printHistoricalShift('short'),hasShiftReprintError:!!s.shiftReprintError,shiftReprintError:s.shiftReprintError||'',
       shiftCurrentOpeningFmt: s.currentShift ? this.fmt(s.currentShift.opening_cash) : '0',
       shiftExpectedFmt: s.currentShift ? this.fmt(s.currentShift.expected_cash) : '0',
       shiftOpenedAt: s.currentShift && s.currentShift.opened_at ? new Date(s.currentShift.opened_at).toLocaleString('th-TH') : '',
